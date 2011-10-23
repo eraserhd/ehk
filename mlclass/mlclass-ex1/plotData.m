@@ -15,12 +15,11 @@ function plotData(x, y)
 %       markers larger by using plot(..., 'rx', 'MarkerSize', 10);
 
 figure; % open a new figure window
-
-
-
-
-
+plot(x,y,'rx','MarkerSize',10);
+ylabel('Profit in $10,000s');
+xlabel('Populaton of City in 10,000s');
 
 % ============================================================
 
 end
+% vim:set ft=octave sts=4 sw=4 ai et:
