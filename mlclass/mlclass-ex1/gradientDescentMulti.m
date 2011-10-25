@@ -16,16 +16,12 @@ for iter = 1:num_iters
     % Hint: While debugging, it can be useful to print out the values
     %       of the cost function (computeCostMulti) and gradient here.
     %
-
-
-
-
-
-
-
-
-
-
+	h = sum((ones(m,1) * theta') .* X,2);
+	n_theta = zeros(length(theta),1);
+	for j=1:length(theta)
+		n_theta(j) = theta(j) - alpha / m * sum((h .- y) .* X(:,j));
+	endfor
+	theta = n_theta;
 
     % ============================================================
 
@@ -35,3 +31,4 @@ for iter = 1:num_iters
 end
 
 end
+% vim:set ft=octave sts=4 sw=4 ai et:
