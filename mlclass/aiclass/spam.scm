@@ -11,7 +11,7 @@
 
 ;; Given a message set, build a spam classifier.
 (define (compile-messages messages)
-  (define P-spam (/ (length (filter cdr messages)) (length messages)))
+  (define P-spam (/ (+ 1 (length (filter cdr messages))) (+ (length messages) 2)))
   (define P-ham (- 1.0 P-spam))
 
   (define unique-words
@@ -47,7 +47,8 @@
 	(loop
 	  (cdr words)
 	  (cons
-	    (cons (car words) (/ (word-count (car words) spam?) all-words-count))
+	    (cons (car words) (/ (+ (word-count (car words) spam?) 1)
+				 (+ all-words-count (length unique-words))))
 	    frequency-table)))))
 
   (define P-word-given-spam (build-P-word-given messages #t))
@@ -68,6 +69,3 @@
 	    (cdr message))))))
 
   classify)
-
-
-  
