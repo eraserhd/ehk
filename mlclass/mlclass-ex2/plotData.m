@@ -12,17 +12,12 @@ figure; hold on;
 %               examples and 'ko' for the negative examples.
 %
 
-
-
-
-
-
-
-
+a = X(y == 1,:);
+plot(a(:,1),a(:,2),'k+');
+b = X(y == 0,:);
+plot(b(:,1),b(:,2),'ko');
 
 % =========================================================================
-
-
 
 hold off;
 

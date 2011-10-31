@@ -113,4 +113,4 @@ p = predict(theta, X);
 
 fprintf('Train Accuracy: %f\n', mean(double(p == y)) * 100);
 
-
+% vim:set ft=octave sts=4 sw=4 ai et:
