@@ -9,7 +9,6 @@ m = length(y); % number of training examples
 
 % You need to return the following variables correctly 
 J = 0;
-grad = zeros(size(theta));
 
 % ====================== YOUR CODE HERE ======================
 % Instructions: Compute the cost of a particular choice of theta.
@@ -17,11 +16,18 @@ grad = zeros(size(theta));
 %               Compute the partial derivatives and set grad to the partial
 %               derivatives of the cost w.r.t. each parameter in theta
 
+h = sigmoid(sum((ones(m,1) * theta') .* X,2));
+r = sum(theta(2:length(theta),:) .^ 2);
+r = lambda / (2 * m) * r;
+J = sum(-y .* log(h) - (1 - y) .* log(1 - h)) / m + r;
 
-
-
-
+grad = zeros(size(theta));
+grad(1) = sum((h - y) .* X(:,1)) / m;
+for j=2:length(theta)
+  grad(j) = (sum((h - y) .* X(:,j)) + lambda * theta(j)) / m;
+end
 
 % =============================================================
 
 end
+% vim:set ft=octave sts=4 sw=4 ai et:
