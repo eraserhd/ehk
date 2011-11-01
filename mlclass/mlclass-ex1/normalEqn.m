@@ -11,7 +11,7 @@ function [theta] = normalEqn(X, y)
 % ---------------------- Sample Solution ----------------------
 
 
-theta = pinv(X' * X) * X' * y
+theta = pinv(X' * X) * X' * y;
 
 
 % -------------------------------------------------------------
