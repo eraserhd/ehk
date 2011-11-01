@@ -8,13 +8,7 @@ function g = sigmoid(z)
 % Instructions: Compute the sigmoid of each value of z (z can be a matrix,
 %               vector or scalar).
 
-g = zeros(size(z));
-for i=1:size(z,1)
-    for j=1:size(z,2)
-        g(i,j) = 1 / (1 + e ^ - z(i,j));
-    end
-end
-
+g = arrayfun(@(x) 1 / (1 + e ^ - x), z);
 
 % =============================================================
 
