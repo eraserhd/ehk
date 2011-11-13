@@ -62,23 +62,14 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+binarized_y = zeros(size(y));
+for i=1:size(y,1)
+  binarized_y(i,y(i)) = 1;
+end
 
+ff = sigmoid([ones(m,1) sigmoid([ones(m,1) X] * Theta1')] * Theta2');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+J = sum(sum(-binarized_y .* log(ff) - (1 - binarized_y) .* log(1 - ff),1),2) / m;
 
 % -------------------------------------------------------------
 
@@ -86,6 +77,5 @@ Theta2_grad = zeros(size(Theta2));
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
-
 
 end
