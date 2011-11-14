@@ -69,7 +69,11 @@ end
 
 ff = sigmoid([ones(m,1) sigmoid([ones(m,1) X] * Theta1')] * Theta2');
 
-J = sum(sum(-binarized_y .* log(ff) - (1 - binarized_y) .* log(1 - ff),1),2) / m;
+% regularization
+r = (lambda / (2 * m)) * (sum(sum(Theta1(:,2:size(Theta1,2)) .^ 2,1),2) + sum(sum(Theta2(:,2:size(Theta2,2)) .^ 2,1),2));
+
+J = sum(sum(-binarized_y .* log(ff) - (1 - binarized_y) .* log(1 - ff),1),2) / m + r;
+
 
 % -------------------------------------------------------------
 
