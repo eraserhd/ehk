@@ -67,17 +67,38 @@ for i=1:size(y,1)
   binarized_y(i,y(i)) = 1;
 end
 
+% Compute feed-forward, regularization term, and error
 ff = sigmoid([ones(m,1) sigmoid([ones(m,1) X] * Theta1')] * Theta2');
-
-% regularization
-r = (lambda / (2 * m)) * (sum(sum(Theta1(:,2:size(Theta1,2)) .^ 2,1),2) + sum(sum(Theta2(:,2:size(Theta2,2)) .^ 2,1),2));
-
+r = (lambda / (2 * m)) * (sum(sum(Theta1(:,2:end) .^ 2,1),2) + sum(sum(Theta2(:,2:end) .^ 2,1),2));
 J = sum(sum(-binarized_y .* log(ff) - (1 - binarized_y) .* log(1 - ff),1),2) / m + r;
 
+% Compute gradients
+for t=1:m
 
-% -------------------------------------------------------------
+  % Feed-forward pass
+  z_2 = [1 X(t,:)] * Theta1';
+  a_2 = sigmoid(z_2);
 
-% =========================================================================
+  z_3 = [1 a_2] * Theta2';
+  a_3 = sigmoid(z_3);
+
+  % Backprop
+  delta_3 = a_3 - binarized_y(t,:);
+  delta_2 = (Theta2' * delta_3') .* sigmoidGradient([1 z_2])';
+
+  %size(Theta2_grad)
+  %size(delta_3)
+  %size(a_2)
+  Theta2_grad = Theta2_grad + delta_3' * [1 a_2];
+
+  %size(Theta1_grad)
+  %size(delta_2(2:end))
+  %size(X(t,:))
+  Theta1_grad = Theta1_grad + delta_2(2:end) * [1 X(t,:)];
+end
+
+Theta1_grad /= m;
+Theta2_grad /= m;
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
