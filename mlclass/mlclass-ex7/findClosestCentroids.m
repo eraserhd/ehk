@@ -22,14 +22,8 @@ idx = zeros(size(X,1), 1);
 %
 
 for i=1:size(X,1)
-  best_dist = 1e200;
-  for j=1:K
-    dist = sum((X(i,:) - centroids(j,:)) .^ 2);
-    if dist < best_dist
-      best_dist = dist;
-      idx(i) = j;
-    end
-  end
+  dists = sum(((X(i,:)' * ones(1,size(centroids,1)))' - centroids) .^ 2, 2);
+  [_, idx(i)] = min(dists');
 end
 
 % =============================================================
