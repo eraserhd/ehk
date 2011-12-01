@@ -212,7 +212,7 @@ colors = palette(idx(sel), :);
 
 %  Visualize the data and centroid memberships in 3D
 figure;
-scatter3(X(sel, 1), X(sel, 2), X(sel, 3), 10, colors);
+colormap(jet); scatter3(X(sel, 1), X(sel, 2), X(sel, 3), 10, idx(sel));
 title('Pixel dataset plotted in 3D. Color shows centroid memberships');
 fprintf('Program paused. Press enter to continue.\n');
 pause;
