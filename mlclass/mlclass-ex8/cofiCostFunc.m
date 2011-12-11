@@ -38,7 +38,8 @@ X_grad = zeros(size(X));
 Theta_grad = zeros(size(Theta));
 
 inner_J = (X * Theta' - Y) .* R;
-J = sum(sum(inner_J .^ 2, 1), 2) / 2;
+J_regularization = (lambda / 2) * sum(sum(params .^ 2, 1), 2);
+J = sum(sum(inner_J .^ 2, 1), 2) / 2 + J_regularization;
 
 X_grad = inner_J * Theta;
 Theta_grad = inner_J' * X;
