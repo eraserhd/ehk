@@ -37,7 +37,11 @@ Theta = reshape(params(num_movies*num_features+1:end), ...
 X_grad = zeros(size(X));
 Theta_grad = zeros(size(Theta));
 
-J = sum(sum(((X * Theta' - Y) .* R) .^ 2, 1), 2) / 2;
+inner_J = (X * Theta' - Y) .* R;
+J = sum(sum(inner_J .^ 2, 1), 2) / 2;
+
+X_grad = inner_J * Theta;
+Theta_grad = inner_J' * X;
 
 grad = [X_grad(:); Theta_grad(:)];
 
