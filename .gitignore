@@ -1,0 +1,6 @@
+*.dSYM
+*.o
+archive/*
+!archive/*.cpp
+work/*
+!work/*.cpp
