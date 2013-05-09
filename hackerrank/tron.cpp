@@ -69,81 +69,6 @@ bool empty(pair<int, int> const& p) {
     return at(p) == '-';
 }
 
-const int LP_SIZE = 20;
-int LP_TABLE[15][15];
-pair<int, int> LP_REVERSE[LP_SIZE+1];
-
-bool fill_LP_TABLE() {
-    memset(LP_TABLE,-1,sizeof(LP_TABLE));
-    int count = 0;
-    queue<pair<int, int> > q;
-    q.push(positions[me]);
-    while (!q.empty()) {
-        pair<int, int> t = q.front(); q.pop();
-        for (int d = 0; d < 4; ++d) {
-            pair<int, int> next = move(t, d);
-            if (!empty(next))
-                continue;
-            if (LP_TABLE[next.first][next.second] != -1)
-                continue;
-            LP_TABLE[next.first][next.second] = count;
-            LP_REVERSE[count] = next;
-            ++count;
-            q.push(next);
-        }
-    }
-    return count < LP_SIZE;
-}
-
-int next_move_for_longest_path() {
-    static unsigned dp[1<<LP_SIZE];
-    static unsigned char from[1<<LP_SIZE];
-    memset(dp, 0, sizeof(dp));
-    memset(from, 0, sizeof(from));
-
-    queue<int> q;
-
-    for (int d = 0; d < 4; ++d) {
-        pair<int, int> first = move(positions[me], d);
-        if (!empty(first))
-            continue;
-        int bit = LP_TABLE[first.first][first.second];
-        dp[bit] |= 1<<bit;
-        from[bit] |= 1<<d;
-        q.push(bit);
-    }
-
-    while (!q.empty()) {
-        int t = q.front(); q.pop();
-        for (int x = dp[t]; x; x^=(x&-x)) {
-            int n = __builtin_ctz(x);
-            pair<int, int> at = LP_REVERSE[n];
-            for (int d = 0; d < 4; ++d) {
-                pair<int, int> to = move(at, d);
-                if (!empty(to))
-                    continue;
-                int to_n = 1<<LP_TABLE[to.first][to.second];
-                if (n&to_n) continue; // Already seen before getting here
-                if (dp[n|to_n] & to_n) continue; // Already seen next step
-
-                dp[n|to_n] |= to_n;
-                from[n|to_n] |= from[n];
-                q.push(n|to_n);
-            }
-        }
-    }
-
-    int best = -1;
-    int best_popcount = 0;
-    for (int i = 0; i < sizeof(dp)/sizeof(dp[0]); ++i)
-        if (__builtin_popcount(dp[i]) > best_popcount) {
-            best_popcount = __builtin_popcount(dp[i]);
-            best = i;
-        }
-
-    return __builtin_ctz(from[best]);
-}
-
 int main() {
     read_state();
 
@@ -159,16 +84,52 @@ int main() {
                 cout << DN[UP] <<endl;
         }
     } else {
-        if (fill_LP_TABLE())
-            cout << DN[next_move_for_longest_path()] << endl;
-        else if (empty(move(positions[me], RIGHT)))
-            cout << DN[RIGHT] <<endl;
-        else if (empty(move(positions[me], LEFT)))
-            cout << DN[LEFT] << endl;
-        else if (positions[me].first > 7)
-            cout << DN[DOWN] << endl;
-        else
-            cout << DN[UP] << endl;
+        int best_d = 0;
+        int best_score = -1;
+
+        for (int d = 0; d < 4; ++d) {
+            pair<int, int> at = move(positions[me], d);
+            if (!empty(at))
+                continue;
+
+            int neighbors = 0;
+            for (int d2 = 0; d2 < 4; ++d2) {
+                pair<int, int> t = move(at, d2);
+                if (!empty(t))
+                    ++neighbors;
+            }
+
+            board[at.first][at.second] = '*';
+
+            int reachable = 0;
+            queue<pair<int, int> > q;
+            bool seen[15][15] = {};
+            seen[at.first][at.second] = true;
+            q.push(at);
+            while (!q.empty()) {
+                pair<int, int> t = q.front(); q.pop();
+                for (int d = 0; d < 4; ++d) {
+                    pair<int, int> nt = move(t, d);
+                    if (!empty(nt))
+                        continue;
+                    if (seen[nt.first][nt.second])
+                        continue;
+                    seen[nt.first][nt.second] = true;
+                    ++reachable;
+                    q.push(nt);
+                }
+            }
+
+            board[at.first][at.second] = '-';
+
+            int score = reachable * 10 + neighbors;
+            if (score > best_score) {
+                best_d = d;
+                best_score = score;
+            }
+        }
+
+        cout << DN[best_d] <<endl;
     }
 
     return 0;
