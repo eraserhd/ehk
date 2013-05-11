@@ -1,7 +1,9 @@
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <iterator>
 #include <limits.h>
 #include <map>
 #include <queue>
@@ -69,6 +71,63 @@ bool empty(pair<int, int> const& p) {
     return at(p) == '-';
 }
 
+pair<double, double> find_reachable_centroid() {
+    pair<double, double> centroid = make_pair(0,0);
+    int reachable = 0;
+
+    bool seen[15][15] = {};
+    queue<pair<int, int> > q;
+    q.push(positions[me]);
+    seen[positions[me].first][positions[me].second] = true;
+
+    while (!q.empty()) {
+        pair<int, int> t = q.front(); q.pop();
+
+        ++reachable;
+        centroid.first += t.first;
+        centroid.second +=  t.second;
+
+        for (int d = 0; d < 4; ++d) {
+            pair<int, int> nt = move(t, d);
+            if (!empty(nt))
+                continue;
+            if (seen[nt.first][nt.second])
+                continue;
+
+            seen[nt.first][nt.second] = true;
+            q.push(nt);
+        }
+    }
+
+    centroid.first /= reachable;
+    centroid.second /= reachable;
+
+    return centroid;
+}
+
+int reachable_from(pair<int, int> at) {
+    int reachable = 0;
+    queue<pair<int, int> > q;
+    bool seen[15][15] = {};
+    seen[at.first][at.second] = true;
+    q.push(at);
+    while (!q.empty()) {
+        pair<int, int> t = q.front(); q.pop();
+        for (int d = 0; d < 4; ++d) {
+            pair<int, int> nt = move(t, d);
+            if (!empty(nt))
+                continue;
+            if (seen[nt.first][nt.second])
+                continue;
+            seen[nt.first][nt.second] = true;
+            ++reachable;
+            q.push(nt);
+        }
+    }
+
+    return reachable;
+}
+
 int main() {
     read_state();
 
@@ -84,45 +143,34 @@ int main() {
                 cout << DN[UP] <<endl;
         }
     } else {
+        pair<double, double> centroid = find_reachable_centroid();
+
         int best_d = 0;
-        int best_score = -1;
+        double best_score = -1;
 
         for (int d = 0; d < 4; ++d) {
             pair<int, int> at = move(positions[me], d);
             if (!empty(at))
                 continue;
 
-            int neighbors = 0;
-            for (int d2 = 0; d2 < 4; ++d2) {
-                pair<int, int> t = move(at, d2);
-                if (!empty(t))
-                    ++neighbors;
-            }
-
             board[at.first][at.second] = '*';
 
-            int reachable = 0;
-            queue<pair<int, int> > q;
-            bool seen[15][15] = {};
-            seen[at.first][at.second] = true;
-            q.push(at);
-            while (!q.empty()) {
-                pair<int, int> t = q.front(); q.pop();
-                for (int d = 0; d < 4; ++d) {
-                    pair<int, int> nt = move(t, d);
-                    if (!empty(nt))
-                        continue;
-                    if (seen[nt.first][nt.second])
-                        continue;
-                    seen[nt.first][nt.second] = true;
-                    ++reachable;
-                    q.push(nt);
-                }
+            int max_reachable = -1;
+            for (int d2 = 0; d2 < 4; ++d2) {
+                pair<int, int> at2 = move(at, d2);
+                if (!empty(at2))
+                    continue;
+
+                max_reachable = max(max_reachable, reachable_from(at2));
             }
 
             board[at.first][at.second] = '-';
 
-            int score = reachable * 10 + neighbors;
+            double x_dist = at.first - centroid.first;
+            double y_dist = at.second - centroid.second;
+            double dist = sqrt(x_dist*x_dist + y_dist*y_dist);
+
+            double score = max_reachable * 100 + dist;
             if (score > best_score) {
                 best_d = d;
                 best_score = score;
