@@ -62,18 +62,66 @@ int area(vector<pair<int, int> > const& points) {
     return area;
 }
 
+bool inside(pair<int,int> const& point, vector<pair<int, int> > const& points) {
+    set<int> x_scan;
+
+    for (int i = 0; i < points.size(); ++i) {
+        pair<int, int> a = points[i];
+        pair<int, int> b = points[(i+1)%points.size()];
+
+        if (a.second == b.second) continue; // skip because horizontal
+
+        if (a.second > b.second) swap(a,b); // make ys ascending
+
+        if (a.second <= point.second && b.second > point.second)
+            x_scan.insert(a.first);
+    }
+
+    int edges_to_left = 0;
+    typeof(x_scan.begin()) x_sweep = x_scan.begin();
+    while (x_sweep != x_scan.end() && *x_sweep <= point.first) {
+        ++edges_to_left;
+        ++x_sweep;
+    }
+
+    return edges_to_left&1;
+}
+
 int solve() {
     sort(ALL(faces));
 
-    TR(faces, it) {
-        cout << "A:" << area(it->second) <<"/";
-        cout << "Z:" << it->first << " ";
-        TR(it->second, p_it) {
-            cout << "(" << p_it->first << "," << p_it->second << ") ";
+    typeof(faces.begin()) z_sweep = faces.begin();
+    int last_z = -1;
+    int volume = 0;
+    int current_area = 0;
+
+    while (z_sweep != faces.end()) {
+        int z = z_sweep->first;
+        int z_dist = z - last_z;
+
+        volume += z_dist * current_area;
+
+        while (z == z_sweep->first) {
+            int a = area(z_sweep->second);
+
+            pair<int, int> inside_point = *min_element(ALL(z_sweep->second));
+
+            bool start = true;
+            typeof(faces.begin()) z_sweep_2 = faces.begin();
+            while (z_sweep_2 != z_sweep) {
+                if (inside(inside_point, z_sweep_2->second))
+                    start = !start;
+                ++z_sweep_2;
+            }
+
+            current_area += a * (start ? 1 : -1);
+            ++z_sweep;
         }
-        cout << endl;
+
+        last_z = z;
     }
-    return 0;
+
+    return volume;
 }
 
 int main() {
