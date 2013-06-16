@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <queue>
@@ -126,15 +127,15 @@ int solve() {
 
 int main() {
     int T;
-    cin >> T;
+    scanf("%d", &T);
     for (int t = 0; t < T; ++t) {
         int F;
-        cin >> F;
+        scanf("%d", &F);
         faces.clear();
 
         for (int f = 0; f < F; ++f) {
             int P;
-            cin >> P;
+            scanf("%d", &P);
 
             int first_z = -1;
             bool z_face = true;
@@ -142,7 +143,7 @@ int main() {
 
             for (int p = 0; p < P; ++p) {
                 int x,y,z;
-                cin >> x >> y >> z;
+                scanf("%d%d%d",&x,&y,&z);
                 points.push_back(make_pair(x,y));
 
                 if (first_z == -1)
@@ -155,7 +156,7 @@ int main() {
                 faces.push_back(make_pair(first_z, points));
         }
 
-        cout << "The bulk is composed of " << solve() << " units." << endl;
+        printf("The bulk is composed of %d units.\n", solve());
     }
     return 0;
 }
