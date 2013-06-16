@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <queue>
+#include <set>
 #include <utility>
 #include <vector>
 using namespace std;
@@ -10,61 +11,55 @@ using namespace std;
 
 vector<pair<int, vector<pair<int, int> > > > faces;
 
-bool crosses(vector<pair<int, int> > const& points, pair<int, int> a, pair<int, int> b) {
-    for (int i = 0; i < points.size(); ++i) {
-        pair<int, int> const& c = points[i];
-        pair<int, int> const& d = points[(i+1)%points.size()];
-
-        if (c.first == d.first) {
-            if (a.first == b.first) continue;
-            if (a.first >= c.first && b.first >= c.first) continue;
-            if (a.first < c.first && b.first < c.first) continue;
-            if (a.second < min(c.second, d.second)) continue;
-            if (a.second >= max(c.second, d.second)) continue;
-            return true;
-        } else {
-            if (a.second == b.second) continue;
-            if (a.second >= c.second && b.second >= c.second) continue;
-            if (a.second < c.second && b.second < c.second) continue;
-            if (a.first < min(c.first, d.first)) continue;
-            if (a.first >= max(c.first, d.first)) continue;
-            return true;
-        }
-    }
-    return false;
-}
-
-char A[1024][1024];
 int area(vector<pair<int, int> > const& points) {
-    memset(A, 0, sizeof(A));
 
-    queue<pair<int, int> > q;
-    A[0][0] = 1;
-    q.push(make_pair(0,0));
-    int filled = 1;
+    vector<pair<int, int> > events; // at y, toggle x
 
-    while (!q.empty()) {
-        pair<int, int> t = q.front(); q.pop();
+    for (int i = 0; i < points.size(); ++i) {
+        pair<int, int> const& a = points[i];
+        pair<int, int> const& b = points[(i+1)%points.size()];
 
-        const int DX[] = {-1,1,0,0};
-        const int DY[] = {0,0,-1,1};
+        if (a.second == b.second) continue; // horizontal edge
 
-        for (int d = 0; d < 4; ++d) {
-            pair<int, int> nt(t.first + DX[d], t.second + DY[d]);
-            if (nt.first < 0 || nt.second < 0 || nt.first >= 1024 || nt.second >= 1024)
-                continue;
-            if (A[nt.first][nt.second])
-                continue;
-            if (crosses(points, t, nt))
-                continue;
-
-            A[nt.first][nt.second] = 1;
-            q.push(nt);
-            ++filled;
-        }
+        events.push_back(make_pair(a.second, a.first));
+        events.push_back(make_pair(b.second, b.first));
     }
 
-    return 1024*1024 - filled;
+    sort(ALL(events));
+
+    int area = 0;
+    int last_y = -1;
+    set<int> x_scan;
+
+    typeof(events.begin()) y_sweep = events.begin();
+    while (y_sweep != events.end()) {
+        int y = y_sweep->first;
+
+        int y_dist = y - last_y;
+        int x_area = 0;
+        typeof(x_scan.begin()) x_sweep = x_scan.begin();
+        while (x_sweep != x_scan.end()) {
+            int x1 = *x_sweep++;
+            int x2 = *x_sweep++;
+            
+            x_area += (x2 - x1);
+        }
+
+        //cerr << "Adding " << x_area << " * " << y_dist << endl;
+        area += x_area * y_dist;
+
+        while (y == y_sweep->first && y_sweep != events.end()) {
+            if (x_scan.count(y_sweep->second) > 0)
+                x_scan.erase(y_sweep->second);
+            else
+                x_scan.insert(y_sweep->second);
+            ++y_sweep;
+        }
+
+        last_y = y;
+    }
+
+    return area;
 }
 
 int solve() {
