@@ -10,7 +10,18 @@ using namespace std;
 #define ALL(c) (c).begin(),(c).end()
 #define TR(c,i) for (typeof((c).begin()) i = (c).begin(); i != (c).end(); ++i)
 
-vector<pair<int, vector<pair<int, int> > > > faces;
+struct Face {
+    int z;
+    vector<pair<int, int> > points;
+
+    inline bool operator < (Face const& rhs) const {
+        if (z < rhs.z) return true;
+        if (z > rhs.z) return false;
+        return points < rhs.points;
+    }
+};
+
+vector<Face> faces;
 
 int area(vector<pair<int, int> > const& points) {
 
@@ -97,20 +108,20 @@ int solve() {
     int current_area = 0;
 
     while (z_sweep != faces.end()) {
-        int z = z_sweep->first;
+        int z = z_sweep->z;
         int z_dist = z - last_z;
 
         volume += z_dist * current_area;
 
-        while (z == z_sweep->first) {
-            int a = area(z_sweep->second);
+        while (z == z_sweep->z) {
+            int a = area(z_sweep->points);
 
-            pair<int, int> inside_point = *min_element(ALL(z_sweep->second));
+            pair<int, int> inside_point = *min_element(ALL(z_sweep->points));
 
             bool start = true;
             typeof(faces.begin()) z_sweep_2 = faces.begin();
             while (z_sweep_2 != z_sweep) {
-                if (inside(inside_point, z_sweep_2->second))
+                if (inside(inside_point, z_sweep_2->points))
                     start = !start;
                 ++z_sweep_2;
             }
@@ -137,23 +148,24 @@ int main() {
             int P;
             scanf("%d", &P);
 
-            int first_z = -1;
             bool z_face = true;
-            vector<pair<int, int> > points;
+
+            Face face;
+            face.z = -1;
 
             for (int p = 0; p < P; ++p) {
                 int x,y,z;
                 scanf("%d%d%d",&x,&y,&z);
-                points.push_back(make_pair(x,y));
+                face.points.push_back(make_pair(x,y));
 
-                if (first_z == -1)
-                    first_z = z;
-                else if (first_z != z)
+                if (face.z == -1)
+                    face.z = z;
+                else if (face.z != z)
                     z_face = false;
             }
 
             if (z_face)
-                faces.push_back(make_pair(first_z, points));
+                faces.push_back(face);
         }
 
         printf("The bulk is composed of %d units.\n", solve());
