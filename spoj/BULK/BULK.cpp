@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <iostream>
 #include <queue>
 #include <set>
@@ -24,54 +26,36 @@ struct Face {
 vector<Face> faces;
 
 int area(vector<pair<int, int> > const& points) {
-
-    vector<pair<int, int> > events; // at y, toggle x
+    queue<int> ps, ns;
 
     for (int i = 0; i < points.size(); ++i) {
         pair<int, int> const& a = points[i];
         pair<int, int> const& b = points[(i+1)%points.size()];
 
-        if (a.second == b.second) continue; // horizontal edge
-
-        events.push_back(make_pair(a.second, a.first));
-        events.push_back(make_pair(b.second, b.first));
+        ps.push(a.first*b.second);
+        ns.push(a.second*b.first);
     }
 
-    sort(ALL(events));
-
-    int area = 0;
-    int last_y = -1;
-    set<int> x_scan;
-
-    typeof(events.begin()) y_sweep = events.begin();
-    while (y_sweep != events.end()) {
-        int y = y_sweep->first;
-
-        int y_dist = y - last_y;
-        int x_area = 0;
-        typeof(x_scan.begin()) x_sweep = x_scan.begin();
-        while (x_sweep != x_scan.end()) {
-            int x1 = *x_sweep++;
-            int x2 = *x_sweep++;
-            
-            x_area += (x2 - x1);
+    int accum = 0;
+    while (!ps.empty() || !ns.empty()) {
+        if (ps.empty()) {
+            accum -= ns.front(), ns.pop();
+            continue;
         }
-
-        //cerr << "Adding " << x_area << " * " << y_dist << endl;
-        area += x_area * y_dist;
-
-        while (y == y_sweep->first && y_sweep != events.end()) {
-            if (x_scan.count(y_sweep->second) > 0)
-                x_scan.erase(y_sweep->second);
-            else
-                x_scan.insert(y_sweep->second);
-            ++y_sweep;
+        if (ns.empty()) {
+            accum += ps.front(), ps.pop();
+            continue;
         }
-
-        last_y = y;
+        if (accum < 0)
+            accum += ps.front(), ps.pop();
+        else
+            accum -= ns.front(), ns.pop();
     }
 
-    return area;
+    if (accum < 0)
+        accum = -accum;
+
+    return accum/2;
 }
 
 bool inside(pair<int,int> const& point, vector<pair<int, int> > const& points) {
@@ -113,7 +97,7 @@ int solve() {
 
         volume += z_dist * current_area;
 
-        while (z == z_sweep->z) {
+        while (z_sweep != faces.end() && z == z_sweep->z) {
             int a = area(z_sweep->points);
 
             pair<int, int> inside_point = *min_element(ALL(z_sweep->points));
@@ -136,6 +120,8 @@ int solve() {
     return volume;
 }
 
+// O(T* F^2 * P)
+
 int main() {
     int T;
     scanf("%d", &T);
@@ -143,6 +129,7 @@ int main() {
         int F;
         scanf("%d", &F);
         faces.clear();
+        faces.reserve(F);
 
         for (int f = 0; f < F; ++f) {
             int P;
@@ -152,6 +139,7 @@ int main() {
 
             Face face;
             face.z = -1;
+            face.points.reserve(P);
 
             for (int p = 0; p < P; ++p) {
                 int x,y,z;
