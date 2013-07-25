@@ -4,21 +4,24 @@
     (read-char input nil)
     name))
 
-(let ((names ())
-      (accumulator 0))
+(defun read-names ()
+  (let ((names ()))
+    (with-open-file (input #p"names.txt" :direction :input)
+      (loop
+	(push (or (read-name input) (return)) names)))
+    names))
 
-  (with-open-file (input #p"names.txt" :direction :input)
-    (loop
-      (push (or (read-name input) (return)) names)))
+(defun name-sum (name)
+  (loop for c across name
+	sum (+ 1 (- (char-int c) (char-int #\A)))))
 
-  (setf names (sort names #'string<))
+(defun compute-answer ()
+  (let ((sorted-names (sort (read-names) #'string<))
+	(accumulator 0))
+    (loop for name in sorted-names
+	  for index from 1
+	  do (setf accumulator (+ accumulator
+				  (* index (name-sum name)))))
+    accumulator))
 
-  (loop for name in names
-	for index from 1
-	do (setf accumulator (+ accumulator
-				(* index
-				   (loop for c across name
-					 sum (+ 1 (- (char-int c)
-						     (char-int #\A))))))))
-
-  (format t "~A~%" accumulator))
+(format t "~A~%" (compute-answer))
