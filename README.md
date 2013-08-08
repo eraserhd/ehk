@@ -1,44 +1,43 @@
+Cracker Barrel has a triangular peg solitair game with fifteen holes and
+fourteen golf tees.  It looks like this:
 
-So, I was at Cracker Barrel, where they have this game with fifteen holes and
-fourteen golf tees.  I played around with it for a while, and was able to come
-up with a way to end up with two pegs.
+FIXME: Image
 
-I was wondering if there actually was a solution to the game.  I started
-thinking about it.
+I wondered how I'd write a solver for this game in Common Lisp.  Hrmm:
 
-Later that day, in a curious turn of hotel selection luck and laziness, we
-ended up at a different Cracker Barrel.  I played the game some more and ended
-up with one peg.  So there is a solution.
+## States
 
-I enjoy writing solvers for games like this.  So here's what I was thinking:
+A _state_ in this game is one configuration of the board.  For example, the
+initial state looks like this:
 
-First, there are fifteen holes, each of which can contain a peg or not.  If we
-represent each hole in the board by a bit in a number, we can number the states.
-For example, a state with a peg in holes 3, 11, and 14 would be 18440 (a number
-with bits 3, 11, and 14 set is 2^3 + 2^11 + 2^14).
+FIXME: Image
 
-The ability to number states is really useful for this kind of problem.  It
-allows us to give an upper bound to the number of possible states that can
-help us design a solution.  In this case, we have the upper bound of 2^15,
-which is 32768.  There is at least one state which can't be reached–the state
-with no pegs.  There's clearly other states which can't be reached: for
-example, only the starting state has one peg missing–since we need to remove
-a peg for each move, there are no other states with one peg missing; however,
-since we have every possible bit combination of fifteen bits between zero
-and 32,768, we have fifteen different numbered states which have one bit
-missing.  Also think of this: there's only two possible moves at the beginning
-of the game, so there are only two possible boards with two pegs missing,
-but we have (15 choose 2) numbers.
+And a possible state after a player's first move looks like this:
 
-This is fine.  Figuring out that we can encode the states like this serves
-two purposes: 1) We know that we can fit all the states in memory.  2) We
-know that we can make an array of size 32,768 if we want to keep track of
-some kind of information about each state (like whether we've seen it
-before when searching, or how many steps it takes to reach it, or from
-which previous step we reached it).
+FIXME: Image
+
+Since each state is made up of fifteen bits of information (whether each
+hole is occupied), we can encode a state as a 15-bit integer.  For example,
+a state with a peg in holes 3, 11, and 14 would be `#b100100000001000`
+(a prefix of `#b` in Lisp represents a literal binary number).  Converting
+this binary number to decimal yields 18440.
+
+This allows us to notice an upper bound to the number of possible states–
+something important for designing a solver.  The largest 15-bit number
+is 32767.  That's good news, we can store all of them in memory easily,
+especially since we now have a numeric encoding for each that we can
+use as an array index.
+
+Some of the states can't be reached.  It's impossible to achieve a board
+with no pegs on it.  Also, we only have two legal moves on the first
+turn, after which we come to one of two possible configurations of the
+board having two empty holes–but we have quite a lot of fifteen bit
+integers with two zero bits.
+
+So we have our first bit of code:
 
 ```lisp
-(defvar *start-state* #*011111111111111)
+(defvar *start-state* #b111111111111110)
 ```
 
 And we need to know when we've reached a goal state, which is any state
@@ -46,11 +45,11 @@ with just one peg:
 
 ```lisp
 (defun end-state-p (state)
-  (= 1 (reduce #'+ state)))
+  (= 1 (logcount state)))
 ```
 
-This function sums all the bits and checks if the sum is `1`, indicating
-that just one bit is set.  I wrote it and tested it in the SBCL REPL.
+LOGCOUNT is a Lisp function which counts the number of bits in an integer.
+I wrote it and tested it in the SBCL REPL.
 
 The next thing we need to figure out is how to tell which holes are adjacent
 to other holes.  First, to choose a numbering scheme.  The simplest thing
