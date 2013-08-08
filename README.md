@@ -57,9 +57,9 @@ to other holes.  First, to choose a numbering scheme.  The simplest thing
 seems to be this:
 
                0
-	     1   2
-	   3   4   5
-	 6   7   8   9
+             1   2
+           3   4   5
+         6   7   8   9
       10  11  12  13  14
 
 
@@ -101,13 +101,13 @@ of consecutive holes.  This seems straightforward in Lisp:
 ```lisp
 (defvar *sequences* '((0 2 5 9 14) ; Moving down and right
                       (1 4 8 13)
-		      (3 7 12)
-		      (0 1 3 6 10) ; Moving down and left
-		      (2 4 7 11)
-		      (5 8 12)
-		      (3 4 5)      ; Moving left-to-right
-		      (6 7 8 9)
-		      (10 11 12 13 14)))
+                      (3 7 12)
+                      (0 1 3 6 10) ; Moving down and left
+                      (2 4 7 11)
+                      (5 8 12)
+                      (3 4 5)      ; Moving left-to-right
+                      (6 7 8 9)
+                      (10 11 12 13 14)))
 ```
 
 I've removed entries for rows with fewer than three consecutive slots, since
@@ -122,8 +122,8 @@ making one valid move.
 (defun next-states (state)
   (let ((result ()))
     (loop for sequence in *sequences*
-    	  do (dolist (rest-of sequence)
-	       (if (and (>= (length rest-of) 3)
+              do (dolist (rest-of sequence)
+               (if (and (>= (length rest-of) 3)
 
 ...
 ```
@@ -192,9 +192,9 @@ a bit:
 (defun reverse-3-bits (state bits)
   (loop with result = (copy-seq state)
         for bit in bits
-	for bit-number from 0 to 2
+        for bit-number from 0 to 2
         do (setf (aref result bit) (logxor 1 (aref result bit)))
-	finally (return result)))
+        finally (return result)))
 ```
 
 The BIT-NUMBER part above is a kind of hack.  When writing NEXT-STATES before,
@@ -245,11 +245,11 @@ tools.
 ```lisp
 (defun next-states (state)
   (loop with result = ()
-	for sequence in *sequences*
-	do (loop for possible-jump on sequence
-		 when (can-jump state possible-jump)
-		 do (push (reverse-3-bits state possible-jump) result))
-	finally (return result)))
+        for sequence in *sequences*
+        do (loop for possible-jump on sequence
+                 when (can-jump state possible-jump)
+                 do (push (reverse-3-bits state possible-jump) result))
+        finally (return result)))
 ```
 
 A few attempts with this in the REPL and it seems to work!
@@ -280,10 +280,10 @@ states after two moves.
   (let ((states (list *start-state*)))
     (loop
       (if (find-if #'end-state-p states)
-	(return t))
+        (return t))
       (setf states (mapcan #'next-states states))
       (if (null states)
-	(return nil)))))
+        (return nil)))))
 ```
 
 This is the first draft.  It only recursively makes moves until it finds
@@ -314,43 +314,43 @@ little bits.  A little bit of worry.  I end up with the following code:
 
 (defvar *sequences* '((0 2 5 9 14) ; Moving down and right
                       (1 4 8 13)
-		      (3 7 12)
-		      (0 1 3 6 10) ; Moving down and left
-		      (2 4 7 11)
-		      (5 8 12)
-		      (3 4 5)      ; Moving left-to-right
-		      (6 7 8 9)
-		      (10 11 12 13 14)))
+                      (3 7 12)
+                      (0 1 3 6 10) ; Moving down and left
+                      (2 4 7 11)
+                      (5 8 12)
+                      (3 4 5)      ; Moving left-to-right
+                      (6 7 8 9)
+                      (10 11 12 13 14)))
 
 (defun reverse-3-bits (state bits)
   (loop with result = state
         for bit in bits
-	for bit-number from 0 to 2
+        for bit-number from 0 to 2
         do (setf result (logxor (ash 1 bit) result))
-	finally (return result)))
+        finally (return result)))
 
 (defun can-jump (state bits)
   (and (>= (length bits) 3)
        (logtest state (ash 1 (second bits)))
        (not (eq (logtest state (ash 1 (first bits)))
-		(logtest state (ash 1 (third bits)))))))
+                (logtest state (ash 1 (third bits)))))))
 
 (defun next-states (state)
   (loop with result = ()
-	for sequence in *sequences*
-	do (loop for possible-jump on sequence
-		 when (can-jump state possible-jump)
-		 do (push (reverse-3-bits state possible-jump) result))
-	finally (return result)))
+        for sequence in *sequences*
+        do (loop for possible-jump on sequence
+                 when (can-jump state possible-jump)
+                 do (push (reverse-3-bits state possible-jump) result))
+        finally (return result)))
 
 (defun solve ()
   (let ((states (list *start-state*)))
     (loop
       (if (find-if #'end-state-p states)
-	(return t))
+        (return t))
       (setf states (mapcan #'next-states states))
       (if (null states)
-	(return nil)))))
+        (return nil)))))
 ```
 
 It doesn't blow up, and runs in the same amount of time.  How much
@@ -366,27 +366,27 @@ a successful goal to the start state.
 ```lisp
 (defun solve ()
   (let ((states (list *start-state*))
-	(found (make-array 32768 :initial-element -1))
-	(states-for-next-iteration ()))
+        (found (make-array 32768 :initial-element -1))
+        (states-for-next-iteration ()))
     (loop
       (setf states-for-next-iteration ())
 
       (dolist (state states)
-	(if (end-state-p state)
-	  (let ((path ()))
-	    (loop while (not (= state -1))
-		  do (push state path)
-		     (setf state (aref found state)))
-	    (return-from solve path)))
+        (if (end-state-p state)
+          (let ((path ()))
+            (loop while (not (= state -1))
+                  do (push state path)
+                     (setf state (aref found state)))
+            (return-from solve path)))
 
-	(dolist (next-state (next-states state))
-	  (if (= -1 (aref found next-state))
-	    (progn
-	      (setf (aref found next-state) state)
-	      (push next-state states-for-next-iteration)))))
+        (dolist (next-state (next-states state))
+          (if (= -1 (aref found next-state))
+            (progn
+              (setf (aref found next-state) state)
+              (push next-state states-for-next-iteration)))))
       (setf states states-for-next-iteration)
       (if (null states)
-	(return-from solve nil)))))
+        (return-from solve nil)))))
 ```
 
 Writing this was kind of painful.  At first, it simply printed
@@ -417,10 +417,10 @@ So we need a function to print a state in a way we can understand.
 
 (defun print-state (state)
   (apply #'format t *template*
-	 (loop for i from 0 to 14
-	       collect (if (logtest (ash 1 i) state)
-			 "X"
-			 "."))))
+         (loop for i from 0 to 14
+               collect (if (logtest (ash 1 i) state)
+                         "X"
+                         "."))))
 ```
 
 Now we can run the following from the REPL:
@@ -431,85 +431,85 @@ Now we can run the following from the REPL:
 
 And we get the following output:
 
-	.
+        .
        X X
       X X X
      X X X X
     X X X X X
 
-	X
+        X
        X .
       X X .
      X X X X
     X X X X X
 
-	X
+        X
        X .
       . . X
      X X X X
     X X X X X
 
-	X
+        X
        X .
       X . X
      . X X X
     . X X X X
 
-	X
+        X
        . .
       . . X
      X X X X
     . X X X X
 
-	X
+        X
        . .
       X . X
      X . X X
     . X . X X
 
-	X
+        X
        . .
       X . X
      X . X X
     . X X . .
 
-	X
+        X
        . .
       X . X
      X . X X
     . . . X .
 
-	X
+        X
        X .
       . . X
      . . X X
     . . . X .
 
-	X
+        X
        X X
       . . .
      . . X .
     . . . X .
 
-	X
+        X
        X X
       . X .
      . . . .
     . . . . .
 
-	.
+        .
        X .
       . X X
      . . . .
     . . . . .
 
-	.
+        .
        X .
       X . .
      . . . .
     . . . . .
 
-	.
+        .
        . .
       . . .
      X . . .
