@@ -225,74 +225,9 @@ laptop.
 
 The next part is wanting to find a sequence of moves that solves the
 problem.  This is where the bit representation and the array stuff comes
-in handy.  But... I still don't know how to convert a bit vector to an
-integer.  After some Googling... well, there isn't a standard way. Some
-people have some nifty functions to do it, but... why am I using bit
-vectors anyway?  Apparently, I can use `#b` to prefix a binary literal
-as an integer, and do different kinds of math on it with the LOG
-operators.
-
-OK.
-
-A flurry of searching and replacing different expressions and rewriting
-little bits.  A little bit of worry.  I end up with the following code:
-
-```lisp
-(defvar *start-state* #b111111111111110)
-
-(defun end-state-p (state)
-  (= 1 (logcount state)))
-
-(defvar *sequences* '((0 2 5 9 14) ; Moving down and right
-                      (1 4 8 13)
-                      (3 7 12)
-                      (0 1 3 6 10) ; Moving down and left
-                      (2 4 7 11)
-                      (5 8 12)
-                      (3 4 5)      ; Moving left-to-right
-                      (6 7 8 9)
-                      (10 11 12 13 14)))
-
-(defun toggle-3-holes (state hole-numbers)
-  (loop with result = state
-        for bit in hole-numbers
-        for bit-number from 0 to 2
-        do (setf result (logxor (ash 1 bit) result))
-        finally (return result)))
-
-(defun can-jump (state hole-numbers)
-  (and (>= (length hole-numbers) 3)
-       (logtest state (ash 1 (second hole-numbers)))
-       (not (eq (logtest state (ash 1 (first hole-numbers)))
-                (logtest state (ash 1 (third hole-numbers)))))))
-
-(defun next-states (state)
-  (loop with result = ()
-        for sequence in *sequences*
-        do (loop for possible-jump on sequence
-                 when (can-jump state possible-jump)
-                 do (push (toggle-3-holes state possible-jump) result))
-        finally (return result)))
-
-(defun solve ()
-  (let ((states (list *start-state*)))
-    (loop
-      (if (find-if #'end-state-p states)
-        (return t))
-      (setf states (mapcan #'next-states states))
-      (if (null states)
-        (return nil)))))
-```
-
-It doesn't blow up, and runs in the same amount of time.  How much
-confidence does that give me that it's correct?  Hrmm.  After looking
-over the code, I think that if it were wrong, it would blow up or
-return immediately or not return.  Of course, there could be some kind
-of off-by-one introduced, but I don't see it.
-
-So now we can add an array which can point from each state to its
+in handy.  I want to add an array which can point from each state to its
 previous state.  This can be used to trace the path backward from
-a successful goal to the start state.
+a found goal to the first move.
 
 ```lisp
 (defun solve ()
