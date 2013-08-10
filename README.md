@@ -133,47 +133,16 @@ let's figure out how to reverse a bit in a Common Lisp bit array:
 
 ```lisp
 (defun toggle-hole (state hole-number)
-  (setf (aref state hole-number) (lognot (aref state hole-number))))
+  (lognot (aref state hole-number)))
 ```
         
 And test in the REPL.  It turns out this is wrong, as LOGNOT does not return
-1 for 0 and 0 for 1.  But, in looking at the documentation, I found LOGCOUNT,
-which I imagine counts the bits in a number.  I tested a few cases:
-
-```lisp
-(logcount 22) => 3
-(logcount 1) => 1
-(logcount 2) => 1
-```
-
-And then used SBCL's built-in DESCRIBE to get the documentation of LOGCOUNT,
-which confirmed it will count the number of set bits (if the integer is
-positive).  If the integer is negative, it counts the number of zero bits.
-Weird, but OK.
-
-So I'm thinking, "Cool!  I can use LOGCOUNT in my END-STATE-P!"  Alas, no,
-it's not simpler: LOGCOUNT takes an integer, while END-STATE-P operates on a
-bit vector.  I still haven't figured out how to convert between integers and
-bit vectors, but it seems to be more operations just to use LOGCOUNT anyhow.
-
-I add an entry for LOGCOUNT to my local Anki deck for Common Lisp anyhow.
-
-In any case, we can use LOGXOR to flip the low bit, changing 0 to 1 and 1
-to 0, fixing our REVERSE-BIT:
+1 for 0 and 0 for 1.  In any case, we can use LOGXOR to flip the low bit,
+changing 0 to 1 and 1 to 0, fixing our REVERSE-BIT:
 
 ```lisp
 (defun toggle-hole (state hole-number)
-  (setf (aref state hole-number) (logxor 1 (aref state hole-number))))
-```
-
-Try it in the REPL and, oops, we don't want to mutate STATE, we want a modified
-copy.
-
-```lisp
-(defun toggle-hole (state hole-number)
-  (let ((copy (copy-seq state)))
-    (setf (aref copy hole-number) (logxor 1 (aref copy hole-number)))
-    copy))
+  (logxor 1 (aref state hole-number)))
 ```
 
 Test this in the REPL, and yay!  Success!
@@ -188,12 +157,12 @@ Thinking about this, I want to flip three bits simulataneously.  So I recode
 a bit:
 
 ```lisp
-(defun toggle-3-holes (state bits)
-  (loop with result = (copy-seq state)
-        for bit in bits
-        for bit-number from 0 to 2
-        do (setf (aref result bit) (logxor 1 (aref result bit)))
-        finally (return result)))
+(defun toggle-3-holes (state hole-numbers)
+  (loop with result = state
+        for bit in hole-numbers
+	for bit-number from 0 to 2
+        do (setf result (logxor (ash 1 bit) result))
+	finally (return result)))
 ```
 
 The BIT-NUMBER part above is a kind of hack.  When writing NEXT-STATES before,
