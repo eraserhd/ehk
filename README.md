@@ -62,37 +62,13 @@ seems to be this:
       10  11  12  13  14
 
 
-My first thought is that I can keep a logic table says
-things like:
+My first thought is that I can keep a logic table of all the triplets
+of holes which can represent a jump.  For example `(0 2 5)` and `(7 8 9)`.
+That seems ugly, so I reject it.
 
-* If hole 0 is filled and hole 2 is filled and hole 5 is empty, we can fill
-  hole five and empty holes zero and two.
-* If hole 0 is filled and hole 1 is filled and hole 3 is empty, we can fill
-  hole three and empty holes zero and one.
-
-And so forth, with one entry for every three consecutve holes.  I think
-there would be thirty-six entries this way (each row of five has six–three
-in each direction, each row of four holes has four consecutive threes,
-each row of three has two consecutive threes.  There are three of each
-of those kinds of rows.)
-
-Ugh.
-
-But then I remember that there's a way for representing a complete binary
-tree as an array.  A complete binary tree is one in which every node which is
-not on the bottom level has both a right branch and a left branch.
-
-In this scheme, we can move from a node to its left child by multiplying by
-two and we can move to a node's right child by multiplying by two and adding
-one.
-
-I look at my diagram and see this doesn't work since we expect hole 4 to be
-reachable as the right child of 1 _and_ the left child of 2, which is
-contrary to the complete binary tree notion.  I wonder if I can play with
-the math a little bit to get it to work for our case and have no luck.
-(I notice different numbers need to be added for each layer.)
-
-Ugh.
+I consider something I remember about representing a complete binary tree as
+an array, scratch around some math, realize that it doesn't apply here, so
+I reject this as well.
 
 So then I think the simplest thing I can do is to keep track of sequences
 of consecutive holes.  This seems straightforward in Lisp:
@@ -113,23 +89,11 @@ I've removed entries for rows with fewer than three consecutive slots, since
 we can't jump a peg with fewer than three slots and I can't think of another
 use for the information.
 
-Now that we know how holes connect to each other, we need to figure out how
-to compute, given a starting state, all the states which are reachable by
-making one valid move.
-
-```lisp
-(defun next-states (state)
-  (let ((result ()))
-    (loop for sequence in *sequences*
-              do (dolist (rest-of sequence)
-               (if (and (>= (length rest-of) 3)
-
-...
-```
-
-So I took a break, and came back to this a while later.  When I did, I noticed
-a bunch of simpler steps I could take, so let's back up a little bit.  First,
-let's figure out how to reverse a bit in a Common Lisp bit array:
+Next, I start coding up a function, NEXT-STATES, that takes an input state
+and returns a list of all states reachable from it by making one jump.  I wrote
+down a little code, and was interrupted.  When I came back, I noticed
+a bunch of simpler steps I could take, so I deleted that and started with
+toggling a hole:
 
 ```lisp
 (defun toggle-hole (state hole-number)
@@ -192,17 +156,17 @@ Well, the next thing we want to know is whether we can make a jump, given three
 consecutive holes.  Let's try:
 
 ```lisp
-(defun can-jump (state bits)
-  (and (>= (length bits) 3)
-       (= 1 (aref state (second bits)))
-       (not (= (aref state (first bits))
-               (aref state (third bits))))))
+(defun can-jump (state hole-numbers)
+  (and (>= (length hole-numbers) 3)
+       (logtest state (ash 1 (second hole-numbers)))
+       (not (eq (logtest state (ash 1 (first hole-numbers)))
+		(logtest state (ash 1 (third hole-numbers)))))))
 ```
 
 Hah.  The beatiful trick here is this:  The middle hole has to be filled, of
 course, and _one_ of the holes on either end must be filled while the other
 must be empty.  This catches whether a jump can be made _in either direction_.
-Which is pretty cool, because REVERSE-3-BITS will make the correct result
+Which is pretty cool, because TOGGLE-3-HOLES will make the correct result
 regardless of the direction.
 
 A little bit of testing in the REPL, and success!
@@ -224,11 +188,10 @@ A few attempts with this in the REPL and it seems to work!
 
     * (next-states *start-state*)
 
-    (#*101011111111111 #*110110111111111)
+    (32757 32731)
     * (mapcar #'next-states (next-states *start-state*))
 
-    ((#*101100111111111 #*101111011101111 #*101111101111011 #*111001110111111)
-     (#*110001111111111 #*110111110111011 #*111100101111111 #*110111111011110))
+    ((32717 31677 28541 32487) (32739 28411 32591 15867))
 
 So now what?
 
