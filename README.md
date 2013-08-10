@@ -132,8 +132,8 @@ a bunch of simpler steps I could take, so let's back up a little bit.  First,
 let's figure out how to reverse a bit in a Common Lisp bit array:
 
 ```lisp
-(defun reverse-bit (state bit)
-  (setf (aref state bit) (lognot (aref state bit))))
+(defun toggle-hole (state hole-number)
+  (setf (aref state hole-number) (lognot (aref state hole-number))))
 ```
         
 And test in the REPL.  It turns out this is wrong, as LOGNOT does not return
@@ -162,17 +162,17 @@ In any case, we can use LOGXOR to flip the low bit, changing 0 to 1 and 1
 to 0, fixing our REVERSE-BIT:
 
 ```lisp
-(defun reverse-bit (state bit)
-  (setf (aref state bit) (logxor 1 (aref state bit))))
+(defun toggle-hole (state hole-number)
+  (setf (aref state hole-number) (logxor 1 (aref state hole-number))))
 ```
 
 Try it in the REPL and, oops, we don't want to mutate STATE, we want a modified
 copy.
 
 ```lisp
-(defun reverse-bit (state bit)
+(defun toggle-hole (state hole-number)
   (let ((copy (copy-seq state)))
-    (setf (aref copy bit) (logxor 1 (aref copy bit)))
+    (setf (aref copy hole-number) (logxor 1 (aref copy hole-number)))
     copy))
 ```
 
@@ -188,7 +188,7 @@ Thinking about this, I want to flip three bits simulataneously.  So I recode
 a bit:
 
 ```lisp
-(defun reverse-3-bits (state bits)
+(defun toggle-3-holes (state bits)
   (loop with result = (copy-seq state)
         for bit in bits
         for bit-number from 0 to 2
@@ -247,7 +247,7 @@ tools.
         for sequence in *sequences*
         do (loop for possible-jump on sequence
                  when (can-jump state possible-jump)
-                 do (push (reverse-3-bits state possible-jump) result))
+                 do (push (toggle-3-holes state possible-jump) result))
         finally (return result)))
 ```
 
@@ -321,25 +321,25 @@ little bits.  A little bit of worry.  I end up with the following code:
                       (6 7 8 9)
                       (10 11 12 13 14)))
 
-(defun reverse-3-bits (state bits)
+(defun toggle-3-holes (state hole-numbers)
   (loop with result = state
-        for bit in bits
+        for bit in hole-numbers
         for bit-number from 0 to 2
         do (setf result (logxor (ash 1 bit) result))
         finally (return result)))
 
-(defun can-jump (state bits)
-  (and (>= (length bits) 3)
-       (logtest state (ash 1 (second bits)))
-       (not (eq (logtest state (ash 1 (first bits)))
-                (logtest state (ash 1 (third bits)))))))
+(defun can-jump (state hole-numbers)
+  (and (>= (length hole-numbers) 3)
+       (logtest state (ash 1 (second hole-numbers)))
+       (not (eq (logtest state (ash 1 (first hole-numbers)))
+                (logtest state (ash 1 (third hole-numbers)))))))
 
 (defun next-states (state)
   (loop with result = ()
         for sequence in *sequences*
         do (loop for possible-jump on sequence
                  when (can-jump state possible-jump)
-                 do (push (reverse-3-bits state possible-jump) result))
+                 do (push (toggle-3-holes state possible-jump) result))
         finally (return result)))
 
 (defun solve ()

@@ -14,25 +14,25 @@
 		      (6 7 8 9)
 		      (10 11 12 13 14)))
 
-(defun reverse-3-bits (state bits)
+(defun toggle-3-holes (state hole-numbers)
   (loop with result = state
-        for bit in bits
+        for bit in hole-numbers
 	for bit-number from 0 to 2
         do (setf result (logxor (ash 1 bit) result))
 	finally (return result)))
 
-(defun can-jump (state bits)
-  (and (>= (length bits) 3)
-       (logtest state (ash 1 (second bits)))
-       (not (eq (logtest state (ash 1 (first bits)))
-		(logtest state (ash 1 (third bits)))))))
+(defun can-jump (state hole-numbers)
+  (and (>= (length hole-numbers) 3)
+       (logtest state (ash 1 (second hole-numbers)))
+       (not (eq (logtest state (ash 1 (first hole-numbers)))
+		(logtest state (ash 1 (third hole-numbers)))))))
 
 (defun next-states (state)
   (loop with result = ()
 	for sequence in *sequences*
 	do (loop for possible-jump on sequence
 		 when (can-jump state possible-jump)
-		 do (push (reverse-3-bits state possible-jump) result))
+		 do (push (toggle-3-holes state possible-jump) result))
 	finally (return result)))
 
 (defun solve ()
