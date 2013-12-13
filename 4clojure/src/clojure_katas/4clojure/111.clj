@@ -4,16 +4,9 @@
 
   (fn [w p]
     (let [p (vec (map #(clojure.string/replace % #"\s+" "") p))
-          in-bounds (fn [i j]
-                      (and (>= i 0)
-                           (>= j 0)
-                           (< i (count p))
-                           (< j (count (get p i)))))
 
           at (fn [i j]
-               (if-not (in-bounds i j)
-                 \#
-                 (get (get p i) j)))
+               (get-in p [i j] \#))
 
           w-length (count w)
 
