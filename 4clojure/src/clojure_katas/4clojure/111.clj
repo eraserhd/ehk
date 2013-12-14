@@ -8,27 +8,28 @@
           at (fn [i j]
                (get-in p [i j] \#))
 
-          w-length (count w)
+          at-n (fn [[i j] [i-delta j-delta] n]
+                 (at (+ i (* n i-delta)) (+ j (* n j-delta))))
 
-          check (fn [[i j] [i-delta j-delta]]
-                  (and (every?
-                         identity
-                         (for [n (range (count w))]
-                           (let [board-c (at (+ i (* i-delta n)) (+ j (* j-delta n)))
-                                 word-c (get w n)]
-                             (or (= board-c \_)
-                                 (= board-c word-c)))))
-                       (= \# (at (- i i-delta) (- j j-delta)))
-                       (= \# (at (+ i (* i-delta w-length)) (+ j (* j-delta w-length))))))
+          across [0 1]
 
-          all-positions (apply
-                          concat
+          down [1 0]
+
+          fits-at (fn [pos dir]
+                    (and (every?
+                           #(some (partial = (at-n pos dir %)) [\_ (get w %)])
+                           (range (count w)))
+                         (= \# (at-n pos dir -1))
+                         (= \# (at-n pos dir (count w)))))
+
+          all-positions (reduce
+                          into
                           (for [i (range (count p))]
                             (for [j (range (count (get p i)))]
                               [i j])))
 
-          allowed? (or (some identity (map #(check % [1 0]) all-positions))
-                       (some identity (map #(check % [0 1]) all-positions))
+          allowed? (or (some #(fits-at % across) all-positions)
+                       (some #(fits-at % down) all-positions)
                        false)]
       allowed?))
 
