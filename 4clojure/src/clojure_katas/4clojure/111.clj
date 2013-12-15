@@ -22,11 +22,9 @@
                          (= \# (at-n pos dir -1))
                          (= \# (at-n pos dir (count w)))))
 
-          all-positions (reduce
-                          into
-                          (for [i (range (count p))]
-                            (for [j (range (count (get p i)))]
-                              [i j])))
+          all-positions (for [i (range (count p))
+                              j (range (count (get p i)))]
+                          [i j])
 
           allowed? (or (some #(fits-at % across) all-positions)
                        (some #(fits-at % down) all-positions)
