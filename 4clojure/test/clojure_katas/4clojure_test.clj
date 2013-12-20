@@ -1,6 +1,6 @@
-(ns clojure-katas.core-test
+(ns clojure-katas.4clojure-test
   (:require [clojure.test :refer :all]
-            [clojure-katas.core :refer :all]))
+            [clojure-katas.4clojure :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
