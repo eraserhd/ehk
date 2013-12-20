@@ -26,3 +26,8 @@
       (-> (:body response)
           (json/parse-string true)
           (assoc :number number)))))
+
+(defn problem-ns
+  [problem]
+  (str "(ns clojure-katas.4clojure." (:number problem) "\n"
+       "  " (prn-str (:title problem)) ")\n"))
