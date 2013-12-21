@@ -28,3 +28,11 @@
 (deftest problem-ns-test
   (is (= "(ns clojure-katas.4clojure.110\n  \"Sequence of pronunciations\")\n"
          (problem-ns sample-problem))))
+
+(deftest tests-test
+  (is (=
+"(= [[1 1] [2 1] [1 2 1 1]] (take 3 (__ [1])))
+(= [3 1 2 4] (first (__ [1 1 1 4 4])))
+(= [1 1 1 3 2 1 3 2 1 1] (nth (__ [1]) 6))
+(= 338 (count (nth (__ [3 2]) 15)))
+" (tests sample-problem))))

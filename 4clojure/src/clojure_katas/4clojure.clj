@@ -1,4 +1,5 @@
 (ns clojure-katas.4clojure
+  (:require [clojure.string :as string])
   (:require [clj-http.client :as http])
   (:require [cheshire.core :as json]))
 
@@ -30,4 +31,10 @@
 (defn problem-ns
   [problem]
   (str "(ns clojure-katas.4clojure." (:number problem) "\n"
-       "  " (prn-str (:title problem)) ")\n"))
+       "  " (pr-str (:title problem)) ")\n"))
+
+(defn tests
+  [problem]
+  (str
+    (string/join "\n" (map string/trim-newline (:tests problem)))
+    "\n"))
