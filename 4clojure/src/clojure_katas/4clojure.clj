@@ -83,5 +83,33 @@
 (defn problem-ns
   [problem]
   (str "(ns clojure-katas.4clojure." (:number problem) "\n"
-       "  " (pr-str (:title problem)) ")\n"))
+       "  \""
+       (-> (ns-docstring problem)
+           (string/replace "\\" "\\\\")
+           (string/replace "\"" "\\\""))
+       "\")\n"))
 
+(defn problem-file-content
+  [problem]
+  (str (problem-ns problem)
+       "\n"
+       "(def __\n"
+       "\n"
+       "  (fn []\n"
+       "    nil)\n"
+       "\n"
+       "  )\n"
+       "\n"
+       (tests problem)))
+
+(defn problem-path
+  [problem]
+  (str "src/clojure_katas/4clojure/" (:number problem) ".clj"))
+
+(defn start-problem
+  "Create starter file for working on a 4clojure problem."
+  [problem-number]
+  (let [problem (get-problem problem-number)
+        path (problem-path problem)]
+    (spit path (problem-file-content problem))
+    (println (str "Wrote " path "."))))
