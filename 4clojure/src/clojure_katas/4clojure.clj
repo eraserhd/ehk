@@ -28,22 +28,60 @@
           (json/parse-string true)
           (assoc :number number)))))
 
-(defn problem-ns
-  [problem]
-  (str "(ns clojure-katas.4clojure." (:number problem) "\n"
-       "  " (pr-str (:title problem)) ")\n"))
-
 (defn tests
   [problem]
   (str
     (string/join "\n" (map string/trim-newline (:tests problem)))
     "\n"))
 
+(defn word-wrap
+  "Wraps a paragraph at 76 characters."
+  [paragraph]
+  (loop [string paragraph
+         lines []]
+    (cond
+      (= "" string)
+      (string/join "\n" lines)
+      (>= 76 (count string))
+      (recur "" (conj lines string))
+      :else
+      (let [break-point (or (first
+                              (for [i (range 76 0 -1)
+                                    :when (= \space (get string i))]
+                                i))
+                            76)
+            [line rest] (split-at break-point string)
+            line (string/trim (apply str line))
+            rest (string/trim (apply str rest))]
+        (recur rest (conj lines line))))))
+
 (defn format-description
   [description]
   (-> description
       (string/replace #"</?code>" "")
       (string/replace #"<p>" "")
-      (string/replace #"</p>" "\n\n")
-      string/trim-newline
-      (str "\n")))
+      (string/split #"</p>")
+      ((partial map word-wrap))
+      ((partial string/join "\n\n"))
+      string/trim-newline))
+
+(defn indent-string
+  [s]
+  (->> s
+       (#(string/split % #"\n"))
+       (map #(str "  " %))
+       (string/join "\n")
+       (#(string/replace % #"  \n" "\n"))))
+
+(defn ns-docstring
+  [problem]
+  (str (:title problem) "\n\n"
+       (-> (:description problem)
+           format-description
+           indent-string)))
+
+(defn problem-ns
+  [problem]
+  (str "(ns clojure-katas.4clojure." (:number problem) "\n"
+       "  " (pr-str (:title problem)) ")\n"))
+
