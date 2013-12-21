@@ -38,3 +38,8 @@
   (str
     (string/join "\n" (map string/trim-newline (:tests problem)))
     "\n"))
+
+(defn format-description
+  [description]
+  (-> description
+      (string/replace #"</?code>" "")))

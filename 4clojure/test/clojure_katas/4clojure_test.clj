@@ -36,3 +36,7 @@
 (= [1 1 1 3 2 1 3 2 1 1] (nth (__ [1]) 6))
 (= 338 (count (nth (__ [3 2]) 15)))
 " (tests sample-problem))))
+
+(deftest format-description-test
+  (testing "strips code tags"
+    (is (= "hello world!" (format-description "hello <code>world</code>!")))))
