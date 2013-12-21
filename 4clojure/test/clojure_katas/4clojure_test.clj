@@ -39,4 +39,7 @@
 
 (deftest format-description-test
   (testing "strips code tags"
-    (is (= "hello world!" (format-description "hello <code>world</code>!")))))
+    (is (= "hello world!\n" (format-description "hello <code>world</code>!"))))
+  (testing "handles paragraph tags"
+    (is (= "Paragraph 1.\n\nParagraph 2.\n"
+           (format-description "<p>Paragraph 1.</p><p>Paragraph 2.</p>")))))

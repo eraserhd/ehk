@@ -42,4 +42,8 @@
 (defn format-description
   [description]
   (-> description
-      (string/replace #"</?code>" "")))
+      (string/replace #"</?code>" "")
+      (string/replace #"<p>" "")
+      (string/replace #"</p>" "\n\n")
+      string/trim-newline
+      (str "\n")))
