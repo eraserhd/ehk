@@ -31,7 +31,10 @@
 (defn tests
   [problem]
   (str
-    (string/join "\n" (map string/trim-newline (:tests problem)))
+    (->> (:tests problem)
+         (map string/trim-newline)
+         (map #(string/replace % "\r" ""))
+         (string/join "\n"))
     "\n"))
 
 (defn word-wrap
@@ -59,7 +62,10 @@
   [description]
   (-> description
       (string/replace #"</?code>" "")
-      (string/replace #"<p>" "")
+      (string/replace #"</?i>" "")
+      (string/replace "<p>" "")
+      (string/replace "\r" "")
+      (string/replace #"<br/?>" "\n")
       (string/split #"</p>")
       ((partial map word-wrap))
       ((partial string/join "\n\n"))
