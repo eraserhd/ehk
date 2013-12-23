@@ -14,3 +14,8 @@
           (let [unseen (filter (comp not backtrack) (neighbors node))]
             (recur (into remaining-queue unseen)
                    (into backtrack (map #(vec [% node]) unseen)))))))))
+
+(defn gcd [a b]
+  (if (= b 0)
+    a
+    (recur b (mod a b))))
