@@ -8,7 +8,7 @@
             >=n-seqs (map (partial drop-while #(< % n)) seqs)]
         (if (apply = (map first >=n-seqs))
           n
-          (recur (map (partial drop-while #(= n %)) >=n-seqs))))))
+          (recur (map (partial drop-while #{n}) >=n-seqs))))))
 
   )
 

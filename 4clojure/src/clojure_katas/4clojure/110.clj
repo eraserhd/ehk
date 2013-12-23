@@ -20,7 +20,7 @@
                 (if-not (seq s)
                   p
                   (let [x (first s)
-                        n (count (take-while #(= x %) s))]
+                        n (count (take-while #{x} s))]
                     (recur (drop n s)
                            (conj (conj p n) x))))))]
       (lazy-seq
