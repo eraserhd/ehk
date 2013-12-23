@@ -15,30 +15,23 @@
 
   The mouse is not allowed to travel diagonally in the maze (only
   up/down/left/right), nor can he escape the edge of the maze.  Your function
-  must return true iff the maze is solvable by the mouse.")
+  must return true iff the maze is solvable by the mouse."
+  (:require [clojure-katas.algo :as algo]))
 
 (def __
 
   (fn [maze]
-    (loop [queue (vec (for [i (range (count maze))
-                            j (range (count (get maze i)))
-                            :when (= \M (get-in maze [i j]))]
-                        [i j]))
-           seen #{(first queue)}]
-      (if-not (seq queue)
-        false
-        (let [[[i j] & rest-of-queue] queue
-              found? (= \C (get-in maze [i j]))
-              unseen (for [[di dj] [[0 1] [0 -1] [1 0] [-1 0]]
-                           :let [ii (+ i di)
-                                 jj (+ j dj)]
-                           :when (and (not (seen [ii jj]))
-                                      (#{\space \C} (get-in maze [ii jj])))]
-                       [ii jj])]
-          (if found?
-            true
-            (recur (into rest-of-queue unseen)
-                   (into seen unseen)))))))
+    (not (nil? (algo/bfs
+                 (first (for [i (range (count maze))
+                              j (range (count (get maze i)))
+                              :when (= \M (get-in maze [i j]))]
+                          [i j]))
+                 #(= \C (get-in maze %))
+                 #(for [[di dj] [[0 1] [0 -1] [1 0] [-1 0]]
+                        :let [i (+ di (first %))
+                              j (+ dj (second %))]
+                        :when (#{\space \C} (get-in maze [i j]))]
+                    [i j])))))
 
   )
 
