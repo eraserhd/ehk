@@ -100,11 +100,8 @@
   (str (problem-ns problem)
        "\n"
        "(def __\n"
-       "\n"
        "  (fn []\n"
-       "    nil)\n"
-       "\n"
-       "  )\n"
+       "    nil))\n"
        "\n"
        (tests problem)))
 
