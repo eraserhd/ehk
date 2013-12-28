@@ -1,0 +1,6 @@
+* Use when-first in existing submissions
+* Use clojure.set/index instead of "merge-with clojure.set/union"
+* Use clojure.core/complement instead of (comp not ...)
+* Use clojure.core/frequencies, (where :pair is found)
+* Use clojure.core/group-by, (where :pair is found?)
+* Many places to use partition
