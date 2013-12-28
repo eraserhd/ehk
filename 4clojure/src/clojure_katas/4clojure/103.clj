@@ -13,11 +13,8 @@
 
 (def __
   (fn __ [n items]
-    (cond
-      (zero? n)
+    (if (zero? n)
       #{#{}}
-
-      :else
       (loop [items items
              r #{}]
         (if-not (seq items)
