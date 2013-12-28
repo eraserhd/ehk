@@ -1,7 +1,6 @@
 (ns clojure-katas.4clojure.84)
 
 (def transitive-closure
-
   (fn [s]
     (letfn [(->map [s]
               (loop [s s
@@ -21,14 +20,12 @@
                                    (cond
                                      (not (seq queue)) (vec seen)
                                      (not (seq (m (first queue)))) (recur (rest queue) seen)
-                                     :else (let [unseen (filter (comp not seen) (m (first queue)))]
+                                     :else (let [unseen (filter (complement seen) (m (first queue)))]
                                              (recur
                                                (into (rest queue) unseen)
                                                (into seen unseen)))))]
                       (map #(vec [k %]) values))))))]
-      (compute (->map s))))
-
-  )
+      (compute (->map s)))))
 
 (let [divides #{[8 4] [9 3] [4 2] [27 9]}]
   (= (transitive-closure  divides) #{[4 2] [8 4] [8 2] [9 3] [27 9] [27 3]}))

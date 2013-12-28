@@ -11,7 +11,7 @@
             (if (= ::start (backtrack (first path)))
               path
               (recur (conj path (backtrack (first path))))))
-          (let [unseen (filter (comp not backtrack) (neighbors node))]
+          (let [unseen (filter (complement backtrack) (neighbors node))]
             (recur (into remaining-queue unseen)
                    (into backtrack (map #(vec [% node]) unseen)))))))))
 

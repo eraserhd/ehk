@@ -7,7 +7,6 @@
   integer n, and returns true iff it is a balanced prime.")
 
 (def __
-
   (fn [n]
     (letfn [(prime? [n]
               (cond
@@ -23,11 +22,9 @@
                           seq
                           nil?)))]
       (and (prime? n)
-           (let [next-prime (first (drop-while (comp not prime?) (range (+ n 1) Integer/MAX_VALUE)))
-                 prev-prime (first (drop-while (comp not prime?) (range (- n 1) 1 -1)))]
-             (and prev-prime (= (/ (+ next-prime prev-prime) 2) n))))))
-
-  )
+           (let [next-prime (first (drop-while (complement prime?) (range (+ n 1) Integer/MAX_VALUE)))
+                 prev-prime (first (drop-while (complement prime?) (range (- n 1) 1 -1)))]
+             (and prev-prime (= (/ (+ next-prime prev-prime) 2) n)))))))
 
 (= false (__ 4))
 (= true (__ 563))
