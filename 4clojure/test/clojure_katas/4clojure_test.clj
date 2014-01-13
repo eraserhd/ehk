@@ -35,14 +35,14 @@
 
 (deftest format-description-test
   (testing "strips code tags"
-    (is (= "hello world!\n" (format-description "hello <code>world</code>!"))))
+    (is (= "hello world!" (format-description "hello <code>world</code>!"))))
   (testing "handles paragraph tags"
-    (is (= "Paragraph 1.\n\nParagraph 2.\n"
+    (is (= "Paragraph 1.\n\nParagraph 2."
            (format-description "<p>Paragraph 1.</p><p>Paragraph 2.</p>"))))
   (testing "word-wraps paragraphs at 76 characters"
     (is (= (str
              "Write a function that returns a lazy sequence of pronunciations of a\n"
-             "sequence of numbers. A pronunciation of each element in the.\n")
+             "sequence of numbers. A pronunciation of each element in the.")
            (format-description
              (str
                "Write a function that returns a lazy sequence of pronunciations of a sequence "
