@@ -17,6 +17,10 @@
   you're interested in logic programming more generally, you should also check
   out: <a href=\"https://github.com/clojure/core.logic\">core.logic</a>")
 
+;; A simple brute force would be simpler.  This is essentially brute force,
+;; except that we try to do some K-map stuff first, which isn't strictly
+;; necessary.
+
 (def __
   (fn [input-fn]
     (let [bit (fn [n]
@@ -110,7 +114,6 @@
           answer (->> (range 1 (bit-set 0 (count largest-applicable-patterns)))
                       (map #(vector % (reduce bit-or (patterns-for %))))
                       (filter #(= bits (bit-and (second %) bits)))
-                      #_(sort-by second #(< (Long/bitCount %1) (Long/bitCount %2)))
                       first
                       first
                       patterns-for
