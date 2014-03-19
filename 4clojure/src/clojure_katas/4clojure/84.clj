@@ -27,5 +27,6 @@
                       (map #(vec [k %]) values))))))]
       (compute (->map s)))))
 
-(let [divides #{[8 4] [9 3] [4 2] [27 9]}]
-  (= (transitive-closure  divides) #{[4 2] [8 4] [8 2] [9 3] [27 9] [27 3]}))
+(comment
+  (let [divides #{[8 4] [9 3] [4 2] [27 9]}]
+    (= (transitive-closure  divides) #{[4 2] [8 4] [8 2] [9 3] [27 9] [27 3]})))

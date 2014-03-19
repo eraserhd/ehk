@@ -10,5 +10,6 @@
 
   )
 
-(= (perfect? 6) true)
-(= (perfect? 7) false)
+(comment
+  (= (perfect? 6) true)
+  (= (perfect? 7) false))

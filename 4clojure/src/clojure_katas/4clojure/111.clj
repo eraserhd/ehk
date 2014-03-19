@@ -33,8 +33,9 @@
 
   )
 
-(= true (crossword-puzzle "the" ["_ # _ _ e"]))
+(comment
+  (= true (crossword-puzzle "the" ["_ # _ _ e"]))
 
-(= false (crossword-puzzle "the" ["c _ _ _"
-                                  "d _ # e"
-                                  "r y _ _"]))
+  (= false (crossword-puzzle "the" ["c _ _ _"
+                                    "d _ # e"
+                                    "r y _ _"])))

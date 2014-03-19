@@ -29,7 +29,8 @@
             (recur (+ total digit-value) (rest digits) digit-value)
             (recur (- total digit-value) (rest digits) largest-digit-seen)))))))
 
-(= 14 (__ "XIV"))
-(= 827 (__ "DCCCXXVII"))
-(= 3999 (__ "MMMCMXCIX"))
-(= 48 (__ "XLVIII"))
+(comment
+  (= 14 (__ "XIV"))
+  (= 827 (__ "DCCCXXVII"))
+  (= 3999 (__ "MMMCMXCIX"))
+  (= 48 (__ "XLVIII")))

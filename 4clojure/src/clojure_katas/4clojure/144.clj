@@ -8,5 +8,6 @@
 
   )
 
-(= (take 3 (oscilrate 3.14 int double)))
-(= (take 5 (oscilrate 3 #(- % 3) #(+ 5 %))) [3 0 5 2 7])
+(comment
+  (= (take 3 (oscilrate 3.14 int double)))
+  (= (take 5 (oscilrate 3 #(- % 3) #(+ 5 %))) [3 0 5 2 7]))

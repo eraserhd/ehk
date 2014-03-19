@@ -51,9 +51,10 @@
 
   )
 
-(= true (word-chains #{"hat" "coat" "dog" "cat" "oat" "cot" "hot" "hog"}))
-(= false (word-chains #{"cot" "hot" "bat" "fat"}))
-(= false (word-chains #{"to" "top" "stop" "tops" "toss"}))
-(= true (word-chains #{"spout" "do" "pot" "pout" "spot" "dot"}))
-(= true (word-chains #{"share" "hares" "shares" "hare" "are"}))
-(= false (word-chains #{"share" "hares" "hare" "are"}))
+(comment
+  (= true (word-chains #{"hat" "coat" "dog" "cat" "oat" "cot" "hot" "hog"}))
+  (= false (word-chains #{"cot" "hot" "bat" "fat"}))
+  (= false (word-chains #{"to" "top" "stop" "tops" "toss"}))
+  (= true (word-chains #{"spout" "do" "pot" "pout" "spot" "dot"}))
+  (= true (word-chains #{"share" "hares" "shares" "hare" "are"}))
+  (= false (word-chains #{"share" "hares" "hare" "are"})))

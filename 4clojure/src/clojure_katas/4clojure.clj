@@ -31,11 +31,13 @@
 (defn tests
   [problem]
   (str
+    "(comment\n"
     (->> (:tests problem)
          (map string/trim-newline)
          (map #(string/replace % "\r" ""))
+         (map #(str "  " %))
          (string/join "\n"))
-    "\n"))
+    "  )\n"))
 
 (defn word-wrap
   "Wraps a paragraph at 76 characters."

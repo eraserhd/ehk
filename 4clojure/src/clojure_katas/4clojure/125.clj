@@ -14,5 +14,6 @@
 
 (def __ '(fn [] (let [a ["(fn [] (let [a " "] (str (first a) (pr-str a) (second a))))"]] (str (first a) (pr-str a) (second a)))))
 
-(= (str __) ((eval __)))
-
+(comment
+  (= (str __) ((eval __)))
+  )

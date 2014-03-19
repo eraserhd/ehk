@@ -23,9 +23,10 @@
 
   )
 
-(= nil (analyze [[:e :e :e]
-                 [:e :e :e]
-                 [:e :e :e]]))
-(= :x (analyze [[:x :e :o]
-                [:x :e :e]
-                [:x :e :o]]))
+(comment
+  (= nil (analyze [[:e :e :e]
+                   [:e :e :e]
+                   [:e :e :e]]))
+  (= :x (analyze [[:x :e :o]
+                  [:x :e :e]
+                  [:x :e :o]])))

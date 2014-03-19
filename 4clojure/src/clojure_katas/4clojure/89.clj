@@ -42,5 +42,6 @@
   )
 
 
-(= true (can-make-tour? [[:a :b]]))
-(= false (can-make-tour? [[:a :a] [:b :b]]))
+(comment
+  (= true (can-make-tour? [[:a :b]]))
+  (= false (can-make-tour? [[:a :a] [:b :b]])))

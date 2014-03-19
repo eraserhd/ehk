@@ -19,7 +19,8 @@
   )
 
 
-(= (happy? 7) true)
-(= (happy? 986543210) true)
-(= (happy? 2) false)
-(= (happy? 3) false)
+(comment
+  (= (happy? 7) true)
+  (= (happy? 986543210) true)
+  (= (happy? 2) false)
+  (= (happy? 3) false))

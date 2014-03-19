@@ -20,6 +20,7 @@
 
   )
 
-(= (__ "something") "something")
-(= (__ "multi-word-key") "multiWordKey")
-(= (__ "leaveMeAlone") "leaveMeAlone")
+(comment
+  (= (__ "something") "something")
+  (= (__ "multi-word-key") "multiWordKey")
+  (= (__ "leaveMeAlone") "leaveMeAlone"))

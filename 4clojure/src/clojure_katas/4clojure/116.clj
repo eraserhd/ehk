@@ -26,6 +26,7 @@
                  prev-prime (first (drop-while (complement prime?) (range (- n 1) 1 -1)))]
              (and prev-prime (= (/ (+ next-prime prev-prime) 2) n)))))))
 
-(= false (__ 4))
-(= true (__ 563))
-(= 1103 (nth (filter __ (range)) 15))
+(comment
+  (= false (__ 4))
+  (= true (__ 563))
+  (= 1103 (nth (filter __ (range)) 15)))

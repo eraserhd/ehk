@@ -12,8 +12,9 @@
 
   )
 
-(= :map (black-box-testing {:a 1, :b 2}))
-(= :list (black-box-testing (range (rand-int 20))))
-(= :vector (black-box-testing [1 2 3 4 5 6]))
-(= :set (black-box-testing #{10 (rand-int 5)}))
-(= [:map :set :vector :list] (map black-box-testing [{} #{} [] ()]))
+(comment
+  (= :map (black-box-testing {:a 1, :b 2}))
+  (= :list (black-box-testing (range (rand-int 20))))
+  (= :vector (black-box-testing [1 2 3 4 5 6]))
+  (= :set (black-box-testing #{10 (rand-int 5)}))
+  (= [:map :set :vector :list] (map black-box-testing [{} #{} [] ()])))

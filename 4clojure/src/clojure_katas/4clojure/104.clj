@@ -34,10 +34,11 @@
         (digit (quot n 10) \X \L \C)
         (digit n \I \V \X)))))
 
-(= "I" (__ 1))
-(= "XXX" (__ 30))
-(= "IV" (__ 4))
-(= "CXL" (__ 140))
-(= "DCCCXXVII" (__ 827))
-(= "MMMCMXCIX" (__ 3999))
-(= "XLVIII" (__ 48))
+(comment
+  (= "I" (__ 1))
+  (= "XXX" (__ 30))
+  (= "IV" (__ 4))
+  (= "CXL" (__ 140))
+  (= "DCCCXXVII" (__ 827))
+  (= "MMMCMXCIX" (__ 3999))
+  (= "XLVIII" (__ 48)))

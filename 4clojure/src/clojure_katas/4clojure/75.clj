@@ -13,5 +13,6 @@
 
   )
 
-(= 1 (totient 1))
-(= 4 (totient 10))
+(comment
+  (= 1 (totient 1))
+  (= 4 (totient 10)))
