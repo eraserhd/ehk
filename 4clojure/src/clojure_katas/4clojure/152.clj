@@ -63,6 +63,14 @@
     (let [width (->> input
                      (map count)
                      (apply max))
+          height (count input)
+
+          ->lvals (->> (flatten input)
+                       (into #{})
+                       (map (fn [i k] [k (bit-set 0 i)]) (range))
+                       (into {}))
+
+          l-input (vec (map #(vec (map ->lvals %)) input))
 
           square-mask (fn [w]
                         (->> (for [i (range w)
@@ -93,8 +101,14 @@
           col-masks (partial stripe-masks rem)
 
           square-masks (for [mask-width (range 2 9)
+                             :when (<= mask-width width)
+                             :when (<= mask-width height)
+
                              i (range 0 8)
-                             j (range 0 8)]
+                             :when (<= (+ i mask-width) height)
+
+                             j (range 0 8)
+                             :when (<= (+ j mask-width) width)]
                          (let [mask (bit-shift-left (square-mask mask-width) (+ j (* i 8)))]
                            [mask-width mask (row-masks mask) (col-masks mask)]))
 
@@ -120,6 +134,14 @@
 
           alignment-masks (map alignment-mask alignments)
 
+          vset-for-mask (fn [mask alignment]
+                          (->> mask
+                               bits-in-mask
+                               (map #(vector (quot % 8) (rem % 8)))
+                               (map (fn [[i j]]
+                                      (get-in l-input [i (- j (get alignment i))])))
+                               (reduce bit-or 0)))
+
           values-for-mask (fn [mask alignment]
                             (->> mask
                                  bits-in-mask
@@ -132,7 +154,7 @@
                         [w sm rms cms] square-masks
                         :when (= sm (bit-and a-mask sm))
                         :when (every? 
-                                #(= w (count (into #{} (values-for-mask % a))))
+                                #(= w (Long/bitCount (vset-for-mask % a)))
                                 (concat [sm] rms cms))]
                     [w (values-for-mask sm a)])]
       (->> squares
