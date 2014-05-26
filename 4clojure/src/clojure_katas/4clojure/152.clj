@@ -64,7 +64,39 @@
                      (map count)
                      (apply max))
 
-          height (count input)
+          square-mask (fn [w]
+                        (->> (for [i (range w)
+                                   j (range w)]
+                               (bit-set 0 (+ j (* i 8))))
+                             (reduce bit-or)))
+
+          bits-in-mask (fn bits-in-mask [m]
+                         (if (zero? m)
+                           []
+                           (let [lsb (Long/lowestOneBit m)
+                                 lsb-number (Long/numberOfTrailingZeros lsb)]
+                             (conj (bits-in-mask (bit-xor m lsb)) lsb-number))))
+
+          compose-bits (fn [bs]
+                         (->> bs
+                              (map #(bit-set 0 %))
+                              (reduce bit-or 0)))
+
+          stripe-masks (fn [f m]
+                         (->> m
+                              bits-in-mask
+                              (group-by #(f % 8))
+                              vals
+                              (map compose-bits)))
+
+          row-masks (partial stripe-masks quot)
+          col-masks (partial stripe-masks rem)
+
+          square-masks (for [mask-width (range 2 9)
+                             i (range 0 8)
+                             j (range 0 8)]
+                         (let [mask (bit-shift-left (square-mask mask-width) (+ j (* i 8)))]
+                           [mask-width mask (row-masks mask) (col-masks mask)]))
 
           alignments (loop [alignments [[]]
                             counts (map count input)]
@@ -76,34 +108,33 @@
                              (vec (concat a [n])))
                            (rest counts))))
 
-          squares (for [i (range height)
-                        w (range 2 (min (inc width) (inc height)))
-                        :when (<= (+ i w) height)
+          alignment-mask (fn [alignment]
+                           (->> (mapcat
+                                  (fn [i j-offset]
+                                    (let [j-length (count (get input i))]
+                                      (for [j (range j-offset (+ j-offset j-length))]
+                                        (bit-set 0 (+ j (* i 8))))))
+                                  (range)
+                                  alignment)
+                                (reduce bit-or)))
 
-                        j (range width)
-                        :when (<= (+ j w) width)
+          alignment-masks (map alignment-mask alignments)
 
-                        a alignments
-                        :let [g (fn [[i j]]
-                                  (get-in input [i (- j (get a i))]))
-                              elts (into [] (for [ii (range i (+ i w))
-                                                  jj (range j (+ j w))]
-                                               (g [ii jj])))
-                              unique-elts (into #{} elts)]
-                        :when (= w (count unique-elts))
-                        :when (not (contains? unique-elts nil))
+          values-for-mask (fn [mask alignment]
+                            (->> mask
+                                 bits-in-mask
+                                 (map #(vector (quot % 8) (rem % 8)))
+                                 (map (fn [[i j]]
+                                        (get-in input [i (- j (get alignment i))])))))
 
-                        :let [rows (for [ii (range i (+ i w))]
-                                     (into #{} (for [jj (range j (+ j w))]
-                                                 (g [ii jj]))))]
-                        :when (every? #(= (count %) w) rows)
+          squares (for [[a a-mask] (map vector alignments alignment-masks)
 
-                        :let [cols (for [jj (range j (+ j w))]
-                                     (into #{} (for [ii (range i (+ i w))]
-                                                 (g [ii jj]))))]
-                        :when (every? #(= (count %) w) cols)]
-
-                    [w elts])]
+                        [w sm rms cms] square-masks
+                        :when (= sm (bit-and a-mask sm))
+                        :when (every? 
+                                #(= w (count (into #{} (values-for-mask % a))))
+                                (concat [sm] rms cms))]
+                    [w (values-for-mask sm a)])]
       (->> squares
            (into #{})
            (map first)
@@ -144,8 +175,8 @@
         []       ])
    {2 2})
   (= (__ [[3 1 2]
-        [1 2 3 1 3 4]
-        [2 3 1 3]    ])
+          [1 2 3 1 3 4]
+          [2 3 1 3]    ])
    {3 1, 2 2})
   (= (__ [[8 6 7 3 2 5 1 4]
         [6 8 3 7]
