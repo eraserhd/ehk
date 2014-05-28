@@ -120,8 +120,8 @@
                        (if-not (seq counts)
                          alignments
                          (recur
-                           (for [a alignments
-                                 n (range (inc (- width (first counts))))]
+                           (for [n (range (inc (- width (first counts))))
+                                 a alignments]
                              (vec (concat a [n])))
                            (rest counts))))
 
