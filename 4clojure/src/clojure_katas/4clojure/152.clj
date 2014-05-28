@@ -77,7 +77,7 @@
                             j (range 8)
                             :let [index (+ j (* 8 i))
                                   value (get-in l-input [i j] 0)]]
-                      (aset a index value))
+                      (aset-long a index value))
                     a)
 
           square-mask (fn [w]
@@ -152,16 +152,20 @@
           alignment-masks (map alignment-mask alignments)
 
           vset-for-mask (fn [mask alignment]
-                          (->> mask
-                               bits-in-mask
-                               (reduce
-                                 (fn [vset bit-number]
-                                   (let [i (quot bit-number 8)
-                                         j (rem bit-number 8)]
-                                     (bit-or
-                                       vset
-                                       (aget ^longs a-input (+ (- j (get alignment i)) (* i 8))))))
-                                 0)))
+                          (loop [m mask
+                                 v 0]
+                            (if (zero? m)
+                              v
+                              (let [lsb (Long/lowestOneBit m)
+                                    m-without-lsb (bit-xor m lsb)
+                                    lsb-number (Long/numberOfTrailingZeros lsb)
+                                    i (quot lsb-number 8)
+                                    index (- lsb-number (get alignment i))
+
+                                    ]
+                                (recur
+                                  m-without-lsb
+                                  (bit-or v (aget ^longs a-input index)))))))
 
           values-for-mask (fn [mask alignment]
                             (->> mask
