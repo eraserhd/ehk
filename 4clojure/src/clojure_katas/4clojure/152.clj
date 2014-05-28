@@ -80,7 +80,7 @@
 
           bits-in-mask (fn bits-in-mask [m]
                          (if (zero? m)
-                           []
+                           ()
                            (let [lsb (Long/lowestOneBit m)
                                  lsb-number (Long/numberOfTrailingZeros lsb)]
                              (conj (bits-in-mask (bit-xor m lsb)) lsb-number))))
@@ -138,9 +138,10 @@
           vset-for-mask (fn [mask alignment]
                           (->> mask
                                bits-in-mask
-                               (map #(vector (quot % 8) (rem % 8)))
-                               (map (fn [[i j]]
-                                      (get-in l-input [i (- j (get alignment i))])))
+                               (map (fn [bit-number]
+                                      (let [i (quot bit-number 8)
+                                            j (rem bit-number 8)]
+                                        (get-in l-input [i (- j (get alignment i))]))))
                                (reduce bit-or 0)))
 
           values-for-mask (fn [mask alignment]
