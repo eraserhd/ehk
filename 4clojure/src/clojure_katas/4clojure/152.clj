@@ -110,7 +110,8 @@
                              j (range 0 8)
                              :when (<= (+ j mask-width) width)]
                          (let [mask (bit-shift-left (square-mask mask-width) (+ j (* i 8)))]
-                           [mask-width mask (row-masks mask) (col-masks mask)]))
+                           [mask-width
+                            (concat [mask] (row-masks mask) (col-masks mask))]))
 
           alignments (loop [alignments [[]]
                             counts (map count input)]
@@ -150,12 +151,11 @@
                                         (get-in input [i (- j (get alignment i))])))))
 
           squares (for [[a a-mask] (map vector alignments alignment-masks)
-
-                        [w sm rms cms] square-masks
+                        [w [sm & _ :as all-masks]] square-masks
                         :when (= sm (bit-and a-mask sm))
                         :when (every? 
                                 #(= w (Long/bitCount (vset-for-mask % a)))
-                                (concat [sm] rms cms))]
+                                all-masks)]
                     [w (values-for-mask sm a)])]
       (->> squares
            (into #{})
