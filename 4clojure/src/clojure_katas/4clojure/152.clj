@@ -138,11 +138,14 @@
           vset-for-mask (fn [mask alignment]
                           (->> mask
                                bits-in-mask
-                               (map (fn [bit-number]
-                                      (let [i (quot bit-number 8)
-                                            j (rem bit-number 8)]
-                                        (get-in l-input [i (- j (get alignment i))]))))
-                               (reduce bit-or 0)))
+                               (reduce
+                                 (fn [vset bit-number]
+                                   (let [i (quot bit-number 8)
+                                         j (rem bit-number 8)]
+                                     (bit-or
+                                       vset
+                                       (get-in l-input [i (- j (get alignment i))]))))
+                                 0)))
 
           values-for-mask (fn [mask alignment]
                             (->> mask
