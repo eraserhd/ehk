@@ -150,8 +150,10 @@
                                  (map (fn [[i j]]
                                         (get-in input [i (- j (get alignment i))])))))
 
-          squares (for [[a a-mask] (map vector alignments alignment-masks)
-                        [w [sm & _ :as all-masks]] square-masks
+          a-and-a-masks (map vector alignments alignment-masks)
+
+          squares (for [[w [sm & _ :as all-masks]] square-masks
+                        [a a-mask] a-and-a-masks
                         :when (= sm (bit-and a-mask sm))
                         :when (every? 
                                 #(= w (Long/bitCount (vset-for-mask % a)))
