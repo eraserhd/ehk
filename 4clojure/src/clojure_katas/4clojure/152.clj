@@ -104,12 +104,14 @@
                              :when (<= mask-width width)
                              :when (<= mask-width height)
 
+                             :let [sm (square-mask mask-width)]
+
                              i (range 0 8)
                              :when (<= (+ i mask-width) height)
 
                              j (range 0 8)
                              :when (<= (+ j mask-width) width)]
-                         (let [mask (bit-shift-left (square-mask mask-width) (+ j (* i 8)))]
+                         (let [mask (bit-shift-left sm (+ j (* i 8)))]
                            [mask-width
                             (concat [mask] (row-masks mask) (col-masks mask))]))
 
