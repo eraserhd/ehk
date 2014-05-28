@@ -65,18 +65,17 @@
                      (apply max))
           height (count input)
 
-          ->lvals (->> (flatten input)
-                       (into #{})
-                       (map (fn [i k] [k (bit-set 0 i)]) (range))
-                       (into {}))
-
-          l-input (vec (map #(vec (map ->lvals %)) input))
+          ->lvals (-> (->> (flatten input)
+                           (into #{})
+                           (map (fn [i k] [k (bit-set 0 i)]) (range))
+                           (into {}))
+                      (assoc nil 0))
 
           a-input (let [a (make-array Long/TYPE 64)]
                     (doseq [i (range 8)
                             j (range 8)
                             :let [index (+ j (* 8 i))
-                                  value (get-in l-input [i j] 0)]]
+                                  value (->lvals (get-in input [i j]))]]
                       (aset-long a index value))
                     a)
 
@@ -160,9 +159,7 @@
                                     m-without-lsb (bit-xor m lsb)
                                     lsb-number (Long/numberOfTrailingZeros lsb)
                                     i (quot lsb-number 8)
-                                    index (- lsb-number (get alignment i))
-
-                                    ]
+                                    index (- lsb-number (get alignment i))]
                                 (recur
                                   m-without-lsb
                                   (bit-or v (aget ^longs a-input index)))))))
