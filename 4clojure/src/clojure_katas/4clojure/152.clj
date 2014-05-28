@@ -166,7 +166,7 @@
 
           values-for-mask (fn [mask alignment]
                             (loop [m mask
-                                   vs ()]
+                                   vs 0]
                               (if (zero? m)
                                 vs
                                 (let [lsb (Long/lowestOneBit m)
@@ -176,7 +176,7 @@
                                       index (- lsb-number (get alignment i))]
                                   (recur
                                     m-without-lsb
-                                    (conj vs (aget ^longs a-input index)))))))
+                                    (bit-xor (bit-shift-left vs 2) (Long/numberOfTrailingZeros (aget ^longs a-input index))))))))
 
           a-and-a-masks (map vector alignments alignment-masks)
 
