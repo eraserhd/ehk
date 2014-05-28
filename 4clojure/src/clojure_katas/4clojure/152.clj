@@ -72,6 +72,14 @@
 
           l-input (vec (map #(vec (map ->lvals %)) input))
 
+          a-input (let [a (make-array Long/TYPE 64)]
+                    (doseq [i (range 8)
+                            j (range 8)
+                            :let [index (+ j (* 8 i))
+                                  value (get-in l-input [i j] 0)]]
+                      (aset a index value))
+                    a)
+
           square-mask (fn [w]
                         (->> (for [i (range w)
                                    j (range w)]
@@ -152,7 +160,7 @@
                                          j (rem bit-number 8)]
                                      (bit-or
                                        vset
-                                       (get-in l-input [i (- j (get alignment i))]))))
+                                       (aget ^longs a-input (+ (- j (get alignment i)) (* i 8))))))
                                  0)))
 
           values-for-mask (fn [mask alignment]
