@@ -3,7 +3,7 @@ bin_PROGRAMS = bin/moreso
 
 test_SOURCES = $(wildcard test/*-test.scm)
 
-all: $(bin_PROGRAMS)
+all: $(bin_PROGRAMS) test
 
 .PHONY: test
 test: $(test_SOURCES)

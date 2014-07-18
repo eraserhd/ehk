@@ -1,3 +1,4 @@
 (include "expect.scm")
+(include "../src/moreso.scm")
 
-(expect (= 2 2))
+(expect (= 42 (moreso:eval 42)))
