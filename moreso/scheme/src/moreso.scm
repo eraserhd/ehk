@@ -1,4 +1,13 @@
 
 
 (define (moreso:eval expr)
-  expr)
+  (cond
+    ((list? expr)
+     (case (car expr)
+       ;; Special forms
+       ((if)
+	(if (moreso:eval (cadr expr))
+	  (moreso:eval (caddr expr))))))
+
+    (else
+     expr)))
