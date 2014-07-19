@@ -1,10 +1,10 @@
 (include "expect.scm")
 (include "../src/moreso.scm")
 
-(define e `(((forty-two . 42)
-	     (+ . ,+)
-	     (/ . ,/)
-	     (f . ,(moreso:lambda '() '(42) '())))))
+(define e `((forty-two . 42)
+	    (+ . ,+)
+	    (/ . ,/)
+	    (f . ,(moreso:lambda '() '(42) '()))))
 
 (define-macro (raises? expr)
   `(with-exception-catcher
@@ -27,9 +27,9 @@
 (expect (raises? (moreso:eval '(quote (1 2) 1) e)))
 
 ;; set!
-(expect (let ((e '(((foo . #f)))))
+(expect (let ((e '((foo . #f))))
 	  (moreso:eval '(set! foo 42) e)
-	  (equal? 42 (cdaar e))))
+	  (equal? 42 (cdar e))))
 (expect (raises? (moreso:eval '(set! does-not-exist 42) e)))
 (expect (raises? (moreso:eval '(set!) e)))
 (expect (raises? (moreso:eval '(set! forty-two) e)))

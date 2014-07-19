@@ -1,11 +1,6 @@
 
 (define (moreso:lookup sym env)
-  (if (null? env)
-    #f
-    (let ((assq-result (assq sym (car env))))
-      (if assq-result
-	assq-result
-	(moreso:lookup sym (cdr env))))))
+  (assq sym env))
 
 (define-structure moreso:procedure
   arg-list
