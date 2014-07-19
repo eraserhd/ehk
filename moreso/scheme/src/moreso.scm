@@ -33,7 +33,10 @@
        ((set!)
 	(let ((cell (moreso:lookup (cadr expr) env)))
 	  (if cell
-	    (set-cdr! cell (caddr expr)))))))
+	    (set-cdr! cell (caddr expr))
+	    (raise (string-append "Unbound symbol `"
+				  (symbol->string expr)
+				  "'.")))))))
 
     (else
      expr)))

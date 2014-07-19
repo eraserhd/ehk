@@ -19,9 +19,13 @@
 (expect (equal? 42 (moreso:eval 'forty-two e)))
 (expect (raises? (moreso:eval 'eleventy-seven e)))
 
+;; quote
 (expect (equal? '(1 2) (moreso:eval ''(1 2) e)))
 (expect (raises? (moreso:eval '(quote (1 2) 1) e)))
 
+;; set!
 (expect (let ((e '(((foo . #f)))))
 	  (moreso:eval '(set! foo 42) e)
 	  (equal? 42 (cdaar e))))
+
+(expect (raises? (moreso:eval '(set! does-not-exist 42) e)))
