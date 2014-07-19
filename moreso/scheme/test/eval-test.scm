@@ -4,7 +4,8 @@
 (define e `((forty-two . 42)
 	    (+ . ,+)
 	    (/ . ,/)
-	    (f . ,(moreso:lambda '() '(42) '()))))
+	    (returns-42 . ,(moreso:lambda '() '(42) '()))
+	    (returns-env-a . ,(moreso:lambda '() '(a) '((a . 67))))))
 
 (define-macro (raises? expr)
   `(with-exception-catcher
@@ -39,4 +40,5 @@
 (expect (equal? 20 (moreso:eval '(/ 40 2) e)))
 
 ;; interpreted procedure calls
-(expect (equal? 42 (moreso:eval '(f) e)))
+(expect (equal? 42 (moreso:eval '(returns-42) e)))
+(expect (equal? 67 (moreso:eval '(returns-env-a) e)))
