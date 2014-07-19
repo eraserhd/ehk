@@ -9,3 +9,9 @@
 (expect (equal? 79 (moreso:eval '(if #t 79) e)))
 (expect (equal? 86 (moreso:eval '(if #f 79 86) e)))
 (expect (equal? 42 (moreso:eval 'forty-two e)))
+(expect (with-exception-catcher
+	  (lambda (ex)
+	    #t)
+	  (lambda ()
+	    (moreso:eval 'eleventy-seven e)
+	    #f)))

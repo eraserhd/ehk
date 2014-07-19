@@ -12,7 +12,10 @@
     ((symbol? expr)
      (let ((cell (moreso:lookup expr env)))
        (if cell
-	 (cdr cell))))
+	 (cdr cell)
+	 (raise (string-append "Unbound symbol `"
+			       (symbol->string expr)
+			       "'.")))))
 
     ((list? expr)
      (case (car expr)
