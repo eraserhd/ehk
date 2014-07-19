@@ -29,3 +29,5 @@
 	  (equal? 42 (cdaar e))))
 
 (expect (raises? (moreso:eval '(set! does-not-exist 42) e)))
+(expect (raises? (moreso:eval '(set!) e)))
+(expect (raises? (moreso:eval '(set! forty-two) e)))

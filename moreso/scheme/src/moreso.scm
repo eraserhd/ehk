@@ -31,12 +31,14 @@
 	  (raise "`quote' expects a single form")))
 
        ((set!)
-	(let ((cell (moreso:lookup (cadr expr) env)))
-	  (if cell
-	    (set-cdr! cell (caddr expr))
-	    (raise (string-append "Unbound symbol `"
-				  (symbol->string expr)
-				  "'.")))))))
+	(if (not (= 3 (length expr)))
+	  (raise "`set!' expects two forms")
+	  (let ((cell (moreso:lookup (cadr expr) env)))
+	    (if cell
+	      (set-cdr! cell (caddr expr))
+	      (raise (string-append "Unbound symbol `"
+				    (symbol->string expr)
+				    "'."))))))))
 
     (else
      expr)))
