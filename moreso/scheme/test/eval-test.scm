@@ -1,7 +1,8 @@
 (include "expect.scm")
 (include "../src/moreso.scm")
 
-(define e '(((forty-two . 42))))
+(define e `(((forty-two . 42)
+	     (+ . ,+))))
 
 (define-macro (raises? expr)
   `(with-exception-catcher
@@ -27,7 +28,9 @@
 (expect (let ((e '(((foo . #f)))))
 	  (moreso:eval '(set! foo 42) e)
 	  (equal? 42 (cdaar e))))
-
 (expect (raises? (moreso:eval '(set! does-not-exist 42) e)))
 (expect (raises? (moreso:eval '(set!) e)))
 (expect (raises? (moreso:eval '(set! forty-two) e)))
+
+;; native procedure calls
+(expect (equal? 42 (moreso:eval '(+ 40 2) e)))

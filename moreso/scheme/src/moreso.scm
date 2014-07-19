@@ -38,7 +38,17 @@
 	      (set-cdr! cell (caddr expr))
 	      (raise (string-append "Unbound symbol `"
 				    (symbol->string expr)
-				    "'."))))))))
+				    "'."))))))
+
+       (else
+	 (let loop ((remaining-args expr)
+		    (evaluated-args '()))
+	   (if (null? remaining-args)
+	     (let ((args (reverse evaluated-args)))
+	       (apply (car args) (cdr args)))
+	     (loop
+	       (cdr remaining-args)
+	       (cons (moreso:eval (car remaining-args) e) evaluated-args)))))))
 
     (else
      expr)))
