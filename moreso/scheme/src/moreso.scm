@@ -59,7 +59,7 @@
 	  (raise "`set!' expects two forms")
 	  (let ((cell (moreso:lookup (cadr expr) env)))
 	    (if cell
-	      (set-cdr! cell (caddr expr))
+	      (set-cdr! cell (moreso:eval (caddr expr) env))
 	      (raise (string-append "Unbound symbol `"
 				    (symbol->string expr)
 				    "'."))))))
