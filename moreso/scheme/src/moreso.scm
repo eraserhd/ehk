@@ -23,7 +23,10 @@
        ((if)
 	(if (moreso:eval (cadr expr) env)
 	  (moreso:eval (caddr expr) env)
-	  (moreso:eval (cadddr expr) env)))))
+	  (moreso:eval (cadddr expr) env)))
+
+       ((quote)
+	(cadr expr))))
 
     (else
      expr)))

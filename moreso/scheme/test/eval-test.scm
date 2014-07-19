@@ -15,3 +15,5 @@
 	  (lambda ()
 	    (moreso:eval 'eleventy-seven e)
 	    #f)))
+
+(expect (equal? '(1 2) (moreso:eval ''(1 2) e)))
