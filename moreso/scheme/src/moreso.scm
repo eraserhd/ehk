@@ -26,7 +26,9 @@
 	  (moreso:eval (cadddr expr) env)))
 
        ((quote)
-	(cadr expr))))
+	(if (= 2 (length expr))
+	  (cadr expr)
+	  (raise "`quote' expects a single form")))))
 
     (else
      expr)))
