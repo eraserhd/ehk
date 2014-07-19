@@ -7,6 +7,20 @@
 	assq-result
 	(moreso:lookup sym (cdr env))))))
 
+(define-structure moreso:procedure
+  arg-list
+  body-exprs
+  lexical-env)
+
+(define moreso:lambda make-moreso:procedure)
+
+(define (moreso:apply procedure args)
+  (if (moreso:procedure? procedure)
+    (moreso:eval
+      (car (moreso:procedure-body-exprs procedure))
+      (moreso:procedure-lexical-env procedure))
+    (apply procedure args)))
+
 (define (moreso:eval expr env)
   (cond
     ((symbol? expr)
@@ -45,7 +59,7 @@
 		    (evaluated-args '()))
 	   (if (null? remaining-args)
 	     (let ((args (reverse evaluated-args)))
-	       (apply (car args) (cdr args)))
+	       (moreso:apply (car args) (cdr args)))
 	     (loop
 	       (cdr remaining-args)
 	       (cons (moreso:eval (car remaining-args) e) evaluated-args)))))))
