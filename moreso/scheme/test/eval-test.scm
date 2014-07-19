@@ -21,3 +21,7 @@
 
 (expect (equal? '(1 2) (moreso:eval ''(1 2) e)))
 (expect (raises? (moreso:eval '(quote (1 2) 1) e)))
+
+(expect (let ((e '(((foo . #f)))))
+	  (moreso:eval '(set! foo 42) e)
+	  (equal? 42 (cdaar e))))

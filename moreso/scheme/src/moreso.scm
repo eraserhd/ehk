@@ -28,7 +28,12 @@
        ((quote)
 	(if (= 2 (length expr))
 	  (cadr expr)
-	  (raise "`quote' expects a single form")))))
+	  (raise "`quote' expects a single form")))
+
+       ((set!)
+	(let ((cell (moreso:lookup (cadr expr) env)))
+	  (if cell
+	    (set-cdr! cell (caddr expr)))))))
 
     (else
      expr)))
