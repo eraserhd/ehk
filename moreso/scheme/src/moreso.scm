@@ -19,6 +19,9 @@
 				   (null? parameters-left))
 			      env)
 
+			     ((symbol? parameters-left)
+			      (cons (cons parameters-left args-left) env))
+
 			     ((null? parameters-left)
 			      (raise "Too many parameters"))
 

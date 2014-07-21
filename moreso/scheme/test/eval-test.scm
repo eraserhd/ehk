@@ -6,7 +6,8 @@
 	    (/ . ,/)
 	    (returns-42 . ,(moreso:lambda '() '(42) '()))
 	    (returns-env-a . ,(moreso:lambda '() '(a) '((a . 67))))
-	    (returns-param . ,(moreso:lambda '(a) '(a) '()))))
+	    (returns-param . ,(moreso:lambda '(a) '(a) '()))
+	    (returns-params . ,(moreso:lambda 'a '(a) '()))))
 
 (define-macro (raises? message expr)
   `(with-exception-catcher
@@ -50,3 +51,5 @@
 (expect (equal? 93 (moreso:eval '(returns-param 93) e)))
 (expect (raises? "Too many parameters" (moreso:eval '(returns-param 1 2) e)))
 (expect (raises? "Too few parameters" (moreso:eval '(returns-param) e)))
+(expect (equal? '() (moreso:eval '(returns-params) e)))
+(expect (equal? '(4 2 1) (moreso:eval '(returns-params 4 2 1) e)))
