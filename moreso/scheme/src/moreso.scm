@@ -19,6 +19,9 @@
 				   (null? parameters-left))
 			      env)
 
+			     ((null? parameters-left)
+			      (raise (string-append "Too many parameters")))
+
 			     (else
 			       (env-loop
 				 (cons (cons (car parameters-left)
