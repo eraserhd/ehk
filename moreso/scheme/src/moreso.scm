@@ -9,36 +9,36 @@
 
 (define moreso:lambda make-moreso:procedure)
 
-(define (moreso:apply p args)
+(define (moreso:apply p args-passed)
   (if (moreso:procedure? p)
     (let ((procedure-env (let env-loop ((env (moreso:procedure-lexical-env p))
-					(args-left args)
-					(parameters-left (moreso:procedure-arg-list p)))
+					(args-passed args-passed)
+					(args-specified (moreso:procedure-arg-list p)))
 			   (cond
-			     ((and (null? args-left)
-				   (null? parameters-left))
+			     ((and (null? args-passed)
+				   (null? args-specified))
 			      env)
 
-			     ((symbol? parameters-left)
-			      (cons (cons parameters-left args-left) env))
+			     ((symbol? args-specified)
+			      (cons (cons args-specified args-passed) env))
 
-			     ((null? parameters-left)
+			     ((null? args-specified)
 			      (raise "Too many parameters"))
 
-			     ((null? args-left)
+			     ((null? args-passed)
 			      (raise "Too few parameters"))
 
 			     (else
 			       (env-loop
-				 (cons (cons (car parameters-left)
-					     (car args-left))
+				 (cons (cons (car args-specified)
+					     (car args-passed))
 				       env)
-				 (cdr args-left)
-				 (cdr parameters-left)))))))
+				 (cdr args-passed)
+				 (cdr args-specified)))))))
       (moreso:eval
 	(car (moreso:procedure-body-exprs p))
 	procedure-env))
-    (apply p args)))
+    (apply p args-passed)))
 
 (define (moreso:eval expr env)
   (cond
