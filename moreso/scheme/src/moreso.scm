@@ -9,32 +9,34 @@
 
 (define moreso:lambda make-moreso:procedure)
 
+(define (moreso:bind-args env args-passed args-specified)
+  (cond
+    ((and (null? args-passed)
+	  (null? args-specified))
+     env)
+
+    ((symbol? args-specified)
+     (cons (cons args-specified args-passed) env))
+
+    ((null? args-specified)
+     (raise "Too many parameters"))
+
+    ((null? args-passed)
+     (raise "Too few parameters"))
+
+    (else
+      (moreso:bind-args
+	(cons (cons (car args-specified)
+		    (car args-passed))
+	      env)
+	(cdr args-passed)
+	(cdr args-specified)))))
+
 (define (moreso:apply p args-passed)
   (if (moreso:procedure? p)
-    (let ((procedure-env (let env-loop ((env (moreso:procedure-lexical-env p))
-					(args-passed args-passed)
-					(args-specified (moreso:procedure-arg-list p)))
-			   (cond
-			     ((and (null? args-passed)
-				   (null? args-specified))
-			      env)
-
-			     ((symbol? args-specified)
-			      (cons (cons args-specified args-passed) env))
-
-			     ((null? args-specified)
-			      (raise "Too many parameters"))
-
-			     ((null? args-passed)
-			      (raise "Too few parameters"))
-
-			     (else
-			       (env-loop
-				 (cons (cons (car args-specified)
-					     (car args-passed))
-				       env)
-				 (cdr args-passed)
-				 (cdr args-specified)))))))
+    (let ((procedure-env (moreso:bind-args (moreso:procedure-lexical-env p)
+					   args-passed
+					   (moreso:procedure-arg-list p))))
       (moreso:eval
 	(car (moreso:procedure-body-exprs p))
 	procedure-env))
