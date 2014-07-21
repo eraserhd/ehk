@@ -39,7 +39,7 @@
 	 (cdr cell)
 	 (raise (string-append "Unbound symbol `"
 			       (symbol->string expr)
-			       "'.")))))
+			       "'")))))
 
     ((list? expr)
      (case (car expr)
@@ -61,8 +61,8 @@
 	    (if cell
 	      (set-cdr! cell (moreso:eval (caddr expr) env))
 	      (raise (string-append "Unbound symbol `"
-				    (symbol->string expr)
-				    "'."))))))
+				    (symbol->string (cadr expr))
+				    "'"))))))
 
        (else
 	 (let loop ((remaining-args expr)

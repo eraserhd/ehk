@@ -8,10 +8,10 @@
 	    (returns-env-a . ,(moreso:lambda '() '(a) '((a . 67))))
 	    (returns-param . ,(moreso:lambda '(a) '(a) '()))))
 
-(define-macro (raises? expr)
+(define-macro (raises? message expr)
   `(with-exception-catcher
      (lambda (ex)
-       #t)
+       (string=? ,message ex))
      (lambda ()
        ,expr
        #f)))
@@ -22,11 +22,11 @@
 (expect (equal? 79 (moreso:eval '(if #t 79) e)))
 (expect (equal? 86 (moreso:eval '(if #f 79 86) e)))
 (expect (equal? 42 (moreso:eval 'forty-two e)))
-(expect (raises? (moreso:eval 'eleventy-seven e)))
+(expect (raises? "Unbound symbol `eleventy-seven'" (moreso:eval 'eleventy-seven e)))
 
 ;; quote
 (expect (equal? '(1 2) (moreso:eval ''(1 2) e)))
-(expect (raises? (moreso:eval '(quote (1 2) 1) e)))
+(expect (raises? "`quote' expects a single form" (moreso:eval '(quote (1 2) 1) e)))
 
 ;; set!
 (expect (let ((e '((foo . #f))))
@@ -35,9 +35,10 @@
 (expect (let ((e '((foo . #f))))
 	  (moreso:eval '(set! foo (+ 70 9)) e)
 	  (equal? 79 (cdar e))))
-(expect (raises? (moreso:eval '(set! does-not-exist 42) e)))
-(expect (raises? (moreso:eval '(set!) e)))
-(expect (raises? (moreso:eval '(set! forty-two) e)))
+
+(expect (raises? "Unbound symbol `does-not-exist'" (moreso:eval '(set! does-not-exist 42) e)))
+(expect (raises? "`set!' expects two forms" (moreso:eval '(set!) e)))
+(expect (raises? "`set!' expects two forms" (moreso:eval '(set! forty-two) e)))
 
 ;; native procedure calls
 (expect (equal? 42 (moreso:eval '(+ 40 2) e)))
