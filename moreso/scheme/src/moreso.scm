@@ -20,7 +20,10 @@
 			      env)
 
 			     ((null? parameters-left)
-			      (raise (string-append "Too many parameters")))
+			      (raise "Too many parameters"))
+
+			     ((null? args-left)
+			      (raise "Too few parameters"))
 
 			     (else
 			       (env-loop

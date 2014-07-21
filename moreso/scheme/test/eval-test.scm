@@ -49,3 +49,4 @@
 (expect (equal? 67 (moreso:eval '(returns-env-a) e)))
 (expect (equal? 93 (moreso:eval '(returns-param 93) e)))
 (expect (raises? "Too many parameters" (moreso:eval '(returns-param 1 2) e)))
+(expect (raises? "Too few parameters" (moreso:eval '(returns-param) e)))
