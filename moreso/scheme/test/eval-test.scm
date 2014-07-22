@@ -58,3 +58,4 @@
 (expect (equal? '() (moreso:eval '(returns-params) e)))
 (expect (equal? '(4 2 1) (moreso:eval '(returns-params 4 2 1) e)))
 (expect (equal? 5 (moreso:eval '(a-5) e)))
+(expect (equal? 42 (moreso:eval '((lambda () 42)) e)))

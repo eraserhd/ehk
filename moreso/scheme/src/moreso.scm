@@ -75,6 +75,9 @@
 	  (moreso:eval (caddr expr) env)
 	  (moreso:eval (cadddr expr) env)))
 
+       ((lambda)
+	(moreso:lambda (cadr expr) (cddr expr) env))
+
        ((quote)
 	(if (= 2 (length expr))
 	  (cadr expr)
