@@ -128,3 +128,9 @@
 
     (else
      expr)))
+
+;; Default environment
+
+(define moreso:r5rs
+  `((+ . ,+)
+    (/ . ,/)))
