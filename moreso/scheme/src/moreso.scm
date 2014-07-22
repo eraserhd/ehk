@@ -42,15 +42,14 @@
 	(cdr args-passed)
 	(cdr args-specified)))))
 
-(define (moreso:apply p args-passed)
+(define (moreso:apply p args)
   (if (moreso:procedure? p)
-    (let ((procedure-env (moreso:bind-args (moreso:procedure-lexical-environment p)
-					   args-passed
-					   (moreso:procedure-arg-list p))))
-      (moreso:eval
-	(car (moreso:procedure-body p))
-	procedure-env))
-    (apply p args-passed)))
+    (let ((environment (moreso:bind-args
+			 (moreso:procedure-lexical-environment p)
+			 args
+			 (moreso:procedure-arg-list p))))
+      (moreso:eval (car (moreso:procedure-body p)) environment))
+    (apply p args)))
 
 (define (moreso:lookup sym env)
   (assq sym env))
