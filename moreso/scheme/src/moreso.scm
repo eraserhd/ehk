@@ -57,6 +57,22 @@
 	    (moreso:eval (car body) environment)))))
     (apply p args)))
 
+;; Macros
+
+(define moreso:macro-tag '#(moreso:macro))
+
+(define (moreso:make-macro procedure)
+  (vector moreso:macro-tag procedure))
+
+(define (moreso:macro? macro)
+  (and (vector? macro)
+       (eq? (vector-ref macro 0) moreso:macro-tag)))
+
+(define (moreso:macro-procedure macro)
+  (vector-ref macro 1))
+
+;; Eval
+
 (define (moreso:eval expr env)
   (cond
     ((symbol? expr)
@@ -94,14 +110,21 @@
 				    "'"))))))
 
        (else
-	 (let loop ((remaining-args expr)
-		    (evaluated-args '()))
-	   (if (null? remaining-args)
-	     (let ((args (reverse evaluated-args)))
-	       (moreso:apply (car args) (cdr args)))
-	     (loop
-	       (cdr remaining-args)
-	       (cons (moreso:eval (car remaining-args) e) evaluated-args)))))))
+	 (let ((first-form (moreso:eval (car expr) env))
+	       (unevaluated-args (cdr expr)))
+	   (if (moreso:macro? first-form)
+	     (moreso:eval (moreso:apply (moreso:macro-procedure first-form)
+					(cdr expr))
+			  env)
+	     (let ((evaluated-args (let loop ((evaluated '())
+					      (remaining unevaluated-args))
+				     (if (null? remaining)
+				       (reverse evaluated)
+				       (loop
+					 (cons (moreso:eval (car remaining) env)
+					       evaluated)
+					 (cdr remaining))))))
+	       (moreso:apply first-form evaluated-args)))))))
 
     (else
      expr)))

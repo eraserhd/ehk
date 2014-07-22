@@ -11,7 +11,10 @@
 	    (a-5 . ,(moreso:lambda '()
 				   '((set! x 5)
 				     x)
-				   '((x . 0))))))
+				   '((x . 0))))
+	    (double-it . ,(moreso:make-macro
+		            (lambda (value)
+		              `(+ ,value ,value))))))
 
 (define-macro (raises? message expr)
   `(with-exception-catcher
@@ -37,7 +40,7 @@
 (expect (let ((e '((foo . #f))))
 	  (moreso:eval '(set! foo 42) e)
 	  (equal? 42 (cdar e))))
-(expect (let ((e '((foo . #f))))
+(expect (let ((e (cons '(foo . #f) e)))
 	  (moreso:eval '(set! foo (+ 70 9)) e)
 	  (equal? 79 (cdar e))))
 
@@ -59,3 +62,6 @@
 (expect (equal? '(4 2 1) (moreso:eval '(returns-params 4 2 1) e)))
 (expect (equal? 5 (moreso:eval '(a-5) e)))
 (expect (equal? 42 (moreso:eval '((lambda () 42)) e)))
+
+;; macro expansion
+(expect (equal? 4 (moreso:eval '(double-it 2) e)))
