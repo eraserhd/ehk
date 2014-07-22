@@ -51,13 +51,10 @@
       (moreso:eval (car (moreso:procedure-body p)) environment))
     (apply p args)))
 
-(define (moreso:lookup sym env)
-  (assq sym env))
-
 (define (moreso:eval expr env)
   (cond
     ((symbol? expr)
-     (let ((cell (moreso:lookup expr env)))
+     (let ((cell (assq expr env)))
        (if cell
 	 (cdr cell)
 	 (raise (string-append "Unbound symbol `"
@@ -80,7 +77,7 @@
        ((set!)
 	(if (not (= 3 (length expr)))
 	  (raise "`set!' expects two forms")
-	  (let ((cell (moreso:lookup (cadr expr) env)))
+	  (let ((cell (assq (cadr expr) env)))
 	    (if cell
 	      (set-cdr! cell (moreso:eval (caddr expr) env))
 	      (raise (string-append "Unbound symbol `"
