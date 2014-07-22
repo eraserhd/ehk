@@ -131,6 +131,22 @@
 
 ;; Default environment
 
+(define moreso:let
+  (moreso:make-macro
+    (lambda (bindings . body)
+      (let ((binding-names (let loop ((bindings bindings)
+				      (names '()))
+			     (if (null? bindings)
+			       (reverse names)
+			       (loop (cdr bindings) (cons (caar bindings) names)))))
+	    (binding-exprs (let loop ((bindings bindings)
+				      (exprs '()))
+			     (if (null? bindings)
+			       (reverse exprs)
+			       (loop (cdr bindings) (cons (cadar bindings) exprs))))))
+	`((lambda ,binding-names ,@body) ,@binding-exprs)))))
+
 (define moreso:r5rs
   `((+ . ,+)
-    (/ . ,/)))
+    (/ . ,/)
+    (let . ,moreso:let)))
