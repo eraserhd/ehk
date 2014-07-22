@@ -136,16 +136,33 @@
 	     (result '()))
     (if (null? remaining)
       (reverse result)
-      (cons (proc (car remaining)) result))))
+      (loop (cdr remaining) (cons (proc (car remaining)) result)))))
 
 (define moreso:let
   (moreso:make-macro
     (lambda (bindings . body)
-      (let ((binding-names (moreso:map car bindings))
-	    (binding-exprs (moreso:map cadr bindings)))
-	`((lambda ,binding-names ,@body) ,@binding-exprs)))))
+      (let* ((loop-label (if (symbol? bindings)
+			   bindings
+			   #f))
+	     (bindings (if loop-label
+			 (car body)
+			 bindings))
+	     (body (if loop-label
+		     (cdr body)
+		     body))
+	     (binding-names (moreso:map car bindings))
+	     (binding-exprs (moreso:map cadr bindings))
+	     (binding-lambda `(lambda ,binding-names ,@body)))
+	(if loop-label
+	  `((lambda (,loop-label)
+	      (set! ,loop-label ,binding-lambda)
+	      (,loop-label ,@binding-exprs)) #f)
+	  `(,binding-lambda ,@binding-exprs))))))
 
 (define moreso:r5rs
   `((+ . ,+)
     (/ . ,/)
-    (let . ,moreso:let)))
+    (car . ,car)
+    (cdr . ,cdr)
+    (let . ,moreso:let)
+    (null? . ,null?)))
