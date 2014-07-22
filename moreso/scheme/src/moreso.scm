@@ -1,13 +1,23 @@
 
-(define (moreso:lookup sym env)
-  (assq sym env))
+;; Procedures
 
-(define-structure moreso:procedure
-  arg-list
-  body-exprs
-  lexical-env)
+(define moreso:procedure-tag '#(moreso:procedure))
 
-(define moreso:lambda make-moreso:procedure)
+(define (moreso:lambda arg-list body lexical-environment)
+  `#(,moreso:procedure-tag ,arg-list ,body ,lexical-environment))
+
+(define (moreso:procedure? p)
+  (and (vector? p)
+       (eq? moreso:procedure-tag (vector-ref p 0))))
+
+(define (moreso:procedure-arg-list p)
+  (vector-ref p 1))
+
+(define (moreso:procedure-body p)
+  (vector-ref p 2))
+
+(define (moreso:procedure-lexical-environment p)
+  (vector-ref p 3))
 
 (define (moreso:bind-args env args-passed args-specified)
   (cond
@@ -34,13 +44,16 @@
 
 (define (moreso:apply p args-passed)
   (if (moreso:procedure? p)
-    (let ((procedure-env (moreso:bind-args (moreso:procedure-lexical-env p)
+    (let ((procedure-env (moreso:bind-args (moreso:procedure-lexical-environment p)
 					   args-passed
 					   (moreso:procedure-arg-list p))))
       (moreso:eval
-	(car (moreso:procedure-body-exprs p))
+	(car (moreso:procedure-body p))
 	procedure-env))
     (apply p args-passed)))
+
+(define (moreso:lookup sym env)
+  (assq sym env))
 
 (define (moreso:eval expr env)
   (cond
