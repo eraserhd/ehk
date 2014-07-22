@@ -48,7 +48,13 @@
 			 (moreso:procedure-lexical-environment p)
 			 args
 			 (moreso:procedure-arg-list p))))
-      (moreso:eval (car (moreso:procedure-body p)) environment))
+      (let body-loop ((body (moreso:procedure-body p))
+		      (value (if #f #f)))
+	(if (null? body)
+	  value
+	  (body-loop
+	    (cdr body)
+	    (moreso:eval (car body) environment)))))
     (apply p args)))
 
 (define (moreso:eval expr env)
