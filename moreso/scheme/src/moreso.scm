@@ -138,6 +138,11 @@
       (reverse result)
       (loop (cdr remaining) (cons (proc (car remaining)) result)))))
 
+(define moreso:begin
+  (moreso:make-macro
+    (lambda args
+      `(let () ,@args))))
+
 (define moreso:let
   (moreso:make-macro
     (lambda (bindings . body)
@@ -162,6 +167,7 @@
 (define moreso:r5rs
   `((+ . ,+)
     (/ . ,/)
+    (begin . ,moreso:begin)
     (car . ,car)
     (cdr . ,cdr)
     (let . ,moreso:let)
