@@ -29,4 +29,4 @@
 ;; 4.2.3 Sequencing
 
 (expect (= 42 (moreso:eval '(begin 41 42) moreso:r5rs)))
-(expect (equal? (if #f #f) (moreso:eval '(begin) moreso:r5rs)))
+(expect (equal? moreso:unspecified (moreso:eval '(begin) moreso:r5rs)))

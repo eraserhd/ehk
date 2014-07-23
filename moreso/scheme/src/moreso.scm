@@ -1,3 +1,20 @@
+;; Utilities
+
+(define (map proc list)
+  (let loop ((remaining list)
+	     (result '()))
+    (if (null? remaining)
+      (reverse result)
+      (loop (cdr remaining) (cons (proc (car remaining)) result)))))
+
+(define (reduce proc initial-value list)
+  (let loop ((remaining list)
+	     (accumulator initial-value))
+    (if (null? remaining)
+      accumulator
+      (loop (cdr remaining) (proc accumulator (car remaining))))))
+
+;; Miscellaneous
 
 (define moreso:unspecified '#(moreso:unspecified))
 
@@ -20,6 +37,22 @@
 
 (define (moreso:procedure-lexical-environment p)
   (vector-ref p 3))
+
+;; Macros
+
+(define moreso:macro-tag '#(moreso:macro))
+
+(define (moreso:make-macro procedure)
+  (vector moreso:macro-tag procedure))
+
+(define (moreso:macro? macro)
+  (and (vector? macro)
+       (eq? (vector-ref macro 0) moreso:macro-tag)))
+
+(define (moreso:macro-procedure macro)
+  (vector-ref macro 1))
+
+;; Eval
 
 (define (moreso:bind-args env args-passed args-specified)
   (cond
@@ -59,22 +92,6 @@
 	    (moreso:eval (car body) environment)))))
     (apply p args)))
 
-;; Macros
-
-(define moreso:macro-tag '#(moreso:macro))
-
-(define (moreso:make-macro procedure)
-  (vector moreso:macro-tag procedure))
-
-(define (moreso:macro? macro)
-  (and (vector? macro)
-       (eq? (vector-ref macro 0) moreso:macro-tag)))
-
-(define (moreso:macro-procedure macro)
-  (vector-ref macro 1))
-
-;; Eval
-
 (define (moreso:eval expr env)
   (cond
     ((symbol? expr)
@@ -88,6 +105,16 @@
     ((list? expr)
      (case (car expr)
        ;; Special forms
+       ((begin)
+	(if (= 1 (length expr))
+	  moreso:unspecified
+	  (let subexpression-loop ((subexpressions (cdr expr)))
+	    (if (null? (cdr subexpressions))
+	      (moreso:eval (car subexpressions) env)
+	      (begin
+		(moreso:eval (car subexpressions) env)
+		(subexpression-loop (cdr subexpressions)))))))
+       
        ((if)
 	(if (moreso:eval (cadr expr) env)
 	  (moreso:eval (caddr expr) env)
@@ -133,26 +160,7 @@
     (else
      expr)))
 
-(define (map proc list)
-  (let loop ((remaining list)
-	     (result '()))
-    (if (null? remaining)
-      (reverse result)
-      (loop (cdr remaining) (cons (proc (car remaining)) result)))))
-
-(define (reduce proc initial-value list)
-  (let loop ((remaining list)
-	     (accumulator initial-value))
-    (if (null? remaining)
-      accumulator
-      (loop (cdr remaining) (proc accumulator (car remaining))))))
-
 ;; Default environment
-
-(define moreso:begin
-  (moreso:make-macro
-    (lambda args
-      `(let () ,@args))))
 
 (define moreso:cond
   (moreso:make-macro
@@ -199,7 +207,6 @@
   `((+ . ,+)
     (/ . ,/)
     (= . ,=)
-    (begin . ,moreso:begin)
     (car . ,car)
     (cdr . ,cdr)
     (cond . ,moreso:cond)
