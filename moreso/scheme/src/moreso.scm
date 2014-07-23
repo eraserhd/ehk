@@ -135,7 +135,7 @@
 
 ;; Default environment
 
-(define (moreso:map proc list)
+(define (map proc list)
   (let loop ((remaining list)
 	     (result '()))
     (if (null? remaining)
@@ -180,8 +180,8 @@
 	     (body (if loop-label
 		     (cdr body)
 		     body))
-	     (binding-names (moreso:map car bindings))
-	     (binding-exprs (moreso:map cadr bindings))
+	     (binding-names (map car bindings))
+	     (binding-exprs (map cadr bindings))
 	     (binding-lambda `(lambda ,binding-names ,@body)))
 	(if loop-label
 	  `((lambda (,loop-label)
