@@ -150,14 +150,23 @@
 (define moreso:cond
   (moreso:make-macro
     (lambda args
-      (let loop ((args (reverse args))
-		 (expr moreso:unspecified))
-	(if (null? args)
-	  expr
-	  (loop (cdr args)
-		`(if ,(caar args)
-		   (begin ,@(cdar args))
-		   ,expr)))))))
+      (let* ((reversed-conditions (reverse args))
+	     (else-cond? (and (not (null? reversed-conditions))
+			      (eq? 'else (caar reversed-conditions))))
+	     (else-expr (if else-cond?
+			  (cadar reversed-conditions)
+			  moreso:unspecified))
+	     (conds-left (if else-cond?
+			   (cdr reversed-conditions)
+			   reversed-conditions)))
+	(let loop ((conds conds-left)
+		   (expr else-expr))
+	  (if (null? conds)
+	    expr
+	    (loop (cdr conds)
+		  `(if ,(caar conds)
+		     (begin ,@(cdar conds))
+		     ,expr))))))))
 
 (define moreso:let
   (moreso:make-macro

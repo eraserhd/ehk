@@ -21,6 +21,10 @@
 (expect (= 4 (moreso:eval '(cond
 			     ((= 2 3) 42)
 			     ((= 2 2) 4)) moreso:r5rs)))
+(expect (= 72 (moreso:eval '(cond
+			      (#f 42)
+			      ((= 2 3) 98)
+			      (else 72)) moreso:r5rs)))
 
 ;; 4.2.3 Sequencing
 
