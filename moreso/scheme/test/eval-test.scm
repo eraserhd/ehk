@@ -2,13 +2,14 @@
 (include "../src/moreso.scm")
 
 (define e (append `((forty-two . 42)
-		    (returns-42 . ,(moreso:lambda '() '(42) '()))
-		    (returns-env-a . ,(moreso:lambda '() '(a) '((a . 67))))
-		    (returns-param . ,(moreso:lambda '(a) '(a) '()))
-		    (returns-params . ,(moreso:lambda 'a '(a) '()))
+		    (returns-42 . ,(moreso:lambda '() 42 '()))
+		    (returns-env-a . ,(moreso:lambda '() 'a '((a . 67))))
+		    (returns-param . ,(moreso:lambda '(a) 'a '()))
+		    (returns-params . ,(moreso:lambda 'a 'a '()))
 		    (a-5 . ,(moreso:lambda '()
-					   '((set! x 5)
-					     x)
+					   '(begin
+					      (set! x 5)
+					       x)
 					   '((x . 0))))
 		    (double-it . ,(moreso:make-macro
 				    (lambda (value)

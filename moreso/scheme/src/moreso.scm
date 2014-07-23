@@ -16,6 +16,11 @@
 
 ;; Miscellaneous
 
+(define (group-expressions expression-list)
+  (if (= 1 (length expression-list))
+    (car expression-list)
+    (cons 'begin expression-list)))
+
 (define moreso:unspecified '#(moreso:unspecified))
 
 ;; Procedures
@@ -83,13 +88,7 @@
 			 (moreso:procedure-lexical-environment p)
 			 args
 			 (moreso:procedure-arg-list p))))
-      (let body-loop ((body (moreso:procedure-body p))
-		      (value (if #f #f)))
-	(if (null? body)
-	  value
-	  (body-loop
-	    (cdr body)
-	    (moreso:eval (car body) environment)))))
+      (moreso:eval (moreso:procedure-body p) environment))
     (apply p args)))
 
 (define (moreso:eval expr env)
@@ -123,7 +122,7 @@
             moreso:unspecified)))
 
        ((lambda)
-	(moreso:lambda (cadr expr) (cddr expr) env))
+	(moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
 
        ((quote)
 	(if (= 2 (length expr))
@@ -177,7 +176,7 @@
 	(reduce
 	  (lambda (exprs a-cond)
 	    `(if ,(car a-cond)
-	       (begin ,@(cdr a-cond))
+	       ,(group-expressions (cdr a-cond))
 	       ,exprs))
 	  else-expr
 	  conds-left)))))
