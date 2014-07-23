@@ -8,11 +8,13 @@
       (loop (cdr remaining) (cons (proc (car remaining)) result)))))
 
 (define (reduce proc initial-value list)
-  (let loop ((remaining list)
-	     (accumulator initial-value))
-    (if (null? remaining)
-      accumulator
-      (loop (cdr remaining) (proc accumulator (car remaining))))))
+  (cond
+    ((null? list)
+     initial-value)
+    ((null? (cdr list)) ; last element is a tail call
+     (proc initial-value (car list)))
+    (else
+      (reduce proc (proc initial-value (car list)) (cdr list)))))
 
 ;; Miscellaneous
 
@@ -105,14 +107,11 @@
      (case (car expr)
        ;; Special forms
        ((begin)
-	(if (= 1 (length expr))
+	(reduce
+	  (lambda (_ expr)
+	    (moreso:eval expr env))
 	  moreso:unspecified
-	  (let subexpression-loop ((subexpressions (cdr expr)))
-	    (if (null? (cdr subexpressions))
-	      (moreso:eval (car subexpressions) env)
-	      (begin
-		(moreso:eval (car subexpressions) env)
-		(subexpression-loop (cdr subexpressions)))))))
+	  (cdr expr)))
        
        ((if)
 	(if (moreso:eval (cadr expr) env)
