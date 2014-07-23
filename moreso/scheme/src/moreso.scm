@@ -1,4 +1,6 @@
 
+(define moreso:unspecified '#(moreso:unspecified))
+
 ;; Procedures
 
 (define moreso:procedure-tag '#(moreso:procedure))
@@ -89,7 +91,9 @@
        ((if)
 	(if (moreso:eval (cadr expr) env)
 	  (moreso:eval (caddr expr) env)
-	  (moreso:eval (cadddr expr) env)))
+          (if (= 4 (length expr))
+	    (moreso:eval (cadddr expr) env)
+            moreso:unspecified)))
 
        ((lambda)
 	(moreso:lambda (cadr expr) (cddr expr) env))

@@ -28,6 +28,7 @@
 (expect (equal? #t (moreso:eval #t e)))
 (expect (equal? 79 (moreso:eval '(if #t 79) e)))
 (expect (equal? 86 (moreso:eval '(if #f 79 86) e)))
+(expect (eq? moreso:unspecified (moreso:eval '(if #f #f) e)))
 (expect (equal? 42 (moreso:eval 'forty-two e)))
 (expect (raises? "Unbound symbol `eleventy-seven'" (moreso:eval 'eleventy-seven e)))
 
