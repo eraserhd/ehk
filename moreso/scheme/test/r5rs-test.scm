@@ -15,6 +15,7 @@
                               ((= 2 2)
                                42))
                            moreso:r5rs)))
+(expect (equal? moreso:unspecified (moreso:eval '(cond ((= 2 3) 42)) moreso:r5rs)))
 
 ;; 4.2.3 Sequencing
 
