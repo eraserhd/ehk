@@ -9,6 +9,13 @@
 			       (loop (cdr remaining) (+ result (car remaining)))))
 			  moreso:r5rs)))
 
+;; 4.2.1 Conditionals
+
+(expect (= 42 (moreso:eval '(cond
+                              ((= 2 2)
+                               42))
+                           moreso:r5rs)))
+
 ;; 4.2.3 Sequencing
 
 (expect (= 42 (moreso:eval '(begin 41 42) moreso:r5rs)))

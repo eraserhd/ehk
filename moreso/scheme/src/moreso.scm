@@ -143,6 +143,11 @@
     (lambda args
       `(let () ,@args))))
 
+(define moreso:cond
+  (moreso:make-macro
+    (lambda args
+      `(if ,(caar args) (begin ,@(cdar args))))))
+
 (define moreso:let
   (moreso:make-macro
     (lambda (bindings . body)
@@ -167,8 +172,10 @@
 (define moreso:r5rs
   `((+ . ,+)
     (/ . ,/)
+    (= . ,=)
     (begin . ,moreso:begin)
     (car . ,car)
     (cdr . ,cdr)
+    (cond . ,moreso:cond)
     (let . ,moreso:let)
     (null? . ,null?)))
