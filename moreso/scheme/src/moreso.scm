@@ -133,14 +133,21 @@
     (else
      expr)))
 
-;; Default environment
-
 (define (map proc list)
   (let loop ((remaining list)
 	     (result '()))
     (if (null? remaining)
       (reverse result)
       (loop (cdr remaining) (cons (proc (car remaining)) result)))))
+
+(define (reduce proc initial-value list)
+  (let loop ((remaining list)
+	     (accumulator initial-value))
+    (if (null? remaining)
+      accumulator
+      (loop (cdr remaining) (proc accumulator (car remaining))))))
+
+;; Default environment
 
 (define moreso:begin
   (moreso:make-macro
@@ -159,14 +166,13 @@
 	     (conds-left (if else-cond?
 			   (cdr reversed-conditions)
 			   reversed-conditions)))
-	(let loop ((conds conds-left)
-		   (expr else-expr))
-	  (if (null? conds)
-	    expr
-	    (loop (cdr conds)
-		  `(if ,(caar conds)
-		     (begin ,@(cdar conds))
-		     ,expr))))))))
+	(reduce
+	  (lambda (exprs a-cond)
+	    `(if ,(car a-cond)
+	       (begin ,@(cdr a-cond))
+	       ,exprs))
+	  else-expr
+	  conds-left)))))
 
 (define moreso:let
   (moreso:make-macro
