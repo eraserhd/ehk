@@ -146,14 +146,7 @@
 	     (moreso:eval (moreso:apply (moreso:macro-procedure first-form)
 					(cdr expr))
 			  env)
-	     (let ((evaluated-args (let loop ((evaluated '())
-					      (remaining unevaluated-args))
-				     (if (null? remaining)
-				       (reverse evaluated)
-				       (loop
-					 (cons (moreso:eval (car remaining) env)
-					       evaluated)
-					 (cdr remaining))))))
+	     (let ((evaluated-args (map (lambda (arg) (moreso:eval arg env)) unevaluated-args)))
 	       (moreso:apply first-form evaluated-args)))))))
 
     (else
