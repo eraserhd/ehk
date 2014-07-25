@@ -89,29 +89,29 @@
 (define (moreso:eval expr env)
 
  (define special-form-evaluators
-   `((begin . ,(lambda (expr env)
+   `((begin . ,(lambda (expr)
 		 (reduce
 		   (lambda (_ expr)
 		     (moreso:eval expr env))
 		   moreso:unspecified
 		   (cdr expr))))
 
-     (if . ,(lambda (expr env)
+     (if . ,(lambda (expr)
 	      (if (moreso:eval (cadr expr) env)
 		(moreso:eval (caddr expr) env)
 		(if (= 4 (length expr))
 		  (moreso:eval (cadddr expr) env)
 		  moreso:unspecified))))
 
-     (lambda . ,(lambda (expr env)
+     (lambda . ,(lambda (expr)
 		  (moreso:lambda (cadr expr) (group-expressions (cddr expr)) env)))
 
-     (quote . ,(lambda (expr env)
+     (quote . ,(lambda (expr)
 		 (if (= 2 (length expr))
 		   (cadr expr)
 		   (raise "`quote' expects a single form"))))
 
-     (set! . ,(lambda (expr env)
+     (set! . ,(lambda (expr)
 		(if (not (= 3 (length expr)))
 		  (raise "`set!' expects two forms")
 		  (let ((cell (assq (cadr expr) env)))
@@ -132,7 +132,7 @@
  (define (eval-list expr)
    (let ((special-form-evaluator (assq (car expr) special-form-evaluators)))
      (if special-form-evaluator
-       ((cdr special-form-evaluator) expr env)
+       ((cdr special-form-evaluator) expr)
        (let ((first-form (moreso:eval (car expr) env))
 	     (unevaluated-args (cdr expr)))
 	 (if (moreso:macro? first-form)
