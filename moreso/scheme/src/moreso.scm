@@ -100,6 +100,14 @@
       (moreso:eval (cadddr expr) env)
       moreso:unspecified)))
 
+(define (eval-lambda expr env)
+  (moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
+
+(define (eval-quote expr env)
+  (if (= 2 (length expr))
+    (cadr expr)
+    (raise "`quote' expects a single form")))
+
 (define (eval-set! expr env)
   (if (not (= 3 (length expr)))
     (raise "`set!' expects two forms")
@@ -109,14 +117,6 @@
 	(raise (string-append "Unbound symbol `"
 			      (symbol->string (cadr expr))
 			      "'"))))))
-
-(define (eval-quote expr env)
-  (if (= 2 (length expr))
-    (cadr expr)
-    (raise "`quote' expects a single form")))
-
-(define (eval-lambda expr env)
-  (moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
 
 (define special-forms
   `((begin . ,eval-begin)
