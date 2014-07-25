@@ -115,6 +115,9 @@
     (cadr expr)
     (raise "`quote' expects a single form")))
 
+(define (eval-lambda expr env)
+  (moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
+
 (define (eval-list expr env)
   (cond
     ((symbol? expr)
@@ -135,7 +138,7 @@
 	(eval-if expr env))
 
        ((lambda)
-	(moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
+	(eval-lambda expr env))
 
        ((quote)
 	(eval-quote expr env))
