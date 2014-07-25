@@ -86,46 +86,40 @@
       (moreso:eval (moreso:procedure-body p) environment))
     (apply p args)))
 
-(define (eval-begin expr env)
-  (reduce
-    (lambda (_ expr)
-      (moreso:eval expr env))
-    moreso:unspecified
-    (cdr expr)))
-
-(define (eval-if expr env)
-  (if (moreso:eval (cadr expr) env)
-    (moreso:eval (caddr expr) env)
-    (if (= 4 (length expr))
-      (moreso:eval (cadddr expr) env)
-      moreso:unspecified)))
-
-(define (eval-lambda expr env)
-  (moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
-
-(define (eval-quote expr env)
-  (if (= 2 (length expr))
-    (cadr expr)
-    (raise "`quote' expects a single form")))
-
-(define (eval-set! expr env)
-  (if (not (= 3 (length expr)))
-    (raise "`set!' expects two forms")
-    (let ((cell (assq (cadr expr) env)))
-      (if cell
-	(set-cdr! cell (moreso:eval (caddr expr) env))
-	(raise (string-append "Unbound symbol `"
-			      (symbol->string (cadr expr))
-			      "'"))))))
-
-(define special-forms
-  `((begin . ,eval-begin)
-    (if . ,eval-if)
-    (lambda . ,eval-lambda)
-    (quote . ,eval-quote)
-    (set! . ,eval-set!)))
-
 (define (moreso:eval expr env)
+
+ (define special-forms
+   `((begin . ,(lambda (expr env)
+		 (reduce
+		   (lambda (_ expr)
+		     (moreso:eval expr env))
+		   moreso:unspecified
+		   (cdr expr))))
+
+     (if . ,(lambda (expr env)
+	      (if (moreso:eval (cadr expr) env)
+		(moreso:eval (caddr expr) env)
+		(if (= 4 (length expr))
+		  (moreso:eval (cadddr expr) env)
+		  moreso:unspecified))))
+
+     (lambda . ,(lambda (expr env)
+		  (moreso:lambda (cadr expr) (group-expressions (cddr expr)) env)))
+
+     (quote . ,(lambda (expr env)
+		 (if (= 2 (length expr))
+		   (cadr expr)
+		   (raise "`quote' expects a single form"))))
+
+     (set! . ,(lambda (expr env)
+		(if (not (= 3 (length expr)))
+		  (raise "`set!' expects two forms")
+		  (let ((cell (assq (cadr expr) env)))
+		    (if cell
+		      (set-cdr! cell (moreso:eval (caddr expr) env))
+		      (raise (string-append "Unbound symbol `"
+					    (symbol->string (cadr expr))
+					    "'")))))))))
 
  (define (eval-symbol sym)
    (let ((cell (assq sym env)))
