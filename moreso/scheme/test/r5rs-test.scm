@@ -26,6 +26,12 @@
 			      ((= 2 3) 98)
 			      (else 72)) moreso:r5rs)))
 
+(expect (= 42 (moreso:eval '(case 7
+			      ((6 8 9) 79)
+			      ((5 7 10) 42)
+			      ((11 13) #f)
+			      (else #t)) moreso:r5rs)))
+
 ;; 4.2.3 Sequencing
 
 (expect (= 42 (moreso:eval '(begin 41 42) moreso:r5rs)))

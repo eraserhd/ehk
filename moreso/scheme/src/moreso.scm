@@ -154,6 +154,28 @@
 
 ;; Default environment
 
+(define moreso:case
+  (moreso:make-macro
+    (lambda (value-expr . args)
+      (let* ((reversed-conditions (reverse args))
+	     (else-cond? (and (not (null? reversed-conditions))
+			      (eq? 'else (caar reversed-conditions))))
+	     (else-expr (if else-cond?
+			  (cdar reversed-conditions)
+			  moreso:unspecified))
+	     (conds-left (if else-cond?
+			   (cdr reversed-conditions)
+			   reversed-conditions))
+	     (value-symbol (gensym)))
+	`(let ((,value-symbol ,value-expr))
+	   ,(reduce
+	      (lambda (exprs a-case)
+		`(if (memv ,value-symbol ',(car a-case))
+		   ,(group-expressions (cdr a-case))
+		   ,exprs))
+	  else-expr
+	  conds-left))))))
+
 (define moreso:cond
   (moreso:make-macro
     (lambda args
@@ -201,6 +223,8 @@
     (= . ,=)
     (car . ,car)
     (cdr . ,cdr)
+    (case . ,moreso:case)
     (cond . ,moreso:cond)
     (let . ,moreso:let)
+    (memv . ,memv)
     (null? . ,null?)))
