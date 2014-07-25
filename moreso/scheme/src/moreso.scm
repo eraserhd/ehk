@@ -118,25 +118,17 @@
 (define (eval-lambda expr env)
   (moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
 
+(define special-forms
+  `((begin . ,eval-begin)
+    (if . ,eval-if)
+    (lambda . ,eval-lambda)
+    (quote . ,eval-quote)
+    (set! . ,eval-set!)))
+
 (define (eval-list expr env)
-  (case (car expr)
-    ;; Special forms
-    ((begin)
-     (eval-begin expr env))
-    
-    ((if)
-     (eval-if expr env))
-
-    ((lambda)
-     (eval-lambda expr env))
-
-    ((quote)
-     (eval-quote expr env))
-
-    ((set!)
-     (eval-set! expr env))
-
-    (else
+  (let ((special-form (assq (car expr) special-forms)))
+    (if special-form
+      ((cdr special-form) expr env)
       (let ((first-form (moreso:eval (car expr) env))
 	    (unevaluated-args (cdr expr)))
 	(if (moreso:macro? first-form)
