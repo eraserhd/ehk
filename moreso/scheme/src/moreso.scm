@@ -110,6 +110,11 @@
 			      (symbol->string (cadr expr))
 			      "'"))))))
 
+(define (eval-quote expr env)
+  (if (= 2 (length expr))
+    (cadr expr)
+    (raise "`quote' expects a single form")))
+
 (define (eval-list expr env)
   (cond
     ((symbol? expr)
@@ -133,9 +138,7 @@
 	(moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
 
        ((quote)
-	(if (= 2 (length expr))
-	  (cadr expr)
-	  (raise "`quote' expects a single form")))
+	(eval-quote expr env))
 
        ((set!)
 	(eval-set! expr env))
