@@ -1,12 +1,5 @@
 ;; Utilities
 
-(define (map proc list)
-  (let loop ((remaining list)
-	     (result '()))
-    (if (null? remaining)
-      (reverse result)
-      (loop (cdr remaining) (cons (proc (car remaining)) result)))))
-
 (define (reduce proc initial-value list)
   (cond
     ((null? list)
