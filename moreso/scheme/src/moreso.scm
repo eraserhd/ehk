@@ -88,7 +88,7 @@
 
 (define (moreso:eval expr env)
 
- (define special-forms
+ (define special-form-handlers
    `((begin . ,(lambda (expr env)
 		 (reduce
 		   (lambda (_ expr)
@@ -130,7 +130,7 @@
 				"'")))))
 
  (define (eval-list expr)
-   (let ((special-form (assq (car expr) special-forms)))
+   (let ((special-form (assq (car expr) special-form-handlers)))
      (if special-form
        ((cdr special-form) expr env)
        (let ((first-form (moreso:eval (car expr) env))
