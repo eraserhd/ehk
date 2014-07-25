@@ -86,6 +86,13 @@
       (moreso:eval (moreso:procedure-body p) environment))
     (apply p args)))
 
+(define (eval-begin expr env)
+  (reduce
+    (lambda (_ expr)
+      (moreso:eval expr env))
+    moreso:unspecified
+    (cdr expr)))
+
 (define (eval-list expr env)
   (cond
     ((symbol? expr)
@@ -100,11 +107,7 @@
      (case (car expr)
        ;; Special forms
        ((begin)
-	(reduce
-	  (lambda (_ expr)
-	    (moreso:eval expr env))
-	  moreso:unspecified
-	  (cdr expr)))
+	(eval-begin expr env))
        
        ((if)
 	(if (moreso:eval (cadr expr) env)
