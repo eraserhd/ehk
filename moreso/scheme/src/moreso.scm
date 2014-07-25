@@ -86,7 +86,7 @@
       (moreso:eval (moreso:procedure-body p) environment))
     (apply p args)))
 
-(define (moreso:eval expr env)
+(define (eval-list expr env)
   (cond
     ((symbol? expr)
      (let ((cell (assq expr env)))
@@ -140,6 +140,22 @@
 			  env)
 	     (let ((evaluated-args (map (lambda (arg) (moreso:eval arg env)) unevaluated-args)))
 	       (moreso:apply first-form evaluated-args)))))))
+
+    (else
+     expr)))
+
+(define (moreso:eval expr env)
+  (cond
+    ((symbol? expr)
+     (let ((cell (assq expr env)))
+       (if cell
+	 (cdr cell)
+	 (raise (string-append "Unbound symbol `"
+			       (symbol->string expr)
+			       "'")))))
+
+    ((list? expr)
+     (eval-list expr env))
 
     (else
      expr)))
