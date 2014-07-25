@@ -100,6 +100,16 @@
       (moreso:eval (cadddr expr) env)
       moreso:unspecified)))
 
+(define (eval-set! expr env)
+  (if (not (= 3 (length expr)))
+    (raise "`set!' expects two forms")
+    (let ((cell (assq (cadr expr) env)))
+      (if cell
+	(set-cdr! cell (moreso:eval (caddr expr) env))
+	(raise (string-append "Unbound symbol `"
+			      (symbol->string (cadr expr))
+			      "'"))))))
+
 (define (eval-list expr env)
   (cond
     ((symbol? expr)
@@ -128,14 +138,7 @@
 	  (raise "`quote' expects a single form")))
 
        ((set!)
-	(if (not (= 3 (length expr)))
-	  (raise "`set!' expects two forms")
-	  (let ((cell (assq (cadr expr) env)))
-	    (if cell
-	      (set-cdr! cell (moreso:eval (caddr expr) env))
-	      (raise (string-append "Unbound symbol `"
-				    (symbol->string (cadr expr))
-				    "'"))))))
+	(eval-set! expr env))
 
        (else
 	 (let ((first-form (moreso:eval (car expr) env))
