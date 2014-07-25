@@ -119,45 +119,32 @@
   (moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
 
 (define (eval-list expr env)
-  (cond
-    ((symbol? expr)
-     (let ((cell (assq expr env)))
-       (if cell
-	 (cdr cell)
-	 (raise (string-append "Unbound symbol `"
-			       (symbol->string expr)
-			       "'")))))
+  (case (car expr)
+    ;; Special forms
+    ((begin)
+     (eval-begin expr env))
+    
+    ((if)
+     (eval-if expr env))
 
-    ((list? expr)
-     (case (car expr)
-       ;; Special forms
-       ((begin)
-	(eval-begin expr env))
-       
-       ((if)
-	(eval-if expr env))
+    ((lambda)
+     (eval-lambda expr env))
 
-       ((lambda)
-	(eval-lambda expr env))
+    ((quote)
+     (eval-quote expr env))
 
-       ((quote)
-	(eval-quote expr env))
-
-       ((set!)
-	(eval-set! expr env))
-
-       (else
-	 (let ((first-form (moreso:eval (car expr) env))
-	       (unevaluated-args (cdr expr)))
-	   (if (moreso:macro? first-form)
-	     (moreso:eval (moreso:apply (moreso:macro-procedure first-form)
-					(cdr expr))
-			  env)
-	     (let ((evaluated-args (map (lambda (arg) (moreso:eval arg env)) unevaluated-args)))
-	       (moreso:apply first-form evaluated-args)))))))
+    ((set!)
+     (eval-set! expr env))
 
     (else
-     expr)))
+      (let ((first-form (moreso:eval (car expr) env))
+	    (unevaluated-args (cdr expr)))
+	(if (moreso:macro? first-form)
+	  (moreso:eval (moreso:apply (moreso:macro-procedure first-form)
+				     (cdr expr))
+		       env)
+	  (let ((evaluated-args (map (lambda (arg) (moreso:eval arg env)) unevaluated-args)))
+	    (moreso:apply first-form evaluated-args)))))))
 
 (define (eval-symbol sym env)
   (let ((cell (assq sym env)))
