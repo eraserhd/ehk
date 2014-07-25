@@ -25,6 +25,7 @@
 			      (#f 42)
 			      ((= 2 3) 98)
 			      (else 72)) moreso:r5rs)))
+(expect (= 96 (moreso:eval '(cond (else 72 96)) moreso:r5rs)))
 
 (expect (= 42 (moreso:eval '(case 7
 			      ((6 8 9) 79)
