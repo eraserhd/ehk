@@ -93,6 +93,13 @@
     moreso:unspecified
     (cdr expr)))
 
+(define (eval-if expr env)
+  (if (moreso:eval (cadr expr) env)
+    (moreso:eval (caddr expr) env)
+    (if (= 4 (length expr))
+      (moreso:eval (cadddr expr) env)
+      moreso:unspecified)))
+
 (define (eval-list expr env)
   (cond
     ((symbol? expr)
@@ -110,11 +117,7 @@
 	(eval-begin expr env))
        
        ((if)
-	(if (moreso:eval (cadr expr) env)
-	  (moreso:eval (caddr expr) env)
-          (if (= 4 (length expr))
-	    (moreso:eval (cadddr expr) env)
-            moreso:unspecified)))
+	(eval-if expr env))
 
        ((lambda)
 	(moreso:lambda (cadr expr) (group-expressions (cddr expr)) env))
