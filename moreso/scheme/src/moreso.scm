@@ -144,15 +144,18 @@
     (else
      expr)))
 
-(define (moreso:eval expr env)
-  (cond
-    ((symbol? expr)
-     (let ((cell (assq expr env)))
+(define (eval-symbol sym env)
+  (let ((cell (assq sym env)))
        (if cell
 	 (cdr cell)
 	 (raise (string-append "Unbound symbol `"
-			       (symbol->string expr)
+			       (symbol->string sym)
 			       "'")))))
+
+(define (moreso:eval expr env)
+  (cond
+    ((symbol? expr)
+     (eval-symbol expr env))
 
     ((list? expr)
      (eval-list expr env))
