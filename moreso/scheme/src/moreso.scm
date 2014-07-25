@@ -161,7 +161,7 @@
 	     (else-cond? (and (not (null? reversed-conditions))
 			      (eq? 'else (caar reversed-conditions))))
 	     (else-expr (if else-cond?
-			  (cdar reversed-conditions)
+			  (group-expressions (cdar reversed-conditions))
 			  moreso:unspecified))
 	     (conds-left (if else-cond?
 			   (cdr reversed-conditions)
