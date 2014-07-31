@@ -1,32 +1,31 @@
 (define expect:*example-count* 0)
 (define expect:*failures* '())
 
-(define-type expect-failure
-  (condition read-only:)
-  (message read-only:))
+(define-record expect-failure condition message)
 
-(define-macro (expect . args)
+(define-syntax expect
+  (er-macro-transformer
+    (lambda (args rename compare)
+      (define condition #f)
+      (define message #f)
 
-  (define condition #f)
-  (define message #f)
+      (define includes-failure-message?
+	(= 2 (length args)))
 
-  (define includes-failure-message?
-    (= 2 (length args)))
+      (cond
+	(includes-failure-message?
+	  (set! message (car args))
+	  (set! condition (cadr args)))
+	(else
+	  (set! condition (car args))))
 
-  (cond
-    (includes-failure-message?
-     (set! message (car args))
-     (set! condition (cadr args)))
-    (else
-     (set! condition (car args))))
-  
-  `(begin
-     (set! expect:*example-count* (+ 1 expect:*example-count*))
-     (if (not ,condition)
-       (let ((failure (make-expect-failure ',condition ',message)))
-         (set! expect:*failures* (append expect:*failures* (list failure)))
-         (display "F"))
-       (display "."))))
+      `(begin
+	 (set! expect:*example-count* (+ 1 expect:*example-count*))
+	 (if (not ,condition)
+	   (let ((failure (make-expect-failure ',condition ',message)))
+	     (set! expect:*failures* (append expect:*failures* (list failure)))
+	     (display "F"))
+	   (display "."))))))
 
 (define (expect:display-failure failure)
   (display "FAILED: ")
@@ -54,10 +53,4 @@
          (newline)
          (for-each expect:display-failure expect:*failures*))))))
 
-(define (expect:override-exit-to-display-results)
-  (let ((default-exit ##exit))
-    (set! ##exit (lambda (#!optional (exit-code 0))
-                       (expect:display-results)
-                       (default-exit exit-code)))))
-  
-(expect:override-exit-to-display-results)
+(on-exit expect:display-results)

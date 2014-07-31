@@ -1,5 +1,5 @@
-(include "expect.scm")
-(include "../src/moreso.scm")
+(load "test/expect.scm")
+(load "src/moreso.scm")
 
 (define e (append `((forty-two . 42)
 		    (returns-42 . ,(moreso:lambda '() 42 '()))
@@ -16,13 +16,17 @@
 				      `(+ ,value ,value)))))
 		  moreso:r5rs))
 
-(define-macro (raises? message expr)
-  `(with-exception-catcher
-     (lambda (ex)
-       (string=? ,message ex))
-     (lambda ()
-       ,expr
-       #f)))
+(define-syntax raises?
+  (er-macro-transformer
+    (lambda (args rename compare)
+      `(call-with-current-continuation
+	 (lambda (result)
+	   (with-exception-handler
+	     (lambda (ex)
+	       (result #t))
+	     (lambda ()
+	       ,@args
+	       (result #f))))))))
 
 (expect (equal? 42 (moreso:eval 42 e)))
 (expect (equal? #f (moreso:eval #f e)))
