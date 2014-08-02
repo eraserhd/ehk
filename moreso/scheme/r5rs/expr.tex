@@ -31,7 +31,7 @@ the variable reference is the value stored in the location to which the
 variable is bound.  It is an error to reference an
 unbound\index{unbound} variable.
 
-\begin{scheme}
+\begin{scheme}%!example
 (define x 28)
 x   \ev  28%
 \end{scheme}
@@ -51,7 +51,7 @@ may be any external representation of a Scheme object (see
 section~\ref{externalreps}).  This notation is used to include literal
 constants in Scheme code.
 
-\begin{scheme}%
+\begin{scheme}%!example
 (quote a)                     \ev  a
 (quote \sharpsign(a b c))     \ev  \#(a b c)
 (quote (+ 1 2))               \ev  (+ 1 2)%
@@ -61,7 +61,7 @@ constants in Scheme code.
 \singlequote\hyper{datum}.  The two notations are equivalent in all
 respects.
 
-\begin{scheme}
+\begin{scheme}%!example
 'a                   \ev  a
 '\#(a b c)           \ev  \#(a b c)
 '()                  \ev  ()
@@ -73,7 +73,7 @@ respects.
 Numerical constants, string constants, character constants, and boolean
 constants evaluate ``to themselves''; they need not be quoted.
 
-\begin{scheme}
+\begin{scheme}%!example
 '"abc"     \ev  "abc"
 "abc"      \ev  "abc"
 '145932    \ev  145932
@@ -99,7 +99,7 @@ expressions for the procedure to be called and the arguments to be
 passed to it.  The operator and operand expressions are evaluated (in an
 unspecified order) and the resulting procedure is passed the resulting
 arguments.\mainindex{call}\mainindex{procedure call}
-\begin{scheme}%
+\begin{scheme}%!example
 (+ 3 4)                          \ev  7
 ((if \schfalse + *) 3 4)         \ev  12%
 \end{scheme}

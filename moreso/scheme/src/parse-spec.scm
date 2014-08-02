@@ -1,3 +1,5 @@
+(require-extension irregex)
+
 ; A SOURCE produces a character with each invocation (or #f at end-of-stream).
 
 (define (port->source port)
@@ -170,12 +172,27 @@
 
           ((and (eq? state 'initial) (start?))
            (set! state 'in-example)
-           (char-loop (source)))
+           (set! example-chars '())
+           (char-loop))
 
           ((and (eq? state 'in-example) (end?))
+           (set! state 'initial)
+           (set! examples (cons (cons #f ;; section number
+                                      (list->string (reverse (cdr (memv #\\ example-chars)))))
+                                examples))
+           (char-loop))
 
-           )
+          ((eq? state 'in-example)
+           (set! example-chars (cons char example-chars))
+           (char-loop))
 
-          )))))
+          (else
+           (char-loop)))))))
+
+(define (compile-example example)
+  example)
+
+(define (examples)
+  (map compile-example (example-extractor (tex-input-source "r5rs/" "r5rs"))))
 
 ; vim:set et:
