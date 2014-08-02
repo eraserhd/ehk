@@ -3,17 +3,15 @@
 
 R5RS specifies strings and vectors as disjoint types.  This necessitates
 distinct procedures for operating on each type when the procedures would
-otherwise have the same meaning (e.g. {\tt string-length} and
-{\tt vector-length}, {\tt string->list} and {\tt vector->list}).
+otherwise have the same meaning (e.g. {\cf string-length} and
+{\cf vector-length}, {\cf string->list} and {\cf vector->list}).
 
 Since the domains of these functions do not overlap, one solution would be to
 replace the duplicated, type-specific routines with singular, general ones;
 however, removing the string type itself is possible without much trouble.
 
-\subsubsection{\tt string?}
-
-{\tt string?} now returns \schtrue when {\tt vector?} would return \schtrue
-and {\tt char?} would return \schtrue for every element of the vector.
+{\cf string?} now returns \schtrue when {\cf vector?} would return \schtrue
+and {\cf char?} would return \schtrue for every element of the vector.
 
 \begin{scheme}
 (string? '\sharpsign())                    \ev \schtrue
@@ -32,9 +30,9 @@ of characters.  That is,
 \end{scheme}
 
 
-{\tt display}
+{\cf display}
 
-{\tt write} now produces the quoted literal in the cases where {\tt string?}
+{\cf write} now produces the quoted literal in the cases where {\cf string?}
 would return \schtrue.
 
 \begin{enumerate}
