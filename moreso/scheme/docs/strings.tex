@@ -16,9 +16,9 @@ however, removing the string type itself is possible without much trouble.
 and {\tt char?} would return \schtrue for every element of the vector.
 
 \begin{scheme}
-(string? '\sharpsign()) \ev \schtrue
-(string? (vector \sharpsign\\c)) \ev \schtrue
-(string? (vector \sharpsign\\c \schfalse)) \ev \schfalse
+(string? '\sharpsign())                    \ev \schtrue
+(string? (vector \sharpsign\textbackslash{}c))           \ev \schtrue
+(string? (vector \sharpsign\textbackslash{}c \schfalse)) \ev \schfalse
 \end{scheme}
 
 \subsection{Quoted Literals}
