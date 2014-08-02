@@ -1,0 +1,50 @@
+\section{Removal of the Distinct String Type}
+\subsection{Rationale}
+
+R5RS specifies strings and vectors as disjoint types.  This necessitates
+distinct procedures for operating on each type when the procedures would
+otherwise have the same meaning (e.g. {\tt string-length} and
+{\tt vector-length}, {\tt string->list} and {\tt vector->list}).
+
+Since the domains of these functions do not overlap, one solution would be to
+replace the duplicated, type-specific routines with singular, general ones;
+however, removing the string type itself is possible without much trouble.
+
+\subsubsection{\tt string?}
+
+{\tt string?} now returns \schtrue when {\tt vector?} would return \schtrue
+and {\tt char?} would return \schtrue for every element of the vector.
+
+\begin{scheme}
+(string? '\sharpsign()) \ev \schtrue
+(string? (vector \sharpsign\\c)) \ev \schtrue
+(string? (vector \sharpsign\\c \schfalse)) \ev \schfalse
+\end{scheme}
+
+\subsection{Quoted Literals}
+
+The quoted literal string syntax is kept, except that it now represents a vector
+of characters.  That is,
+
+\begin{scheme}
+(vector? "x") \ev \schtrue
+(string? "x") \ev \schtrue
+\end{scheme}
+
+
+{\tt display}
+
+{\tt write} now produces the quoted literal in the cases where {\tt string?}
+would return \schtrue.
+
+\begin{enumerate}
+  \item string-length, string-set!, string-ref, string->list, make-string,
+	string, list->string, string-fill! are all removed in favor of their
+	vector counterparts.
+  \item substring is renamed section and works on any kind of vector.
+  \item string-append and string-copy become vector-append and vector-copy.
+\end{enumerate}
+
+This means that the following procedures are not touched
+
+% vim:set ft=tex:
