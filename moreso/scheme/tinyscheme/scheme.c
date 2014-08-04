@@ -219,7 +219,7 @@ SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (typeflag(p)&T_SYMBOL);
 
 INTERFACE INLINE int is_string(pointer p) {
   int i, num;
-  if (type(p)==T_STRING)
+  if (type(p)==T_STRING) //FIXME: Remove
     return 1;
   if (type(p)!=T_VECTOR)
     return 0;
@@ -371,7 +371,7 @@ static char   *readstr_upto(scheme *sc, char *delim);
 static pointer readstrexp(scheme *sc);
 static INLINE int skipspace(scheme *sc);
 static int token(scheme *sc);
-static void printslashstring(scheme *sc, char *s, int len);
+static void printslashstring(scheme *sc, pointer p);
 static void atom2str(scheme *sc, pointer l, int f, char **pp, int *plen);
 static void printatom(scheme *sc, pointer l, int f);
 static pointer mk_proc(scheme *sc, enum scheme_opcodes op);
@@ -1865,9 +1865,9 @@ static int token(scheme *sc) {
 /* ========== Routines for Printing ========== */
 #define   ok_abbrev(x)   (is_pair(x) && cdr(x) == sc->NIL)
 
-static void printslashstring(scheme *sc, char *p, int len) {
-  int i;
-  unsigned char *s=(unsigned char*)p;
+static void printslashstring(scheme *sc, pointer p) {
+  int i, len=strlength(p);
+  unsigned char *s=(unsigned char*)strvalue(p);
   putcharacter(sc,'"');
   for ( i=0; i<len; i++) {
     if(*s==0xff || *s=='"' || *s<' ' || *s=='\\') {
@@ -1978,7 +1978,7 @@ static void atom2str(scheme *sc, pointer l, int f, char **pp, int *plen) {
           } else { /* Hack, uses the fact that printing is needed */
                *pp=sc->strbuff;
                *plen=0;
-               printslashstring(sc, strvalue(l), strlength(l));
+               printslashstring(sc, l);
                return;
           }
      } else if (is_character(l)) {
