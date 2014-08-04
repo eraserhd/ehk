@@ -166,7 +166,6 @@ static num num_one;
 #define typeflag(p)      ((p)->_flag)
 #define type(p)          (typeflag(p)&T_MASKTYPE)
 
-INTERFACE INLINE int is_string(pointer p)     { return (type(p)==T_STRING); }
 #define strvalue(p)      ((p)->_object._string._svalue)
 #define strlength(p)        ((p)->_object._string._length)
 
@@ -217,6 +216,19 @@ INTERFACE INLINE char *symname(pointer p)   { return strvalue(car(p)); }
 SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (typeflag(p)&T_SYMBOL); }
 #define symprop(p)       cdr(p)
 #endif
+
+INTERFACE INLINE int is_string(pointer p) {
+  int i, num;
+  if (type(p)==T_STRING)
+    return 1;
+  if (type(p)!=T_VECTOR)
+    return 0;
+  num = ivalue(p);
+  for (i=0; i<num; ++i)
+    if (!is_character(vector_elem(p,i)))
+      return 0;
+  return 1;
+}
 
 INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
 INTERFACE INLINE int is_proc(pointer p)     { return (type(p)==T_PROC); }
@@ -1316,7 +1328,7 @@ static void gc(scheme *sc, pointer a, pointer b) {
 }
 
 static void finalize_cell(scheme *sc, pointer a) {
-  if(is_string(a)) {
+  if(type(a)==T_STRING) {
     sc->free(strvalue(a));
   } else if(is_port(a)) {
     if(a->_object._port->kind&port_file
