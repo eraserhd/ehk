@@ -1866,13 +1866,21 @@ static int token(scheme *sc) {
 #define   ok_abbrev(x)   (is_pair(x) && cdr(x) == sc->NIL)
 
 static void printslashstring(scheme *sc, pointer p) {
-  int i, len=strlength(p);
-  unsigned char *s=(unsigned char*)strvalue(p);
+  int i, len;
+  unsigned char s;
+  if (is_vector(p))
+    len=ivalue(p);
+  else
+    len=strlength(p);
   putcharacter(sc,'"');
   for ( i=0; i<len; i++) {
-    if(*s==0xff || *s=='"' || *s<' ' || *s=='\\') {
+    if (is_vector(p))
+      s = charvalue(vector_elem(p,i));
+    else
+      s = ((unsigned char*)strvalue(p))[i];
+    if(s==0xff || s=='"' || s<' ' || s=='\\') {
       putcharacter(sc,'\\');
-      switch(*s) {
+      switch(s) {
       case '"':
         putcharacter(sc,'"');
         break;
@@ -1889,14 +1897,14 @@ static void printslashstring(scheme *sc, pointer p) {
         putcharacter(sc,'\\');
         break;
       default: {
-          int d=*s/16;
+          int d=s/16;
           putcharacter(sc,'x');
           if(d<10) {
             putcharacter(sc,d+'0');
           } else {
             putcharacter(sc,d-10+'A');
           }
-          d=*s%16;
+          d=s%16;
           if(d<10) {
             putcharacter(sc,d+'0');
           } else {
@@ -1905,9 +1913,8 @@ static void printslashstring(scheme *sc, pointer p) {
         }
       }
     } else {
-      putcharacter(sc,*s);
+      putcharacter(sc,s);
     }
-    s++;
   }
   putcharacter(sc,'"');
 }
@@ -4210,7 +4217,10 @@ static pointer opexe_5(scheme *sc, enum scheme_opcodes op) {
 
      /* ========== printing part ========== */
      case OP_P0LIST:
-          if(is_vector(sc->args)) {
+          if(is_string(sc->args)) {
+               printatom(sc, sc->args, sc->print_flag);
+               s_return(sc, sc->T);
+          } else if(is_vector(sc->args)) {
                putstr(sc,"#(");
                sc->args=cons(sc,sc->args,mk_integer(sc,0));
                s_goto(sc,OP_PVECFROM);
