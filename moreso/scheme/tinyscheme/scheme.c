@@ -2126,12 +2126,7 @@ static pointer revappend(scheme *sc, pointer a, pointer b) {
 
 /* equivalence of atoms */
 int eqv(pointer a, pointer b) {
-     if (is_string(a)) {
-          if (is_string(b))
-               return (strvalue(a) == strvalue(b));
-          else
-               return (0);
-     } else if (is_number(a)) {
+     if (is_number(a)) {
           if (is_number(b)) {
                if (num_is_integer(a) == num_is_integer(b))
                     return num_eq(nvalue(a),nvalue(b));
