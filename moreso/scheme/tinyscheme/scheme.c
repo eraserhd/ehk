@@ -4944,7 +4944,7 @@ pointer scheme_eval(scheme *sc, pointer obj)
 
 #if STANDALONE
 
-#if defined(__APPLE__) && !defined (OSX)
+#if defined(__APPLE__) && !defined (OSX) && !defined(__clang__)
 int main()
 {
      extern MacTS_main(int argc, char **argv);

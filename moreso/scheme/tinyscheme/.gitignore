@@ -1,2 +1,4 @@
 *.o
 scheme
+*.a
+*.so
