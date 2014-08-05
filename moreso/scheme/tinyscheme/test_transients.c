@@ -37,6 +37,17 @@ void test_free(void *ptr)
 	assert(0); // Was not allocated with test_malloc()
 }
 
+int pointer_was_freed(void *ptr)
+{
+	test_allocation_t *a;
+
+	for (a = allocations; a; a = a->next)
+		if ((void *)&a->memory == ptr)
+			return a->freed;
+
+	assert(0);
+}
+
 void reset_test_allocator()
 {
 	test_allocation_t *a, *next;
@@ -86,12 +97,26 @@ void check_free_transients_clears_list(scheme *sc)
 {
 	int i;
 
-	sc = scheme_init_new();
 	for (i = 0; i < 3; ++i)
 		allocate_transient(sc, 5);
 
 	free_transients(sc);
+
 	assert(!sc->transients);
+}
+
+void check_free_transients_frees_all_allocated_transients(scheme *sc)
+{
+	int i;
+	void *ptrs[3];
+
+	for (i = 0; i < 3; ++i)
+		ptrs[i] = allocate_transient(sc, 5);
+
+	free_transients(sc);
+
+	for (i = 0; i < 3; ++i)
+		assert(pointer_was_freed((char*)ptrs[i] - (int)&((struct transient *)0)->memory));
 }
 
 void run(void (* check) (scheme *))
@@ -111,5 +136,6 @@ int main(int argc, char **argv)
 	run(check_transients_is_initialized_to_null);
 	run(check_transients_are_recorded);
 	run(check_free_transients_clears_list);
+	run(check_free_transients_frees_all_allocated_transients);
 	exit(0);
 }

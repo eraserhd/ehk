@@ -1028,6 +1028,14 @@ static void* allocate_transient(scheme *sc, int size)
 
 static void free_transients(scheme *sc)
 {
+	struct transient *t, *next;
+
+	t = sc->transients;
+	while (t) {
+		next = t->next;
+		sc->free(t);
+		t = next;
+	}
 	sc->transients = 0;
 }
 
