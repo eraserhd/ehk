@@ -1026,6 +1026,11 @@ static void* allocate_transient(scheme *sc, int size)
 	return &t->memory;
 }
 
+static void free_transients(scheme *sc)
+{
+	sc->transients = 0;
+}
+
 INTERFACE static pointer mk_vector(scheme *sc, int len)
 { return get_vector_object(sc,len,sc->NIL); }
 

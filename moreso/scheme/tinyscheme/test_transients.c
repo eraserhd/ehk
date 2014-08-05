@@ -42,9 +42,25 @@ void check_transients_are_recorded()
 	scheme_deinit(sc);
 }
 
+void check_free_transients_clears_list()
+{
+	scheme *sc;
+	int i;
+
+	sc = scheme_init_new();
+	for (i = 0; i < 3; ++i)
+		allocate_transient(sc, 5);
+
+	free_transients(sc);
+	assert(!sc->transients);
+
+	scheme_deinit(sc);
+}
+
 int main(int argc, char **argv)
 {
 	check_transients_is_initialized_to_null();
 	check_transients_are_recorded();
+	check_free_transients_clears_list();
 	exit(0);
 }
