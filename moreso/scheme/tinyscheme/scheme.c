@@ -4804,6 +4804,8 @@ void scheme_deinit(scheme *sc) {
   char *fname;
 #endif
 
+  free_transients(sc);
+
   sc->oblist=sc->NIL;
   sc->global_env=sc->NIL;
   dump_stack_free(sc);
