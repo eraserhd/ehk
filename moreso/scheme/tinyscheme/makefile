@@ -32,7 +32,7 @@ AR= ar crs
 # Linux
 LD = gcc
 LDFLAGS = -shared
-DEBUG=-g -Wno-char-subscripts -Wno-switch -O
+DEBUG=-g -Wno-char-subscripts -Wno-switch
 SYS_LIBS= -ldl -lm
 PLATFORM_FEATURES= -DSUN_DL=1
 
