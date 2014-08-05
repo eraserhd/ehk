@@ -1015,6 +1015,17 @@ INTERFACE pointer mk_empty_string(scheme *sc, int len, char fill) {
      return (x);
 }
 
+static void* allocate_transient(scheme *sc, int size)
+{
+	struct transient *t;
+	t = (struct transient *)sc->malloc(sizeof(struct transient) + size - 1);
+	if (!t)
+		return 0;
+	t->next = sc->transients;
+	sc->transients = t;
+	return &t->memory;
+}
+
 INTERFACE static pointer mk_vector(scheme *sc, int len)
 { return get_vector_object(sc,len,sc->NIL); }
 
