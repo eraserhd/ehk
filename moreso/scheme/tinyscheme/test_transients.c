@@ -3,26 +3,18 @@
 #include "scheme.c"
 #include <assert.h>
 
-void check_transients_is_initialized_to_null()
+void check_transients_is_initialized_to_null(scheme *sc)
 {
-	scheme sc;
-	memset(&sc,0xfd,sizeof(sc));
-
-	scheme_init(&sc);
-	assert(!sc.transients);
-
-        scheme_deinit(&sc);
+	assert(!sc->transients);
 }
 
-void check_transients_are_recorded()
+void check_transients_are_recorded(scheme *sc)
 {
-	scheme *sc;
 	char *ptrs[3];
 	int i, j, count;
 	struct transient *t;
 	int found;
 
-	sc = scheme_init_new();
 	for (i = 0; i < 3; ++i)
 		ptrs[i] = allocate_transient(sc, 5);
 
@@ -38,13 +30,10 @@ void check_transients_are_recorded()
 				found = 1;
 		assert(found);
 	}
-
-	scheme_deinit(sc);
 }
 
-void check_free_transients_clears_list()
+void check_free_transients_clears_list(scheme *sc)
 {
-	scheme *sc;
 	int i;
 
 	sc = scheme_init_new();
@@ -53,14 +42,23 @@ void check_free_transients_clears_list()
 
 	free_transients(sc);
 	assert(!sc->transients);
+}
 
-	scheme_deinit(sc);
+void run(void (* check) (scheme *))
+{
+	scheme sc;
+	memset(&sc, 0xfd, sizeof(sc));
+	scheme_init(&sc);
+
+	check(&sc);
+
+	scheme_deinit(&sc);
 }
 
 int main(int argc, char **argv)
 {
-	check_transients_is_initialized_to_null();
-	check_transients_are_recorded();
-	check_free_transients_clears_list();
+	run(check_transients_is_initialized_to_null);
+	run(check_transients_are_recorded);
+	run(check_free_transients_clears_list);
 	exit(0);
 }
