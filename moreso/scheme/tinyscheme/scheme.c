@@ -4508,6 +4508,7 @@ static void Eval_Cycle(scheme *sc, enum scheme_opcodes op) {
     if (pcd->func(sc, (enum scheme_opcodes)sc->op) == sc->NIL) {
       return;
     }
+    free_transients(sc);
     if(sc->no_memory) {
       fprintf(stderr,"No memory!\n");
       return;
