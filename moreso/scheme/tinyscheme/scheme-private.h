@@ -58,6 +58,11 @@ struct cell {
   } _object;
 };
 
+struct transient {
+    struct transient *next;
+    char memory[1];
+};
+
 struct scheme {
 /* arrays for segments */
 func_alloc malloc;
@@ -143,6 +148,7 @@ long gensym_cnt;
 struct scheme_interface *vptr;
 void *dump_base;    /* pointer to base of allocated dump stack */
 int dump_size;      /* number of frames allocated for dump stack */
+struct transient *transients;
 };
 
 /* operator code */

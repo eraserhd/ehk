@@ -68,7 +68,7 @@ OBJS = scheme.$(Osuf) dynload.$(Osuf)
 LIBTARGET = $(LIBPREFIX)tinyscheme.$(SOsuf)
 STATICLIBTARGET = $(LIBPREFIX)tinyscheme.$(LIBsuf)
 
-all: $(LIBTARGET) $(STATICLIBTARGET) scheme$(EXE_EXT)
+all: test $(LIBTARGET) $(STATICLIBTARGET) scheme$(EXE_EXT)
 
 %.$(Osuf): %.c
 	$(CC) -I. -c $(DEBUG) $(FEATURES) $(DL_FLAGS) $<
@@ -89,6 +89,7 @@ clean:
 	$(RM) $(OBJS) $(LIBTARGET) $(STATICLIBTARGET) scheme$(EXE_EXT)
 	$(RM) tinyscheme.ilk tinyscheme.map tinyscheme.pdb tinyscheme.exp
 	$(RM) scheme.ilk scheme.map scheme.pdb scheme.lib scheme.exp
+	$(RM) test_transients$(EXE_EXT)
 	$(RM) *~
 
 TAGS_SRCS = scheme.h scheme.c dynload.h dynload.c
@@ -96,3 +97,9 @@ TAGS_SRCS = scheme.h scheme.c dynload.h dynload.c
 tags: TAGS
 TAGS: $(TAGS_SRCS)
 	etags $(TAGS_SRCS)
+
+test_%$(EXE_EXT): test_%.c scheme.h scheme.c scheme-private.h
+	$(CC) -I. -o $@ $(DEBUG) $(FEATURES) $<
+
+test: test_transients$(EXE_EXT)
+	./test_transients$(EXE_EXT)

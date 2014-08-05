@@ -4681,6 +4681,7 @@ int scheme_init_custom_alloc(scheme *sc, func_alloc malloc, func_dealloc free) {
   sc->loadport=sc->NIL;
   sc->nesting=0;
   sc->interactive_repl=0;
+  sc->transients=0;
 
   if (alloc_cellseg(sc,FIRST_CELLSEGS) != FIRST_CELLSEGS) {
     sc->no_memory=1;
