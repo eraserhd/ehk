@@ -101,5 +101,6 @@ TAGS: $(TAGS_SRCS)
 test_%$(EXE_EXT): test_%.c scheme.h scheme.c scheme-private.h
 	$(CC) -I. -o $@ $(DEBUG) $(FEATURES) $<
 
-test: test_transients$(EXE_EXT)
+test: test_transients$(EXE_EXT) test_strings$(EXE_EXT)
+	./test_strings$(EXE_EXT)
 	./test_transients$(EXE_EXT)
