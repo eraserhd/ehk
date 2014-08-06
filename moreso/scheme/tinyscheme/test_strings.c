@@ -64,7 +64,7 @@ void check_string_p_returns_t_for_char_vectors()
 	check("(string? 42)", "#f");
 }
 
-void check_subsection_works_on_quoted_literals()
+void check_subsection_works()
 {
 	check("(subsection #(#\\a #\\b #\\c) 1 2)", "#(#\\b)");
 	check("(subsection #(#\\a #\\b #\\c) 1)", "#(#\\b #\\c)");
@@ -75,7 +75,7 @@ void check_subsection_works_on_quoted_literals()
 int main(int argc, char **argv)
 {
 	check_string_p_returns_t_for_char_vectors();
-	check_subsection_works_on_quoted_literals();
+	check_subsection_works();
 
 	printf(" %d tests, %d failed, %d errors.\n", check_count, fail_count, error_count);
 	if (fail_count == 0 && error_count == 0)
