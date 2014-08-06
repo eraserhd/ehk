@@ -134,8 +134,8 @@
                l
                (loop (pred n) (cons (string-ref s n) l)))))
 
-(define (string-copy str)
-     (string-append str))
+(define (vector-copy str)
+     (vector-append str))
 
 (define (string->anyatom str pred)
      (let* ((a (string->atom str)))
