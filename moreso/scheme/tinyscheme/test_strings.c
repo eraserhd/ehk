@@ -67,6 +67,9 @@ void check_string_p_returns_t_for_char_vectors()
 void check_subsection_works_on_quoted_literals()
 {
 	check("(subsection #(#\\a #\\b #\\c) 1 2)", "#(#\\b)");
+	check("(subsection #(#\\a #\\b #\\c) 1)", "#(#\\b #\\c)");
+	check("(subsection #(#\\a #\\b #\\c) 0)", "#(#\\a #\\b #\\c)");
+	check("(subsection #(#\\a #\\b #\\c) 3)", "#()");
 }
 
 int main(int argc, char **argv)
