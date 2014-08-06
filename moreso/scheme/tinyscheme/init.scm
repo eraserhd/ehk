@@ -106,17 +106,6 @@
              0
              (abs (* (quotient aa (gcd aa bb)) bb)))))))
 
-(define (list->string charlist)
-     (let* ((len (length charlist))
-            (newstr (make-string len))
-            (fill-string!
-               (lambda (str i len charlist)
-                    (if (= i len)
-                         str
-                         (begin (string-set! str i (car charlist))
-                         (fill-string! str (+ i 1) len (cdr charlist)))))))
-          (fill-string! newstr 0 len charlist)))
-
 (define (string-fill! s e)
      (let ((n (string-length s)))
           (let loop ((i 0))
