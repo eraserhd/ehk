@@ -56,9 +56,17 @@ void check(char *expression, char *expect)
 	scheme_deinit(sc);
 }
 
+void check_string_p_returns_t_for_char_vectors()
+{
+	check("(string? '#(#\\a #\\b #\\c))", "#t");
+	check("(string? '#())", "#t");
+	check("(string? '#(#\\a #\\b 42))", "#f");
+	check("(string? 42)", "#f");
+}
+
 int main(int argc, char **argv)
 {
-	check("#t", "#t");
+	check_string_p_returns_t_for_char_vectors();
 
 	printf(" %d tests, %d failed, %d errors.\n", check_count, fail_count, error_count);
 	if (fail_count == 0 && error_count == 0)
