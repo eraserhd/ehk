@@ -96,7 +96,7 @@
     _OP_DEF(opexe_2, "string-ref",                     2,  2,       TST_STRING TST_NATURAL,          OP_STRREF           )
     _OP_DEF(opexe_2, "string-set!",                    3,  3,       TST_STRING TST_NATURAL TST_CHAR, OP_STRSET           )
     _OP_DEF(opexe_2, "string-append",                  0,  INF_ARG, TST_STRING,                      OP_STRAPPEND        )
-    _OP_DEF(opexe_2, "substring",                      2,  3,       TST_STRING TST_NATURAL,          OP_SUBSTR           )
+    _OP_DEF(opexe_2, "subsection",                     2,  3,       TST_STRING TST_NATURAL,          OP_SUBSECTION       )
     _OP_DEF(opexe_2, "vector",                         0,  INF_ARG, TST_NONE,                        OP_VECTOR           )
     _OP_DEF(opexe_2, "make-vector",                    1,  2,       TST_NATURAL TST_ANY,             OP_MKVECTOR         )
     _OP_DEF(opexe_2, "vector-length",                  1,  1,       TST_VECTOR,                      OP_VECLEN           )

@@ -3520,7 +3520,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
        s_return(sc, newstr);
      }
 
-     case OP_SUBSTR: { /* substring */
+     case OP_SUBSECTION: { /* subsection */
           char *str;
           int index0;
           int index1;
@@ -3531,13 +3531,13 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           index0=ivalue(cadr(sc->args));
 
           if(index0>strlength(car(sc->args))) {
-               Error_1(sc,"substring: start out of bounds:",cadr(sc->args));
+               Error_1(sc,"subsection: start out of bounds:",cadr(sc->args));
           }
 
           if(cddr(sc->args)!=sc->NIL) {
                index1=ivalue(caddr(sc->args));
                if(index1>strlength(car(sc->args)) || index1<index0) {
-                    Error_1(sc,"substring: end out of bounds:",caddr(sc->args));
+                    Error_1(sc,"subsection: end out of bounds:",caddr(sc->args));
                }
           } else {
                index1=strlength(car(sc->args));
