@@ -3521,34 +3521,29 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
      }
 
      case OP_SUBSECTION: { /* subsection */
-          char *str;
-          int index0;
-          int index1;
-          int i, len;
+	int index0;
+	int index1;
+	int i, len;
 
-          str=strvalue(car(sc->args));
+	index0 = ivalue(cadr(sc->args));
 
-          index0=ivalue(cadr(sc->args));
+	if (index0 > ivalue_unchecked(car(sc->args)))
+		Error_1(sc,"subsection: start out of bounds:",cadr(sc->args));
 
-          if(index0>strlength(car(sc->args))) {
-               Error_1(sc,"subsection: start out of bounds:",cadr(sc->args));
-          }
+	if (cddr(sc->args) != sc->NIL) {
+		index1 = ivalue(caddr(sc->args));
+		if (index1 > ivalue_unchecked(car(sc->args)) || index1 < index0)
+			Error_1(sc, "subsection: end out of bounds:", caddr(sc->args));
+	} else {
+		index1 = ivalue_unchecked(car(sc->args));
+	}
 
-          if(cddr(sc->args)!=sc->NIL) {
-               index1=ivalue(caddr(sc->args));
-               if(index1>strlength(car(sc->args)) || index1<index0) {
-                    Error_1(sc,"subsection: end out of bounds:",caddr(sc->args));
-               }
-          } else {
-               index1=strlength(car(sc->args));
-          }
+	len = index1 - index0;
+	x = mk_vector(sc, len);
+	for (i = 0; i < len; ++i)
+		set_vector_elem(x, i, vector_elem(car(sc->args), index0+i));
 
-          len=index1-index0;
-	  x = mk_vector(sc, len);
-	  for (i = 0; i < len; ++i)
-		  set_vector_elem(x, i, mk_character(sc, str[index0+i]));
-
-          s_return(sc,x);
+	s_return(sc,x);
      }
 
      case OP_VECTOR: {   /* vector */
