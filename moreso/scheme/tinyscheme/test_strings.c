@@ -73,10 +73,17 @@ void check_subsection_works()
 	check("(subsection #(1 2 3) 1 2)", "#(2)");
 }
 
+void check_vector_copy()
+{
+	check("(vector-append #(#\\a 2 #\\c))", "#(#\\a 2 #\\c)");
+	check("(vector-append #(#\\a 3 #\\c) #(5 #f))", "#(#\\a 3 #\\c 5 #f)");
+}
+
 int main(int argc, char **argv)
 {
 	check_string_p_returns_t_for_char_vectors();
 	check_subsection_works();
+	check_vector_copy();
 
 	printf(" %d tests, %d failed, %d errors.\n", check_count, fail_count, error_count);
 	if (fail_count == 0 && error_count == 0)

@@ -3501,23 +3501,24 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           s_return(sc,car(sc->args));
      }
 
-     case OP_STRAPPEND: { /* string-append */
-       /* in 1.29 string-append was in Scheme in init.scm but was too slow */
-       int len = 0;
-       pointer newstr;
-       char *pos;
+     case OP_VECTOR_APPEND: { /* vector-append */
+	int i, offset, length;
+	pointer result;
 
-       /* compute needed length for new string */
-       for (x = sc->args; x != sc->NIL; x = cdr(x)) {
-          len += strlength(car(x));
-       }
-       newstr = mk_empty_string(sc, len, ' ');
-       /* store the contents of the argument strings into the new string */
-       for (pos = strvalue(newstr), x = sc->args; x != sc->NIL;
-           pos += strlength(car(x)), x = cdr(x)) {
-           memcpy(pos, strvalue(car(x)), strlength(car(x)));
-       }
-       s_return(sc, newstr);
+	length = 0;
+	for (x = sc->args; x != sc->NIL; x = cdr(x))
+		length += ivalue_unchecked(car(x));
+
+	result = mk_vector(sc, length);
+	offset = 0;
+	for (x = sc->args; x != sc->NIL; x = cdr(x)) {
+		for (i = 0; i < ivalue_unchecked(car(x)); ++i)
+			set_vector_elem(result, offset+i, vector_elem(car(x), i));
+
+		offset += ivalue_unchecked(car(x));
+	}
+
+	s_return(sc, result);
      }
 
      case OP_SUBSECTION: { /* subsection */
