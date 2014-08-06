@@ -4828,6 +4828,7 @@ void scheme_deinit(scheme *sc) {
   }
   sc->loadport=sc->NIL;
   sc->gc_verbose=0;
+  ok_to_freely_gc(sc);
   gc(sc,sc->NIL,sc->NIL);
 
   for(i=0; i<=sc->last_cell_seg; i++) {
