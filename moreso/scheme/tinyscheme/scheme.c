@@ -3445,21 +3445,6 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
      case OP_STRLEN:  /* string-length */
           s_return(sc,mk_integer(sc,strlength(car(sc->args))));
 
-     case OP_STRREF: { /* string-ref */
-          char *str;
-          int index;
-
-          str=strvalue(car(sc->args));
-
-          index=ivalue(cadr(sc->args));
-
-          if(index>=strlength(car(sc->args))) {
-               Error_1(sc,"string-ref: out of bounds:",cadr(sc->args));
-          }
-
-          s_return(sc,mk_character(sc,((unsigned char*)str)[index]));
-     }
-
      case OP_STRSET: { /* string-set! */
           char *str;
           int index;

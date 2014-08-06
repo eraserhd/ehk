@@ -110,7 +110,7 @@
      (let loop ((n (pred (string-length s))) (l '()))
           (if (= n -1)
                l
-               (loop (pred n) (cons (string-ref s n) l)))))
+               (loop (pred n) (cons (vector-ref s n) l)))))
 
 (define (vector-copy str)
      (vector-append str))
@@ -159,10 +159,10 @@
                          (if (= i nb) (cmp 0 0) (cmp 0 1)))
                     ((= i nb)
                          (cmp 1 0))
-                    ((chcmp = (string-ref a i) (string-ref b i))
+                    ((chcmp = (vector-ref a i) (vector-ref b i))
                          (loop (succ i)))
                     (else
-                         (chcmp cmp (string-ref a i) (string-ref b i)))))))
+                         (chcmp cmp (vector-ref a i) (vector-ref b i)))))))
 
 
 (define (string=? a b) (string-cmp? char-cmp? = a b))
