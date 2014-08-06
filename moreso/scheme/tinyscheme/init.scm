@@ -106,10 +106,6 @@
              0
              (abs (* (quotient aa (gcd aa bb)) bb)))))))
 
-
-(define (string . charlist)
-     (list->string charlist))
-
 (define (list->string charlist)
      (let* ((len (length charlist))
             (newstr (make-string len))
