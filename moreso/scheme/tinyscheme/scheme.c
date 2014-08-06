@@ -1007,14 +1007,6 @@ INTERFACE pointer mk_counted_string(scheme *sc, const char *str, int len) {
      return (x);
 }
 
-INTERFACE pointer mk_empty_string(scheme *sc, int len, char fill) {
-     pointer x = get_cell(sc, sc->NIL, sc->NIL);
-     typeflag(x) = (T_STRING | T_ATOM);
-     strvalue(x) = store_string(sc,len,0,fill);
-     strlength(x) = len;
-     return (x);
-}
-
 static void* allocate_transient(scheme *sc, int size)
 {
 	struct transient *t;
@@ -3449,18 +3441,6 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
             Error_1(sc, "atom->string: not an atom:", x);
           }
         }
-
-     case OP_MKSTRING: { /* make-string */
-          int fill=' ';
-          int len;
-
-          len=ivalue(car(sc->args));
-
-          if(cdr(sc->args)!=sc->NIL) {
-               fill=charvalue(cadr(sc->args));
-          }
-          s_return(sc,mk_empty_string(sc,len,(char)fill));
-     }
 
      case OP_STRLEN:  /* string-length */
           s_return(sc,mk_integer(sc,strlength(car(sc->args))));
