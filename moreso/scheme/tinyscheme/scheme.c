@@ -3524,7 +3524,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           char *str;
           int index0;
           int index1;
-          int len;
+          int i, len;
 
           str=strvalue(car(sc->args));
 
@@ -3544,9 +3544,9 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           }
 
           len=index1-index0;
-          x=mk_empty_string(sc,len,' ');
-          memcpy(strvalue(x),str+index0,len);
-          strvalue(x)[len]=0;
+	  x = mk_vector(sc, len);
+	  for (i = 0; i < len; ++i)
+		  set_vector_elem(x, i, mk_character(sc, str[index0+i]));
 
           s_return(sc,x);
      }
