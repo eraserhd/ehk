@@ -70,6 +70,7 @@ void check_subsection_works()
 	check("(subsection #(#\\a #\\b #\\c) 1)", "#(#\\b #\\c)");
 	check("(subsection #(#\\a #\\b #\\c) 0)", "#(#\\a #\\b #\\c)");
 	check("(subsection #(#\\a #\\b #\\c) 3)", "#()");
+	check("(subsection #(1 2 3) 1 2)", "#(2)");
 }
 
 int main(int argc, char **argv)
