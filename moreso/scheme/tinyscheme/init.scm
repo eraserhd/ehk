@@ -106,13 +106,6 @@
              0
              (abs (* (quotient aa (gcd aa bb)) bb)))))))
 
-(define (string-fill! s e)
-     (let ((n (string-length s)))
-          (let loop ((i 0))
-               (if (= i n)
-                    s
-                    (begin (string-set! s i e) (loop (succ i)))))))
-
 (define (string->list s)
      (let loop ((n (pred (string-length s))) (l '()))
           (if (= n -1)
