@@ -100,10 +100,6 @@ extern "C" {
 # define STDIO_ADDS_CR 0
 #endif
 
-#ifndef INLINE
-# define INLINE
-#endif
-
 #ifndef USE_INTERFACE
 # define USE_INTERFACE 0
 #endif
