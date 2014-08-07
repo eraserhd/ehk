@@ -4529,7 +4529,14 @@ static pointer mk_proc(scheme *sc, enum scheme_opcodes op) {
 
 /* Hard-coded for the given keywords. Remember to rewrite if more are added! */
 static int syntaxnum(pointer p) {
-     const char *s=strvalue(sc, car(p));
+     int i, length;
+     char s[15];
+
+     length = strlength(car(p));
+     for (i = 0; i < length; ++i)
+	     s[i] = strref(car(p), i);
+     s[length] = 0;
+
      switch(strlength(car(p))) {
      case 2:
           if(s[0]=='i') return OP_IF0;        /* if */
