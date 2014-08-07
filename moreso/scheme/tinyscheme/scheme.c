@@ -214,15 +214,16 @@ SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (typeflag(p)&T_SYMBOL);
 #define symprop(p)       cdr(p)
 #endif
 
-INTERFACE INLINE int is_string(pointer p) {
-  int i, num;
-  if (type(p)!=T_VECTOR)
-    return 0;
-  num = ivalue(p);
-  for (i=0; i<num; ++i)
-    if (!is_character(vector_ref(p,i)))
-      return 0;
-  return 1;
+INTERFACE INLINE int is_string(pointer p)
+{
+	int i, num;
+	if (type(p) != T_VECTOR)
+		return 0;
+	num = ivalue(p);
+	for (i = 0; i < num; ++i)
+		if (!is_character(vector_ref(p, i)))
+			return 0;
+	return 1;
 }
 
 static int vector_length(pointer s)
