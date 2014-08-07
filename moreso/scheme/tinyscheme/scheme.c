@@ -1897,53 +1897,56 @@ static int token(scheme *sc) {
 /* ========== Routines for Printing ========== */
 #define   ok_abbrev(x)   (is_pair(x) && cdr(x) == sc->NIL)
 
-static void printslashstring(scheme *sc, pointer p) {
-  int i, len;
-  unsigned char s;
+static void printslashstring(scheme * sc, pointer p)
+{
+	int i, len;
+	unsigned char s;
 
-  len=vector_length(p);
-  putcharacter(sc,'"');
-  for ( i=0; i<len; i++) {
-    s = charvalue(vector_ref(p,i));
-    if(s==0xff || s=='"' || s<' ' || s=='\\') {
-      putcharacter(sc,'\\');
-      switch(s) {
-      case '"':
-        putcharacter(sc,'"');
-        break;
-      case '\n':
-        putcharacter(sc,'n');
-        break;
-      case '\t':
-        putcharacter(sc,'t');
-        break;
-      case '\r':
-        putcharacter(sc,'r');
-        break;
-      case '\\':
-        putcharacter(sc,'\\');
-        break;
-      default: {
-          int d=s/16;
-          putcharacter(sc,'x');
-          if(d<10) {
-            putcharacter(sc,d+'0');
-          } else {
-            putcharacter(sc,d-10+'A');
-          }
-          d=s%16;
-          if(d<10) {
-            putcharacter(sc,d+'0');
-          } else {
-            putcharacter(sc,d-10+'A');
-          }
-        }
-      }
-    } else {
-      putcharacter(sc,s);
-    }
-  }
-  putcharacter(sc,'"');
+	len = vector_length(p);
+	putcharacter(sc, '"');
+	for (i = 0; i < len; i++) {
+		s = charvalue(vector_ref(p, i));
+		if (s == 0xff || s == '"' || s < ' ' || s == '\\') {
+			putcharacter(sc, '\\');
+			switch (s) {
+			case '"':
+				putcharacter(sc, '"');
+				break;
+			case '\n':
+				putcharacter(sc, 'n');
+				break;
+			case '\t':
+				putcharacter(sc, 't');
+				break;
+			case '\r':
+				putcharacter(sc, 'r');
+				break;
+			case '\\':
+				putcharacter(sc, '\\');
+				break;
+			default:{
+					int d = s / 16;
+					putcharacter(sc, 'x');
+					if (d < 10) {
+						putcharacter(sc, d + '0');
+					} else {
+						putcharacter(sc,
+							     d - 10 + 'A');
+					}
+					d = s % 16;
+					if (d < 10) {
+						putcharacter(sc, d + '0');
+					} else {
+						putcharacter(sc,
+							     d - 10 + 'A');
+					}
+				}
+			}
+		} else {
+			putcharacter(sc, s);
+		}
+	}
+	putcharacter(sc, '"');
 }
 
 
