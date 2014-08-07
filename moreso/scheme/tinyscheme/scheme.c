@@ -984,15 +984,15 @@ static pointer mk_number(scheme *sc, num n) {
 static char *store_string(scheme * sc, const char *str)
 {
 	char *allocated_string;
-	int len_str;
+	int length;
 
-	len_str = strlen(str);
-	allocated_string = (char *) sc->malloc(len_str + 1);
+	length = strlen(str);
+	allocated_string = (char *) sc->malloc(length + 1);
 	if (!allocated_string) {
 		sc->no_memory = 1;
 		return sc->strbuff;
 	}
-	snprintf(allocated_string, len_str + 1, "%s", str);
+	snprintf(allocated_string, length + 1, "%s", str);
 	return allocated_string;
 }
 
