@@ -84,12 +84,18 @@ void check_vector_ref()
 	check("(vector-ref \"abc\" 1)", "#\\b");
 }
 
+void check_vector_length()
+{
+	check("(vector-length \"abc\")", "3");
+}
+
 int main(int argc, char **argv)
 {
 	check_string_p_returns_t_for_char_vectors();
 	check_subsection_works();
 	check_vector_copy();
 	check_vector_ref();
+	check_vector_length();
 
 	printf(" %d tests, %d failed, %d errors.\n", check_count, fail_count, error_count);
 	if (fail_count == 0 && error_count == 0)

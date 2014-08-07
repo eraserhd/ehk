@@ -3548,7 +3548,10 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
      }
 
      case OP_VECLEN:  /* vector-length */
-          s_return(sc,mk_integer(sc,ivalue(car(sc->args))));
+	if (type(car(sc->args)) == T_STRING)
+		s_return(sc, mk_integer(sc, strlength(car(sc->args))));
+	else
+		s_return(sc,mk_integer(sc,ivalue(car(sc->args))));
 
      case OP_VECREF: { /* vector-ref */
 	int index;
