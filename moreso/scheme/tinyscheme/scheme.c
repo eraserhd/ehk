@@ -168,7 +168,7 @@ static num num_one;
 INTERFACE static int is_list(scheme *sc, pointer p);
 INTERFACE INLINE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
 INTERFACE static void fill_vector(pointer vec, pointer obj);
-INTERFACE static pointer vector_elem(pointer vec, int ielem);
+INTERFACE static pointer vector_ref(pointer vec, int ielem);
 INTERFACE static pointer vector_set_x(pointer vec, int ielem, pointer a);
 INTERFACE INLINE int is_number(pointer p)    { return (type(p)==T_NUMBER); }
 INTERFACE INLINE int is_integer(pointer p) {
@@ -220,7 +220,7 @@ INTERFACE INLINE int is_string(pointer p) {
     return 0;
   num = ivalue(p);
   for (i=0; i<num; ++i)
-    if (!is_character(vector_elem(p,i)))
+    if (!is_character(vector_ref(p,i)))
       return 0;
   return 1;
 }
@@ -232,7 +232,7 @@ static int strlength(pointer s)
 
 static char strref(pointer s, int n)
 {
-	return charvalue(vector_elem(s, n));
+	return charvalue(vector_ref(s, n));
 }
 
 INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
@@ -853,7 +853,7 @@ static pointer oblist_add_by_name(scheme *sc, const char *name)
 
   location = hash_fn(name, ivalue_unchecked(sc->oblist));
   vector_set_x(sc->oblist, location,
-                  immutable_cons(sc, x, vector_elem(sc->oblist, location)));
+                  immutable_cons(sc, x, vector_ref(sc->oblist, location)));
   return x;
 }
 
@@ -864,7 +864,7 @@ static INLINE pointer oblist_find_by_name(scheme *sc, const char *name)
   char *s;
 
   location = hash_fn(name, ivalue_unchecked(sc->oblist));
-  for (x = vector_elem(sc->oblist, location); x != sc->NIL; x = cdr(x)) {
+  for (x = vector_ref(sc->oblist, location); x != sc->NIL; x = cdr(x)) {
     s = symname(sc, car(x));
     /* case-insensitive, per R5RS section 2. */
     if(stricmp(name, s) == 0) {
@@ -881,7 +881,7 @@ static pointer oblist_all_symbols(scheme *sc)
   pointer ob_list = sc->NIL;
 
   for (i = 0; i < ivalue_unchecked(sc->oblist); i++) {
-    for (x  = vector_elem(sc->oblist, i); x != sc->NIL; x = cdr(x)) {
+    for (x  = vector_ref(sc->oblist, i); x != sc->NIL; x = cdr(x)) {
       ob_list = cons(sc, x, ob_list);
     }
   }
@@ -1061,7 +1061,7 @@ INTERFACE static void fill_vector(pointer vec, pointer obj) {
      }
 }
 
-INTERFACE static pointer vector_elem(pointer vec, int ielem) {
+INTERFACE static pointer vector_ref(pointer vec, int ielem) {
      int n=ielem/2;
      if(ielem%2==0) {
           return car(vec+1+n);
@@ -1905,7 +1905,7 @@ static void printslashstring(scheme *sc, pointer p) {
   putcharacter(sc,'"');
   for ( i=0; i<len; i++) {
     if (is_vector(p))
-      s = charvalue(vector_elem(p,i));
+      s = charvalue(vector_ref(p,i));
     else
       s = ((unsigned char*)strvalue(sc, p))[i];
     if(s==0xff || s=='"' || s<' ' || s=='\\') {
@@ -2240,7 +2240,7 @@ static INLINE void new_slot_spec_in_env(scheme *sc, pointer env,
     int location = hash_fn(symname(sc, variable), ivalue_unchecked(car(env)));
 
     vector_set_x(car(env), location,
-                    immutable_cons(sc, slot, vector_elem(car(env), location)));
+                    immutable_cons(sc, slot, vector_ref(car(env), location)));
   } else {
     car(env) = immutable_cons(sc, slot, car(env));
   }
@@ -2254,7 +2254,7 @@ static pointer find_slot_in_env(scheme *sc, pointer env, pointer hdl, int all)
   for (x = env; x != sc->NIL; x = cdr(x)) {
     if (is_vector(car(x))) {
       location = hash_fn(symname(sc, hdl), ivalue_unchecked(car(x)));
-      y = vector_elem(car(x), location);
+      y = vector_ref(car(x), location);
     } else {
       y = car(x);
     }
@@ -3489,7 +3489,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
 	offset = 0;
 	for (x = sc->args; x != sc->NIL; x = cdr(x)) {
 		for (i = 0; i < ivalue_unchecked(car(x)); ++i)
-			vector_set_x(result, offset+i, vector_elem(car(x), i));
+			vector_set_x(result, offset+i, vector_ref(car(x), i));
 
 		offset += ivalue_unchecked(car(x));
 	}
@@ -3520,7 +3520,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
 	result_length = end - start;
 	x = mk_vector(sc, result_length);
 	for (i = 0; i < result_length; ++i)
-		vector_set_x(x, i, vector_elem(car(sc->args), start+i));
+		vector_set_x(x, i, vector_ref(car(sc->args), start+i));
 
 	s_return(sc,x);
      }
@@ -3568,7 +3568,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
 	if(index>=ivalue(car(sc->args)))
 		Error_1(sc,"vector-ref: out of bounds:",cadr(sc->args));
 
-	s_return(sc,vector_elem(car(sc->args),index));
+	s_return(sc,vector_ref(car(sc->args),index));
      }
 
      case OP_VECSET: {   /* vector-set! */
@@ -4270,7 +4270,7 @@ static pointer opexe_5(scheme *sc, enum scheme_opcodes op) {
                putstr(sc,")");
                s_return(sc,sc->T);
           } else {
-               pointer elem=vector_elem(vec,i);
+               pointer elem=vector_ref(vec,i);
                ivalue_unchecked(cdr(sc->args))=i+1;
                s_save(sc,OP_PVECFROM, sc->args, sc->NIL);
                sc->args=elem;
@@ -4597,7 +4597,7 @@ static struct scheme_interface vtbl ={
   list_length,
   ivalue,
   fill_vector,
-  vector_elem,
+  vector_ref,
   vector_set_x,
   is_port,
   is_pair,
