@@ -224,11 +224,6 @@ int is_string(pointer p)
 	return 1;
 }
 
-static int vector_length(pointer s)
-{
-	return ivalue_unchecked(s);
-}
-
 int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
 int is_proc(pointer p)     { return (type(p)==T_PROC); }
 int is_foreign(pointer p)  { return (type(p)==T_FOREIGN); }
@@ -989,21 +984,6 @@ static char *allocate_copy_of_string(scheme * sc, const char *str)
 	return allocated_string;
 }
 
-/* get new string */
-pointer mk_string(scheme *sc, const char *str) {
-     return mk_counted_string(sc,str,strlen(str));
-}
-
-pointer mk_counted_string(scheme *sc, const char *str, int len) {
-	int i;
-	pointer x;
-
-	x = get_vector_object(sc, len, sc->NIL);
-	for (i = 0; i < len; ++i)
-		vector_set_x(x, i, mk_character(sc, str[i]));
-	return x;
-}
-
 static void* allocate_transient(scheme *sc, int size)
 {
 	struct transient *t;
@@ -1028,24 +1008,16 @@ static void free_transients(scheme *sc)
 	sc->transients = 0;
 }
 
-static char *strvalue(scheme *sc, pointer s)
-{
-	int i, length;
-	char *str;
-
-	length = vector_length(s);
-	str = allocate_transient(sc, length+1);
-	for (i = 0; i < length; ++i)
-		str[i] = charvalue(vector_ref(s, i));
-	str[length] = 0;
-	return str;
-}
-
 /* -- vectors -- */
 
 static pointer mk_vector(scheme * sc, int len)
 {
 	return get_vector_object(sc, len, sc->NIL);
+}
+
+static int vector_length(pointer s)
+{
+	return ivalue_unchecked(s);
 }
 
 static void fill_vector(pointer vec, pointer obj)
@@ -1078,6 +1050,37 @@ static pointer vector_set_x(pointer vec, int ielem, pointer a)
 	} else {
 		return cdr(vec + 1 + n) = a;
 	}
+}
+
+/* -- strings -- */
+
+pointer mk_string(scheme * sc, const char *str)
+{
+	return mk_counted_string(sc, str, strlen(str));
+}
+
+pointer mk_counted_string(scheme * sc, const char *str, int len)
+{
+	int i;
+	pointer x;
+
+	x = get_vector_object(sc, len, sc->NIL);
+	for (i = 0; i < len; ++i)
+		vector_set_x(x, i, mk_character(sc, str[i]));
+	return x;
+}
+
+static char *strvalue(scheme *sc, pointer s)
+{
+	int i, length;
+	char *str;
+
+	length = vector_length(s);
+	str = allocate_transient(sc, length+1);
+	for (i = 0; i < length; ++i)
+		str[i] = charvalue(vector_ref(s, i));
+	str[length] = 0;
+	return str;
 }
 
 /* -- symbols -- */
