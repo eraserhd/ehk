@@ -225,7 +225,7 @@ INTERFACE INLINE int is_string(pointer p) {
   return 1;
 }
 
-static int strlength(pointer s)
+static int vector_length(pointer s)
 {
 	return ivalue_unchecked(s);
 }
@@ -1039,7 +1039,7 @@ static char *strvalue(scheme *sc, pointer s)
 	int i, length;
 	char *str;
 
-	length = strlength(s);
+	length = vector_length(s);
 	str = allocate_transient(sc, length+1);
 	for (i = 0; i < length; ++i)
 		str[i] = strref(s, i);
@@ -1901,7 +1901,7 @@ static void printslashstring(scheme *sc, pointer p) {
   if (is_vector(p))
     len=ivalue(p);
   else
-    len=strlength(p);
+    len=vector_length(p);
   putcharacter(sc,'"');
   for ( i=0; i<len; i++) {
     if (is_vector(p))
@@ -3467,7 +3467,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           str=strvalue(sc, car(sc->args));
 
           index=ivalue(cadr(sc->args));
-          if(index>=strlength(car(sc->args))) {
+          if(index>=vector_length(car(sc->args))) {
                Error_1(sc,"string-set!: out of bounds:",cadr(sc->args));
           }
 
@@ -3923,7 +3923,7 @@ static pointer opexe_4(scheme *sc, enum scheme_opcodes op) {
                case OP_OPEN_INOUTSTRING:  prop=port_input|port_output; break;
           }
           p=port_from_string(sc, strvalue(sc, car(sc->args)),
-                 strvalue(sc, car(sc->args))+strlength(car(sc->args)), prop);
+                 strvalue(sc, car(sc->args))+vector_length(car(sc->args)), prop);
           if(p==sc->NIL) {
                s_return(sc,sc->F);
           }
@@ -3938,7 +3938,7 @@ static pointer opexe_4(scheme *sc, enum scheme_opcodes op) {
                }
           } else {
                p=port_from_string(sc, strvalue(sc, car(sc->args)),
-                      strvalue(sc, car(sc->args))+strlength(car(sc->args)),
+                      strvalue(sc, car(sc->args))+vector_length(car(sc->args)),
                           port_output);
                if(p==sc->NIL) {
                     s_return(sc,sc->F);
@@ -4520,12 +4520,12 @@ static int syntaxnum(pointer p) {
      int i, length;
      char s[15];
 
-     length = strlength(car(p));
+     length = vector_length(car(p));
      for (i = 0; i < length; ++i)
 	     s[i] = strref(car(p), i);
      s[length] = 0;
 
-     switch(strlength(car(p))) {
+     switch (length) {
      case 2:
           if(s[0]=='i') return OP_IF0;        /* if */
           else return OP_OR0;                 /* or */
