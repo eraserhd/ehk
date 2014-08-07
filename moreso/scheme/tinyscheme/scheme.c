@@ -3442,9 +3442,6 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           }
         }
 
-     case OP_STRLEN:  /* string-length */
-          s_return(sc,mk_integer(sc,strlength(car(sc->args))));
-
      case OP_STRSET: { /* string-set! */
           char *str;
           int index;

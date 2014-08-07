@@ -107,7 +107,7 @@
              (abs (* (quotient aa (gcd aa bb)) bb)))))))
 
 (define (string->list s)
-     (let loop ((n (pred (string-length s))) (l '()))
+     (let loop ((n (pred (vector-length s))) (l '()))
           (if (= n -1)
                l
                (loop (pred n) (cons (vector-ref s n) l)))))
@@ -152,7 +152,7 @@
 
 ; Note the trick of returning (cmp x y)
 (define (string-cmp? chcmp cmp a b)
-     (let ((na (string-length a)) (nb (string-length b)))
+     (let ((na (vector-length a)) (nb (vector-length b)))
           (let loop ((i 0))
                (cond
                     ((= i na)
