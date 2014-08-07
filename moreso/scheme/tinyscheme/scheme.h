@@ -205,12 +205,10 @@ struct scheme_interface {
   pointer (*set_cdr)(pointer p, pointer q);
 
   int (*is_symbol)(pointer p);
-  char *(*symname)(pointer p);
 
   int (*is_syntax)(pointer p);
   int (*is_proc)(pointer p);
   int (*is_foreign)(pointer p);
-  char *(*syntaxname)(pointer p);
   int (*is_closure)(pointer p);
   int (*is_macro)(pointer p);
   pointer (*closure_code)(pointer p);

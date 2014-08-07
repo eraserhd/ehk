@@ -183,13 +183,13 @@ pointer set_car(pointer p, pointer q);
 pointer set_cdr(pointer p, pointer q);
 
 int is_symbol(pointer p);
-char *symname(pointer p);
+char *symname(scheme *sc, pointer p);
 int hasprop(pointer p);
 
 int is_syntax(pointer p);
 int is_proc(pointer p);
 int is_foreign(pointer p);
-char *syntaxname(pointer p);
+char *syntaxname(scheme *sc, pointer p);
 int is_closure(pointer p);
 #ifdef USE_MACRO
 int is_macro(pointer p);

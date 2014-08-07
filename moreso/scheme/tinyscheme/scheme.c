@@ -166,7 +166,7 @@ static num num_one;
 #define typeflag(p)      ((p)->_flag)
 #define type(p)          (typeflag(p)&T_MASKTYPE)
 
-#define strvalue(p)      ((p)->_object._string._svalue)
+#define strvalue(sc,p)      ((p)->_object._string._svalue)
 #define strlength(p)        ((p)->_object._string._length)
 
 INTERFACE static int is_list(scheme *sc, pointer p);
@@ -210,7 +210,7 @@ INTERFACE pointer set_car(pointer p, pointer q) { return car(p)=q; }
 INTERFACE pointer set_cdr(pointer p, pointer q) { return cdr(p)=q; }
 
 INTERFACE INLINE int is_symbol(pointer p)   { return (type(p)==T_SYMBOL); }
-INTERFACE INLINE char *symname(pointer p)   { return strvalue(car(p)); }
+INTERFACE INLINE char *symname(scheme *sc, pointer p)   { return strvalue(sc, car(p)); }
 #if USE_PLIST
 SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (typeflag(p)&T_SYMBOL); }
 #define symprop(p)       cdr(p)
@@ -232,7 +232,6 @@ INTERFACE INLINE int is_string(pointer p) {
 INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
 INTERFACE INLINE int is_proc(pointer p)     { return (type(p)==T_PROC); }
 INTERFACE INLINE int is_foreign(pointer p)  { return (type(p)==T_FOREIGN); }
-INTERFACE INLINE char *syntaxname(pointer p) { return strvalue(car(p)); }
 #define procnum(p)       ivalue(p)
 static const char *procname(pointer x);
 
@@ -860,7 +859,7 @@ static INLINE pointer oblist_find_by_name(scheme *sc, const char *name)
 
   location = hash_fn(name, ivalue_unchecked(sc->oblist));
   for (x = vector_elem(sc->oblist, location); x != sc->NIL; x = cdr(x)) {
-    s = symname(car(x));
+    s = symname(sc, car(x));
     /* case-insensitive, per R5RS section 2. */
     if(stricmp(name, s) == 0) {
       return car(x);
@@ -896,7 +895,7 @@ static INLINE pointer oblist_find_by_name(scheme *sc, const char *name)
      char    *s;
 
      for (x = sc->oblist; x != sc->NIL; x = cdr(x)) {
-        s = symname(car(x));
+        s = symname(sc, car(x));
         /* case-insensitive, per R5RS section 2. */
         if(stricmp(name, s) == 0) {
           return car(x);
@@ -1001,7 +1000,7 @@ INTERFACE pointer mk_string(scheme *sc, const char *str) {
 INTERFACE pointer mk_counted_string(scheme *sc, const char *str, int len) {
      pointer x = get_cell(sc, sc->NIL, sc->NIL);
      typeflag(x) = (T_STRING | T_ATOM);
-     strvalue(x) = store_string(sc,len,str,0);
+     strvalue(sc, x) = store_string(sc,len,str,0);
      strlength(x) = len;
      return (x);
 }
@@ -1344,7 +1343,7 @@ static void gc(scheme *sc, pointer a, pointer b) {
 
 static void finalize_cell(scheme *sc, pointer a) {
   if(type(a)==T_STRING) {
-    sc->free(strvalue(a));
+    sc->free(strvalue(sc, a));
   } else if(is_port(a)) {
     if(a->_object._port->kind&port_file
        && a->_object._port->rep.stdio.closeit) {
@@ -1892,7 +1891,7 @@ static void printslashstring(scheme *sc, pointer p) {
     if (is_vector(p))
       s = charvalue(vector_elem(p,i));
     else
-      s = ((unsigned char*)strvalue(p))[i];
+      s = ((unsigned char*)strvalue(sc, p))[i];
     if(s==0xff || s=='"' || s<' ' || s=='\\') {
       putcharacter(sc,'\\');
       switch(s) {
@@ -1996,7 +1995,7 @@ static void atom2str(scheme *sc, pointer l, int f, char **pp, int *plen) {
           }
      } else if (is_string(l)) {
           if (!f) {
-               p = strvalue(l);
+               p = strvalue(sc, l);
           } else { /* Hack, uses the fact that printing is needed */
                *pp=sc->strbuff;
                *plen=0;
@@ -2039,7 +2038,7 @@ static void atom2str(scheme *sc, pointer l, int f, char **pp, int *plen) {
                }
           }
      } else if (is_symbol(l)) {
-          p = symname(l);
+          p = symname(sc, l);
      } else if (is_proc(l)) {
           p = sc->strbuff;
           snprintf(p,STRBUFFSIZE,"#<%s PROCEDURE %ld>", procname(l),procnum(l));
@@ -2222,7 +2221,7 @@ static INLINE void new_slot_spec_in_env(scheme *sc, pointer env,
   pointer slot = immutable_cons(sc, variable, value);
 
   if (is_vector(car(env))) {
-    int location = hash_fn(symname(variable), ivalue_unchecked(car(env)));
+    int location = hash_fn(symname(sc, variable), ivalue_unchecked(car(env)));
 
     set_vector_elem(car(env), location,
                     immutable_cons(sc, slot, vector_elem(car(env), location)));
@@ -2238,7 +2237,7 @@ static pointer find_slot_in_env(scheme *sc, pointer env, pointer hdl, int all)
 
   for (x = env; x != sc->NIL; x = cdr(x)) {
     if (is_vector(car(x))) {
-      location = hash_fn(symname(hdl), ivalue_unchecked(car(x)));
+      location = hash_fn(symname(sc, hdl), ivalue_unchecked(car(x)));
       y = vector_elem(car(x), location);
     } else {
       y = car(x);
@@ -2516,9 +2515,9 @@ static pointer opexe_0(scheme *sc, enum scheme_opcodes op) {
      case OP_LOAD:       /* load */
           if(file_interactive(sc)) {
                fprintf(sc->outport->_object._port->rep.stdio.file,
-               "Loading %s\n", strvalue(car(sc->args)));
+               "Loading %s\n", strvalue(sc, car(sc->args)));
           }
-          if (!file_push(sc,strvalue(car(sc->args)))) {
+          if (!file_push(sc,strvalue(sc, car(sc->args)))) {
                Error_1(sc,"unable to open", car(sc->args));
           }
       else
@@ -3373,10 +3372,10 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
      }
 
      case OP_STR2SYM:  /* string->symbol */
-          s_return(sc,mk_symbol(sc,strvalue(car(sc->args))));
+          s_return(sc,mk_symbol(sc,strvalue(sc, car(sc->args))));
 
      case OP_STR2ATOM: /* string->atom */ {
-          char *s=strvalue(car(sc->args));
+          char *s=strvalue(sc, car(sc->args));
           long pf = 0;
           if(cdr(sc->args)!=sc->NIL) {
             /* we know cadr(sc->args) is a natural number */
@@ -3411,7 +3410,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
         }
 
      case OP_SYM2STR: /* symbol->string */
-          x=mk_string(sc,symname(car(sc->args)));
+          x=mk_string(sc,symname(sc, car(sc->args)));
           setimmutable(x);
           s_return(sc,x);
 
@@ -3449,7 +3448,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           if(is_immutable(car(sc->args))) {
                Error_1(sc,"string-set!: unable to alter immutable string:",car(sc->args));
           }
-          str=strvalue(car(sc->args));
+          str=strvalue(sc, car(sc->args));
 
           index=ivalue(cadr(sc->args));
           if(index>=strlength(car(sc->args))) {
@@ -3558,7 +3557,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
 		if (index >= strlength(car(sc->args)))
 			Error_1(sc, "vector-ref: out of bounds:", cadr(sc->args));
 
-		s_return(sc, mk_character(sc, strvalue(car(sc->args))[index]));
+		s_return(sc, mk_character(sc, strvalue(sc, car(sc->args))[index]));
 	} else {
 		if(index>=ivalue(car(sc->args)))
 			Error_1(sc,"vector-ref: out of bounds:",cadr(sc->args));
@@ -3782,7 +3781,7 @@ static pointer opexe_4(scheme *sc, enum scheme_opcodes op) {
                setimmutable(car(sc->args));
           }
           putstr(sc, "Error: ");
-          putstr(sc, strvalue(car(sc->args)));
+          putstr(sc, strvalue(sc, car(sc->args)));
           sc->args = cdr(sc->args);
           s_goto(sc,OP_ERR1);
 
@@ -3902,7 +3901,7 @@ static pointer opexe_4(scheme *sc, enum scheme_opcodes op) {
                case OP_OPEN_OUTFILE:    prop=port_output; break;
                case OP_OPEN_INOUTFILE: prop=port_input|port_output; break;
           }
-          p=port_from_filename(sc,strvalue(car(sc->args)),prop);
+          p=port_from_filename(sc,strvalue(sc, car(sc->args)),prop);
           if(p==sc->NIL) {
                s_return(sc,sc->F);
           }
@@ -3918,8 +3917,8 @@ static pointer opexe_4(scheme *sc, enum scheme_opcodes op) {
                case OP_OPEN_INSTRING:     prop=port_input; break;
                case OP_OPEN_INOUTSTRING:  prop=port_input|port_output; break;
           }
-          p=port_from_string(sc, strvalue(car(sc->args)),
-                 strvalue(car(sc->args))+strlength(car(sc->args)), prop);
+          p=port_from_string(sc, strvalue(sc, car(sc->args)),
+                 strvalue(sc, car(sc->args))+strlength(car(sc->args)), prop);
           if(p==sc->NIL) {
                s_return(sc,sc->F);
           }
@@ -3933,8 +3932,8 @@ static pointer opexe_4(scheme *sc, enum scheme_opcodes op) {
                     s_return(sc,sc->F);
                }
           } else {
-               p=port_from_string(sc, strvalue(car(sc->args)),
-                      strvalue(car(sc->args))+strlength(car(sc->args)),
+               p=port_from_string(sc, strvalue(sc, car(sc->args)),
+                      strvalue(sc, car(sc->args))+strlength(car(sc->args)),
                           port_output);
                if(p==sc->NIL) {
                     s_return(sc,sc->F);
@@ -4513,7 +4512,7 @@ static pointer mk_proc(scheme *sc, enum scheme_opcodes op) {
 
 /* Hard-coded for the given keywords. Remember to rewrite if more are added! */
 static int syntaxnum(pointer p) {
-     const char *s=strvalue(car(p));
+     const char *s=strvalue(sc, car(p));
      switch(strlength(car(p))) {
      case 2:
           if(s[0]=='i') return OP_IF0;        /* if */
@@ -4596,12 +4595,10 @@ static struct scheme_interface vtbl ={
   set_cdr,
 
   is_symbol,
-  symname,
 
   is_syntax,
   is_proc,
   is_foreign,
-  syntaxname,
   is_closure,
   is_macro,
   closure_code,
