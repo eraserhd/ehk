@@ -181,7 +181,6 @@ struct scheme_interface {
   void (*putcharacter)(scheme *sc, int c);
 
   int (*is_string)(pointer p);
-  char *(*string_value)(pointer p);
   int (*is_number)(pointer p);
   num (*nvalue)(pointer p);
   long (*ivalue)(pointer p);
