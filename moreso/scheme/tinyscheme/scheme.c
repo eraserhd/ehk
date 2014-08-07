@@ -983,8 +983,8 @@ static pointer mk_number(scheme *sc, num n) {
 /* allocate name to string area */
 static char *store_string(scheme * sc, const char *str)
 {
-	char *allocated_string;
 	int length;
+	char *allocated_string;
 
 	length = strlen(str);
 	allocated_string = (char *) sc->malloc(length + 1);
