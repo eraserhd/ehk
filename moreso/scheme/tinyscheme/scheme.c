@@ -167,7 +167,6 @@ static num num_one;
 #define type(p)          (typeflag(p)&T_MASKTYPE)
 
 #define strvalue(sc,p)      ((p)->_object._string._svalue)
-static int strlength(pointer s);
 
 INTERFACE static int is_list(scheme *sc, pointer p);
 INTERFACE INLINE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
@@ -237,6 +236,14 @@ static int strlength(pointer s)
 		return ivalue_unchecked(s);
 	else
 		abort();
+}
+
+static char strref(pointer s, int n)
+{
+	if (type(s) == T_STRING)
+		return s->_object._string._svalue[n];
+	else
+		return charvalue(vector_elem(s, n));
 }
 
 INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
