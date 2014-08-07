@@ -1,48 +1,67 @@
-\section{Removal of the Distinct String Type}
-\subsection{Rationale}
+\section{Strings}
 
-R5RS specifies strings and vectors as disjoint types.  This necessitates
-distinct procedures for operating on each type when the procedures would
-otherwise have the same meaning (e.g. {\cf string-length} and
-{\cf vector-length}, {\cf string->list} and {\cf vector->list}).
+The R5RS notion of strings as a distinct type is removed; a Moreso string
+is a vector containing only characters.  Moreso has no special restrictions
+on what may be done with this kind of string, although some operations,
+such as replacing an element with a non-character, will make the object
+no longer considered a string.
 
-Since the domains of these functions do not overlap, one solution would be to
-replace the duplicated, type-specific routines with singular, general ones;
-however, removing the string type itself is possible without much trouble.
+\subsection{New Procedures}
+\begin{entry}{\proto{string?}{ obj}{procedure}}
 
-{\cf string?} now returns \schtrue when {\cf vector?} would return \schtrue
-and {\cf char?} would return \schtrue for every element of the vector.
+Returns \schtrue\ if \var{obj} is a vector and every element in \var{obj} is a
+character, and \schfalse\ otherwise:
 
 \begin{scheme}
-(string? '\sharpsign())                    \ev \schtrue
+(string? \sharpsign())                    \ev \schtrue
 (string? (vector \sharpsign\textbackslash{}c))           \ev \schtrue
 (string? (vector \sharpsign\textbackslash{}c \schfalse)) \ev \schfalse
+(string? \sharpsign{}t) \ev \schfalse
+\end{scheme}
+\end{entry}
+
+\begin{entry}{\proto{subsection}{ vector start end}{library procedure}}
+
+{\cf Subsection} returns a fresh vector containing the objects from
+\var{vector} from index \var{start} (inclusive) to index \var{end}
+(exclusive).
+\end{entry}
+
+\begin{entry}{\proto{vector-append}{ vector \dotsfoo}{library procedure}}
+
+Returns a vector containing the concatenation of the supplied vectors.
+\end{entry}
+
+\begin{entry}{\proto{vector-copy}{ vector}{library procedure}}
+
+Returns a fresh vector copy of \var{vector}.
+\end{entry}
+
+\subsection{Removed Procedures}
+
+The following procedures are removed:
+\begin{scheme}
+make-string              string-set!
+string                   string-ref
+string-fill!             string->list
+string-length            list->string
+string-append            substring
+string-copy
 \end{scheme}
 
 \subsection{Quoted Literals}
 
-The quoted literal string syntax is kept, except that it now represents a vector
-of characters.  That is,
+The quoted literal string syntax is kept, except that it is now read as a
+vector of characters.  That is,
 
 \begin{scheme}
 (vector? "x") \ev \schtrue
 (string? "x") \ev \schtrue
+(char? (vector-ref "x" 0)) \ev \schtrue
 \end{scheme}
 
+{\cf write} renders a string as a quoted literal.
 
-{\cf display}
-
-{\cf write} now produces the quoted literal in the cases where {\cf string?}
-would return \schtrue.
-
-\begin{enumerate}
-  \item string-length, string-set!, string-ref, string->list, make-string,
-	string, list->string, string-fill! are all removed in favor of their
-	vector counterparts.
-  \item substring is renamed section and works on any kind of vector.
-  \item string-append and string-copy become vector-append and vector-copy.
-\end{enumerate}
-
-This means that the following procedures are not touched
+Moreso's {\cf display} writes strings in the same way as R5RS's {\cf display}.
 
 % vim:set ft=tex:
