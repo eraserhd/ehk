@@ -1015,11 +1015,13 @@ INTERFACE pointer mk_string(scheme *sc, const char *str) {
 }
 
 INTERFACE pointer mk_counted_string(scheme *sc, const char *str, int len) {
-     pointer x = get_cell(sc, sc->NIL, sc->NIL);
-     typeflag(x) = (T_STRING | T_ATOM);
-     x->_object._string._svalue = store_string(sc,len,str,0);
-     x->_object._string._length = len;
-     return (x);
+	int i;
+	pointer x;
+
+	x = get_vector_object(sc, len, sc->NIL);
+	for (i = 0; i < len; ++i)
+		set_vector_elem(x, i, mk_character(sc, str[i]));
+	return x;
 }
 
 static void* allocate_transient(scheme *sc, int size)
