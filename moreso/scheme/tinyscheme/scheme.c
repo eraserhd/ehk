@@ -167,7 +167,7 @@ static num num_one;
 #define type(p)          (typeflag(p)&T_MASKTYPE)
 
 #define strvalue(sc,p)      ((p)->_object._string._svalue)
-#define strlength(p)        ((p)->_object._string._length)
+static int strlength(pointer s);
 
 INTERFACE static int is_list(scheme *sc, pointer p);
 INTERFACE INLINE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
@@ -227,6 +227,16 @@ INTERFACE INLINE int is_string(pointer p) {
     if (!is_character(vector_elem(p,i)))
       return 0;
   return 1;
+}
+
+static int strlength(pointer s)
+{
+	if (type(s) == T_STRING)
+		return s->_object._string._length;
+	else if (type(s) == T_VECTOR)
+		return ivalue_unchecked(s);
+	else
+		abort();
 }
 
 INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
@@ -1000,8 +1010,8 @@ INTERFACE pointer mk_string(scheme *sc, const char *str) {
 INTERFACE pointer mk_counted_string(scheme *sc, const char *str, int len) {
      pointer x = get_cell(sc, sc->NIL, sc->NIL);
      typeflag(x) = (T_STRING | T_ATOM);
-     strvalue(sc, x) = store_string(sc,len,str,0);
-     strlength(x) = len;
+     x->_object._string._svalue = store_string(sc,len,str,0);
+     x->_object._string._length = len;
      return (x);
 }
 
