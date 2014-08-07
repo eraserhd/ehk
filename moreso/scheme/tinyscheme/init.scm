@@ -106,12 +106,6 @@
              0
              (abs (* (quotient aa (gcd aa bb)) bb)))))))
 
-(define (string->list s)
-     (let loop ((n (pred (vector-length s))) (l '()))
-          (if (= n -1)
-               l
-               (loop (pred n) (cons (vector-ref s n) l)))))
-
 (define (vector-copy str)
      (vector-append str))
 
