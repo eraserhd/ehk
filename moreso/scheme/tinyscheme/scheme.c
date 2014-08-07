@@ -109,21 +109,20 @@ static const char *strlwr(char *s) {
 #endif
 
 enum scheme_types {
-  T_STRING=1,
-  T_NUMBER=2,
-  T_SYMBOL=3,
-  T_PROC=4,
-  T_PAIR=5,
-  T_CLOSURE=6,
-  T_CONTINUATION=7,
-  T_FOREIGN=8,
-  T_CHARACTER=9,
-  T_PORT=10,
-  T_VECTOR=11,
-  T_MACRO=12,
-  T_PROMISE=13,
-  T_ENVIRONMENT=14,
-  T_LAST_SYSTEM_TYPE=14
+  T_NUMBER=1,
+  T_SYMBOL=2,
+  T_PROC=3,
+  T_PAIR=4,
+  T_CLOSURE=5,
+  T_CONTINUATION=6,
+  T_FOREIGN=7,
+  T_CHARACTER=8,
+  T_PORT=9,
+  T_VECTOR=10,
+  T_MACRO=11,
+  T_PROMISE=12,
+  T_ENVIRONMENT=13,
+  T_LAST_SYSTEM_TYPE=13
 };
 
 /* ADJ is enough slack to align cells in a TYPE_BITS-bit boundary */
@@ -217,8 +216,6 @@ SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (typeflag(p)&T_SYMBOL);
 
 INTERFACE INLINE int is_string(pointer p) {
   int i, num;
-  if (type(p)==T_STRING) //FIXME: Remove
-    return 1;
   if (type(p)!=T_VECTOR)
     return 0;
   num = ivalue(p);
@@ -230,20 +227,12 @@ INTERFACE INLINE int is_string(pointer p) {
 
 static int strlength(pointer s)
 {
-	if (type(s) == T_STRING)
-		return s->_object._string._length;
-	else if (type(s) == T_VECTOR)
-		return ivalue_unchecked(s);
-	else
-		abort();
+	return ivalue_unchecked(s);
 }
 
 static char strref(pointer s, int n)
 {
-	if (type(s) == T_STRING)
-		return s->_object._string._svalue[n];
-	else
-		return charvalue(vector_elem(s, n));
+	return charvalue(vector_elem(s, n));
 }
 
 INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
@@ -1374,9 +1363,7 @@ static void gc(scheme *sc, pointer a, pointer b) {
 }
 
 static void finalize_cell(scheme *sc, pointer a) {
-  if(type(a)==T_STRING) {
-    sc->free(a->_object._string._svalue);
-  } else if(is_port(a)) {
+  if(is_port(a)) {
     if(a->_object._port->kind&port_file
        && a->_object._port->rep.stdio.closeit) {
       port_close(sc,a,port_input|port_output);
@@ -3575,27 +3562,16 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
      }
 
      case OP_VECLEN:  /* vector-length */
-	if (type(car(sc->args)) == T_STRING)
-		s_return(sc, mk_integer(sc, strlength(car(sc->args))));
-	else
-		s_return(sc,mk_integer(sc,ivalue(car(sc->args))));
+	s_return(sc,mk_integer(sc,ivalue(car(sc->args))));
 
      case OP_VECREF: { /* vector-ref */
 	int index;
 
 	index=ivalue(cadr(sc->args));
+	if(index>=ivalue(car(sc->args)))
+		Error_1(sc,"vector-ref: out of bounds:",cadr(sc->args));
 
-	if (type(car(sc->args)) == T_STRING) {
-		if (index >= strlength(car(sc->args)))
-			Error_1(sc, "vector-ref: out of bounds:", cadr(sc->args));
-
-		s_return(sc, mk_character(sc, strvalue(sc, car(sc->args))[index]));
-	} else {
-		if(index>=ivalue(car(sc->args)))
-			Error_1(sc,"vector-ref: out of bounds:",cadr(sc->args));
-
-		s_return(sc,vector_elem(car(sc->args),index));
-	}
+	s_return(sc,vector_elem(car(sc->args),index));
      }
 
      case OP_VECSET: {   /* vector-set! */
