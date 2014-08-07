@@ -1900,16 +1900,11 @@ static int token(scheme *sc) {
 static void printslashstring(scheme *sc, pointer p) {
   int i, len;
   unsigned char s;
-  if (is_vector(p))
-    len=ivalue(p);
-  else
-    len=vector_length(p);
+
+  len=vector_length(p);
   putcharacter(sc,'"');
   for ( i=0; i<len; i++) {
-    if (is_vector(p))
-      s = charvalue(vector_ref(p,i));
-    else
-      s = ((unsigned char*)strvalue(sc, p))[i];
+    s = charvalue(vector_ref(p,i));
     if(s==0xff || s=='"' || s<' ' || s=='\\') {
       putcharacter(sc,'\\');
       switch(s) {
