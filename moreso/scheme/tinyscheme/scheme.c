@@ -30,6 +30,7 @@
 #include <limits.h>
 #include <float.h>
 #include <ctype.h>
+#include <assert.h>
 
 #if USE_STRCASECMP
 #include <strings.h>
@@ -229,11 +230,6 @@ INTERFACE INLINE int is_string(pointer p)
 static int vector_length(pointer s)
 {
 	return ivalue_unchecked(s);
-}
-
-static char strref(pointer s, int n)
-{
-	return charvalue(vector_ref(s, n));
 }
 
 INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
@@ -1043,7 +1039,7 @@ static char *strvalue(scheme *sc, pointer s)
 	length = vector_length(s);
 	str = allocate_transient(sc, length+1);
 	for (i = 0; i < length; ++i)
-		str[i] = strref(s, i);
+		str[i] = charvalue(vector_ref(s, i));
 	str[length] = 0;
 	return str;
 }
@@ -4523,7 +4519,7 @@ static int syntaxnum(pointer p) {
 
      length = vector_length(car(p));
      for (i = 0; i < length; ++i)
-	     s[i] = strref(car(p), i);
+	     s[i] = charvalue(vector_ref(car(p), i));
      s[length] = 0;
 
      switch (length) {
