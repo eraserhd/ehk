@@ -39,9 +39,6 @@
 # endif
 #endif
 
-/* Used for documentation purposes, to signal functions in 'interface' */
-#define INTERFACE
-
 #define TOK_EOF     (-1)
 #define TOK_LPAREN  0
 #define TOK_RPAREN  1
@@ -166,13 +163,13 @@ static num num_one;
 #define typeflag(p)      ((p)->_flag)
 #define type(p)          (typeflag(p)&T_MASKTYPE)
 
-INTERFACE static int is_list(scheme *sc, pointer p);
-INTERFACE INLINE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
-INTERFACE static void fill_vector(pointer vec, pointer obj);
-INTERFACE static pointer vector_ref(pointer vec, int ielem);
-INTERFACE static pointer vector_set_x(pointer vec, int ielem, pointer a);
-INTERFACE INLINE int is_number(pointer p)    { return (type(p)==T_NUMBER); }
-INTERFACE INLINE int is_integer(pointer p) {
+static int is_list(scheme *sc, pointer p);
+INLINE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
+static void fill_vector(pointer vec, pointer obj);
+static pointer vector_ref(pointer vec, int ielem);
+static pointer vector_set_x(pointer vec, int ielem, pointer a);
+INLINE int is_number(pointer p)    { return (type(p)==T_NUMBER); }
+INLINE int is_integer(pointer p) {
   if (!is_number(p))
       return 0;
   if (num_is_integer(p) || (double)ivalue(p) == rvalue(p))
@@ -180,42 +177,42 @@ INTERFACE INLINE int is_integer(pointer p) {
   return 0;
 }
 
-INTERFACE INLINE int is_real(pointer p) {
+INLINE int is_real(pointer p) {
   return is_number(p) && (!(p)->_object._number.is_fixnum);
 }
 
-INTERFACE INLINE int is_character(pointer p) { return (type(p)==T_CHARACTER); }
+INLINE int is_character(pointer p) { return (type(p)==T_CHARACTER); }
 INLINE num nvalue(pointer p)       { return ((p)->_object._number); }
-INTERFACE long ivalue(pointer p)      { return (num_is_integer(p)?(p)->_object._number.value.ivalue:(long)(p)->_object._number.value.rvalue); }
-INTERFACE double rvalue(pointer p)    { return (!num_is_integer(p)?(p)->_object._number.value.rvalue:(double)(p)->_object._number.value.ivalue); }
+long ivalue(pointer p)      { return (num_is_integer(p)?(p)->_object._number.value.ivalue:(long)(p)->_object._number.value.rvalue); }
+double rvalue(pointer p)    { return (!num_is_integer(p)?(p)->_object._number.value.rvalue:(double)(p)->_object._number.value.ivalue); }
 #define ivalue_unchecked(p)       ((p)->_object._number.value.ivalue)
 #define rvalue_unchecked(p)       ((p)->_object._number.value.rvalue)
 #define set_num_integer(p)   (p)->_object._number.is_fixnum=1;
 #define set_num_real(p)      (p)->_object._number.is_fixnum=0;
-INTERFACE  long charvalue(pointer p)  { return ivalue_unchecked(p); }
+ long charvalue(pointer p)  { return ivalue_unchecked(p); }
 
-INTERFACE INLINE int is_port(pointer p)     { return (type(p)==T_PORT); }
-INTERFACE INLINE int is_inport(pointer p)  { return is_port(p) && p->_object._port->kind & port_input; }
-INTERFACE INLINE int is_outport(pointer p) { return is_port(p) && p->_object._port->kind & port_output; }
+INLINE int is_port(pointer p)     { return (type(p)==T_PORT); }
+INLINE int is_inport(pointer p)  { return is_port(p) && p->_object._port->kind & port_input; }
+INLINE int is_outport(pointer p) { return is_port(p) && p->_object._port->kind & port_output; }
 
-INTERFACE INLINE int is_pair(pointer p)     { return (type(p)==T_PAIR); }
+INLINE int is_pair(pointer p)     { return (type(p)==T_PAIR); }
 #define car(p)           ((p)->_object._cons._car)
 #define cdr(p)           ((p)->_object._cons._cdr)
-INTERFACE pointer pair_car(pointer p)   { return car(p); }
-INTERFACE pointer pair_cdr(pointer p)   { return cdr(p); }
-INTERFACE pointer set_car(pointer p, pointer q) { return car(p)=q; }
-INTERFACE pointer set_cdr(pointer p, pointer q) { return cdr(p)=q; }
+pointer pair_car(pointer p)   { return car(p); }
+pointer pair_cdr(pointer p)   { return cdr(p); }
+pointer set_car(pointer p, pointer q) { return car(p)=q; }
+pointer set_cdr(pointer p, pointer q) { return cdr(p)=q; }
 
-INTERFACE INLINE int is_symbol(pointer p)   { return (type(p)==T_SYMBOL); }
+INLINE int is_symbol(pointer p)   { return (type(p)==T_SYMBOL); }
 
 static char *strvalue(scheme *sc, pointer s);
-INTERFACE INLINE char *symname(scheme *sc, pointer p)   { return strvalue(sc, car(p)); }
+INLINE char *symname(scheme *sc, pointer p)   { return strvalue(sc, car(p)); }
 #if USE_PLIST
 SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (typeflag(p)&T_SYMBOL); }
 #define symprop(p)       cdr(p)
 #endif
 
-INTERFACE INLINE int is_string(pointer p)
+INLINE int is_string(pointer p)
 {
 	int i, num;
 	if (type(p) != T_VECTOR)
@@ -232,24 +229,24 @@ static int vector_length(pointer s)
 	return ivalue_unchecked(s);
 }
 
-INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
-INTERFACE INLINE int is_proc(pointer p)     { return (type(p)==T_PROC); }
-INTERFACE INLINE int is_foreign(pointer p)  { return (type(p)==T_FOREIGN); }
+INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
+INLINE int is_proc(pointer p)     { return (type(p)==T_PROC); }
+INLINE int is_foreign(pointer p)  { return (type(p)==T_FOREIGN); }
 #define procnum(p)       ivalue(p)
 static const char *procname(pointer x);
 
-INTERFACE INLINE int is_closure(pointer p)  { return (type(p)==T_CLOSURE); }
-INTERFACE INLINE int is_macro(pointer p)    { return (type(p)==T_MACRO); }
-INTERFACE INLINE pointer closure_code(pointer p)   { return car(p); }
-INTERFACE INLINE pointer closure_env(pointer p)    { return cdr(p); }
+INLINE int is_closure(pointer p)  { return (type(p)==T_CLOSURE); }
+INLINE int is_macro(pointer p)    { return (type(p)==T_MACRO); }
+INLINE pointer closure_code(pointer p)   { return car(p); }
+INLINE pointer closure_env(pointer p)    { return cdr(p); }
 
-INTERFACE INLINE int is_continuation(pointer p)    { return (type(p)==T_CONTINUATION); }
+INLINE int is_continuation(pointer p)    { return (type(p)==T_CONTINUATION); }
 #define cont_dump(p)     cdr(p)
 
 /* To do: promise should be forced ONCE only */
-INTERFACE INLINE int is_promise(pointer p)  { return (type(p)==T_PROMISE); }
+INLINE int is_promise(pointer p)  { return (type(p)==T_PROMISE); }
 
-INTERFACE INLINE int is_environment(pointer p) { return (type(p)==T_ENVIRONMENT); }
+INLINE int is_environment(pointer p) { return (type(p)==T_ENVIRONMENT); }
 #define setenvironment(p)    typeflag(p) = T_ENVIRONMENT
 
 #define is_atom(p)       (typeflag(p)&T_ATOM)
@@ -260,9 +257,9 @@ INTERFACE INLINE int is_environment(pointer p) { return (type(p)==T_ENVIRONMENT)
 #define setmark(p)       typeflag(p) |= MARK
 #define clrmark(p)       typeflag(p) &= UNMARK
 
-INTERFACE INLINE int is_immutable(pointer p) { return (typeflag(p)&T_IMMUTABLE); }
+INLINE int is_immutable(pointer p) { return (typeflag(p)&T_IMMUTABLE); }
 /*#define setimmutable(p)  typeflag(p) |= T_IMMUTABLE*/
-INTERFACE INLINE void setimmutable(pointer p) { typeflag(p) |= T_IMMUTABLE; }
+INLINE void setimmutable(pointer p) { typeflag(p) |= T_IMMUTABLE; }
 
 #define caar(p)          car(car(p))
 #define cadr(p)          car(cdr(p))
@@ -941,7 +938,7 @@ pointer mk_foreign_func(scheme *sc, foreign_func f) {
   return (x);
 }
 
-INTERFACE pointer mk_character(scheme *sc, int c) {
+pointer mk_character(scheme *sc, int c) {
   pointer x = get_cell(sc,sc->NIL, sc->NIL);
 
   typeflag(x) = (T_CHARACTER | T_ATOM);
@@ -951,7 +948,7 @@ INTERFACE pointer mk_character(scheme *sc, int c) {
 }
 
 /* get number atom (integer) */
-INTERFACE pointer mk_integer(scheme *sc, long num) {
+pointer mk_integer(scheme *sc, long num) {
   pointer x = get_cell(sc,sc->NIL, sc->NIL);
 
   typeflag(x) = (T_NUMBER | T_ATOM);
@@ -960,7 +957,7 @@ INTERFACE pointer mk_integer(scheme *sc, long num) {
   return (x);
 }
 
-INTERFACE pointer mk_real(scheme *sc, double n) {
+pointer mk_real(scheme *sc, double n) {
   pointer x = get_cell(sc,sc->NIL, sc->NIL);
 
   typeflag(x) = (T_NUMBER | T_ATOM);
@@ -993,11 +990,11 @@ static char *allocate_copy_of_string(scheme * sc, const char *str)
 }
 
 /* get new string */
-INTERFACE pointer mk_string(scheme *sc, const char *str) {
+pointer mk_string(scheme *sc, const char *str) {
      return mk_counted_string(sc,str,strlen(str));
 }
 
-INTERFACE pointer mk_counted_string(scheme *sc, const char *str, int len) {
+pointer mk_counted_string(scheme *sc, const char *str, int len) {
 	int i;
 	pointer x;
 
@@ -1044,40 +1041,48 @@ static char *strvalue(scheme *sc, pointer s)
 	return str;
 }
 
-INTERFACE static pointer mk_vector(scheme *sc, int len)
-{ return get_vector_object(sc,len,sc->NIL); }
+/* -- vectors -- */
 
-INTERFACE static void fill_vector(pointer vec, pointer obj) {
-     int i;
-     int num=ivalue(vec)/2+ivalue(vec)%2;
-     for(i=0; i<num; i++) {
-          typeflag(vec+1+i) = T_PAIR;
-          setimmutable(vec+1+i);
-          car(vec+1+i)=obj;
-          cdr(vec+1+i)=obj;
-     }
+static pointer mk_vector(scheme * sc, int len)
+{
+	return get_vector_object(sc, len, sc->NIL);
 }
 
-INTERFACE static pointer vector_ref(pointer vec, int ielem) {
-     int n=ielem/2;
-     if(ielem%2==0) {
-          return car(vec+1+n);
-     } else {
-          return cdr(vec+1+n);
-     }
+static void fill_vector(pointer vec, pointer obj)
+{
+	int i;
+	int num = ivalue(vec) / 2 + ivalue(vec) % 2;
+	for (i = 0; i < num; i++) {
+		typeflag(vec + 1 + i) = T_PAIR;
+		setimmutable(vec + 1 + i);
+		car(vec + 1 + i) = obj;
+		cdr(vec + 1 + i) = obj;
+	}
 }
 
-INTERFACE static pointer vector_set_x(pointer vec, int ielem, pointer a) {
-     int n=ielem/2;
-     if(ielem%2==0) {
-          return car(vec+1+n)=a;
-     } else {
-          return cdr(vec+1+n)=a;
-     }
+static pointer vector_ref(pointer vec, int ielem)
+{
+	int n = ielem / 2;
+	if (ielem % 2 == 0) {
+		return car(vec + 1 + n);
+	} else {
+		return cdr(vec + 1 + n);
+	}
 }
 
-/* get new symbol */
-INTERFACE pointer mk_symbol(scheme *sc, const char *name) {
+static pointer vector_set_x(pointer vec, int ielem, pointer a)
+{
+	int n = ielem / 2;
+	if (ielem % 2 == 0) {
+		return car(vec + 1 + n) = a;
+	} else {
+		return cdr(vec + 1 + n) = a;
+	}
+}
+
+/* -- symbols -- */
+
+pointer mk_symbol(scheme *sc, const char *name) {
      pointer x;
 
      /* first check oblist */
@@ -1090,7 +1095,7 @@ INTERFACE pointer mk_symbol(scheme *sc, const char *name) {
      }
 }
 
-INTERFACE pointer gensym(scheme *sc) {
+pointer gensym(scheme *sc) {
      pointer x;
      char name[40];
 
@@ -1603,7 +1608,7 @@ static int realloc_port_string(scheme *sc, port *p)
   }
 }
 
-INTERFACE void putstr(scheme *sc, const char *s) {
+void putstr(scheme *sc, const char *s) {
   port *pt=sc->outport->_object._port;
   if(pt->kind&port_file) {
     fputs(s,pt->rep.stdio.file);
@@ -1633,7 +1638,7 @@ static void putchars(scheme *sc, const char *s, int len) {
   }
 }
 
-INTERFACE void putcharacter(scheme *sc, int c) {
+void putcharacter(scheme *sc, int c) {
   port *pt=sc->outport->_object._port;
   if(pt->kind&port_file) {
     fputc(c,pt->rep.stdio.file);
@@ -4556,10 +4561,10 @@ static int syntaxnum(pointer p) {
 
 /* initialization of TinyScheme */
 #if USE_INTERFACE
-INTERFACE static pointer s_cons(scheme *sc, pointer a, pointer b) {
+static pointer s_cons(scheme *sc, pointer a, pointer b) {
  return cons(sc,a,b);
 }
-INTERFACE static pointer s_immutable_cons(scheme *sc, pointer a, pointer b) {
+static pointer s_immutable_cons(scheme *sc, pointer a, pointer b) {
  return immutable_cons(sc,a,b);
 }
 
