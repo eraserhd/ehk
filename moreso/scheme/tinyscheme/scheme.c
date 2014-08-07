@@ -3458,27 +3458,6 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           }
         }
 
-     case OP_STRSET: { /* string-set! */
-          char *str;
-          int index;
-          int c;
-
-          if(is_immutable(car(sc->args))) {
-               Error_1(sc,"string-set!: unable to alter immutable string:",car(sc->args));
-          }
-          str=strvalue(sc, car(sc->args));
-
-          index=ivalue(cadr(sc->args));
-          if(index>=vector_length(car(sc->args))) {
-               Error_1(sc,"string-set!: out of bounds:",cadr(sc->args));
-          }
-
-          c=charvalue(caddr(sc->args));
-
-          str[index]=(char)c;
-          s_return(sc,car(sc->args));
-     }
-
      case OP_VECTOR_APPEND: { /* vector-append */
 	int i, offset, length;
 	pointer result;
