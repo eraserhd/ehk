@@ -354,7 +354,7 @@ static void finalize_cell(scheme *sc, pointer a);
 static int count_consecutive_cells(pointer x, int needed);
 static pointer find_slot_in_env(scheme *sc, pointer env, pointer sym, int all);
 static pointer mk_number(scheme *sc, num n);
-static char *store_string(scheme *sc, int len, const char *str, char fill);
+static char *store_string(scheme *sc, int len, const char *str);
 static pointer mk_vector(scheme *sc, int len);
 static pointer mk_atom(scheme *sc, char *q);
 static pointer mk_sharp_const(scheme *sc, char *name);
@@ -981,7 +981,7 @@ static pointer mk_number(scheme *sc, num n) {
 }
 
 /* allocate name to string area */
-static char *store_string(scheme *sc, int len_str, const char *str, char fill) {
+static char *store_string(scheme *sc, int len_str, const char *str) {
      char *q;
 
      q=(char*)sc->malloc(len_str+1);
@@ -991,9 +991,6 @@ static char *store_string(scheme *sc, int len_str, const char *str, char fill) {
      }
      if(str!=0) {
           snprintf(q, len_str+1, "%s", str);
-     } else {
-          memset(q, fill, len_str);
-          q[len_str]=0;
      }
      return (q);
 }
@@ -1391,7 +1388,7 @@ static int file_push(scheme *sc, const char *fname) {
 #if SHOW_ERROR_LINE
     sc->load_stack[sc->file_i].rep.stdio.curr_line = 0;
     if(fname)
-      sc->load_stack[sc->file_i].rep.stdio.filename = store_string(sc, strlen(fname), fname, 0);
+      sc->load_stack[sc->file_i].rep.stdio.filename = store_string(sc, strlen(fname), fname);
 #endif
   }
   return fin!=0;
@@ -1431,7 +1428,7 @@ static port *port_rep_from_filename(scheme *sc, const char *fn, int prop) {
 
 #if SHOW_ERROR_LINE
   if(fn)
-    pt->rep.stdio.filename = store_string(sc, strlen(fn), fn, 0);
+    pt->rep.stdio.filename = store_string(sc, strlen(fn), fn);
 
   pt->rep.stdio.curr_line = 0;
 #endif
@@ -4843,7 +4840,7 @@ void scheme_load_named_file(scheme *sc, FILE *fin, const char *filename) {
 #if SHOW_ERROR_LINE
   sc->load_stack[0].rep.stdio.curr_line = 0;
   if(fin!=stdin && filename)
-    sc->load_stack[0].rep.stdio.filename = store_string(sc, strlen(filename), filename, 0);
+    sc->load_stack[0].rep.stdio.filename = store_string(sc, strlen(filename), filename);
 #endif
 
   sc->inport=sc->loadport;
