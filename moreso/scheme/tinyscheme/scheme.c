@@ -981,18 +981,19 @@ static pointer mk_number(scheme *sc, num n) {
 }
 
 /* allocate name to string area */
-static char *store_string(scheme *sc, const char *str) {
-     char *q;
-     int len_str;
+static char *store_string(scheme * sc, const char *str)
+{
+	char *allocated_string;
+	int len_str;
 
-     len_str = strlen(str);
-     q=(char*)sc->malloc(len_str+1);
-     if(q==0) {
-          sc->no_memory=1;
-          return sc->strbuff;
-     }
-     snprintf(q, len_str+1, "%s", str);
-     return (q);
+	len_str = strlen(str);
+	allocated_string = (char *) sc->malloc(len_str + 1);
+	if (!allocated_string) {
+		sc->no_memory = 1;
+		return sc->strbuff;
+	}
+	snprintf(allocated_string, len_str + 1, "%s", str);
+	return allocated_string;
 }
 
 /* get new string */
