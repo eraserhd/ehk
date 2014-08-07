@@ -167,7 +167,7 @@ static int is_list(scheme *sc, pointer p);
 int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
 static void fill_vector(pointer vec, pointer obj);
 static pointer vector_ref(pointer vec, int ielem);
-static pointer vector_set_x(pointer vec, int ielem, pointer a);
+static void vector_set_x(pointer vec, int ielem, pointer a);
 int is_number(pointer p)    { return (type(p)==T_NUMBER); }
 int is_integer(pointer p) {
   if (!is_number(p))
@@ -1042,13 +1042,13 @@ static pointer vector_ref(pointer vec, int ielem)
 	}
 }
 
-static pointer vector_set_x(pointer vec, int ielem, pointer a)
+static void vector_set_x(pointer vec, int ielem, pointer a)
 {
 	int n = ielem / 2;
 	if (ielem % 2 == 0) {
-		return car(vec + 1 + n) = a;
+		car(vec + 1 + n) = a;
 	} else {
-		return cdr(vec + 1 + n) = a;
+		cdr(vec + 1 + n) = a;
 	}
 }
 
@@ -3541,7 +3541,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
      }
 
      case OP_VECLEN:  /* vector-length */
-	s_return(sc,mk_integer(sc,ivalue(car(sc->args))));
+	s_return(sc,mk_integer(sc,vector_length(car(sc->args))));
 
      case OP_VECREF: { /* vector-ref */
 	int index;

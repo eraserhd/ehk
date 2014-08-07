@@ -191,7 +191,7 @@ struct scheme_interface {
   long (*vector_length)(pointer vec);
   void (*fill_vector)(pointer vec, pointer elem);
   pointer (*vector_ref)(pointer vec, int ielem);
-  pointer (*vector_set_x)(pointer vec, int ielem, pointer newel);
+  void (*vector_set_x)(pointer vec, int ielem, pointer newel);
   int (*is_port)(pointer p);
 
   int (*is_pair)(pointer p);
