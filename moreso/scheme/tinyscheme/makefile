@@ -85,11 +85,14 @@ $(STATICLIBTARGET): $(OBJS)
 $(OBJS): scheme.h scheme-private.h opdefines.h
 dynload.$(Osuf): dynload.h
 
+test_SOURCES = $(wildcard test_*.c)
+test_PROGRAMS = $(addsuffix $(EXE_EXT),$(basename $(test_SOURCES)))
+
 clean:
 	$(RM) $(OBJS) $(LIBTARGET) $(STATICLIBTARGET) scheme$(EXE_EXT)
 	$(RM) tinyscheme.ilk tinyscheme.map tinyscheme.pdb tinyscheme.exp
 	$(RM) scheme.ilk scheme.map scheme.pdb scheme.lib scheme.exp
-	$(RM) test_transients$(EXE_EXT)
+	$(RM) $(test_PROGRAMS)
 	$(RM) *~
 
 TAGS_SRCS = scheme.h scheme.c dynload.h dynload.c
@@ -101,7 +104,5 @@ TAGS: $(TAGS_SRCS)
 test_%$(EXE_EXT): test_%.c scheme.h scheme.c scheme-private.h
 	$(CC) -I. -o $@ $(DEBUG) $(FEATURES) $<
 
-test: test_transients$(EXE_EXT) test_strings$(EXE_EXT) test_deinit$(EXE_EXT)
-	./test_strings$(EXE_EXT)
-	./test_transients$(EXE_EXT)
-	./test_deinit$(EXE_EXT)
+test: $(test_PROGRAMS)
+	for f in $(test_PROGRAMS); do ./$$f || exit $$?; done
