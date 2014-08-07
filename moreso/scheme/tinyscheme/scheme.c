@@ -166,8 +166,6 @@ static num num_one;
 #define typeflag(p)      ((p)->_flag)
 #define type(p)          (typeflag(p)&T_MASKTYPE)
 
-#define strvalue(sc,p)      ((p)->_object._string._svalue)
-
 INTERFACE static int is_list(scheme *sc, pointer p);
 INTERFACE INLINE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
 INTERFACE static void fill_vector(pointer vec, pointer obj);
@@ -209,6 +207,8 @@ INTERFACE pointer set_car(pointer p, pointer q) { return car(p)=q; }
 INTERFACE pointer set_cdr(pointer p, pointer q) { return cdr(p)=q; }
 
 INTERFACE INLINE int is_symbol(pointer p)   { return (type(p)==T_SYMBOL); }
+
+static char *strvalue(scheme *sc, pointer s);
 INTERFACE INLINE char *symname(scheme *sc, pointer p)   { return strvalue(sc, car(p)); }
 #if USE_PLIST
 SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (typeflag(p)&T_SYMBOL); }
@@ -1046,6 +1046,19 @@ static void free_transients(scheme *sc)
 	sc->transients = 0;
 }
 
+static char *strvalue(scheme *sc, pointer s)
+{
+	int i, length;
+	char *str;
+
+	length = strlength(s);
+	str = allocate_transient(sc, length+1);
+	for (i = 0; i < length; ++i)
+		str[i] = strref(s, i);
+	str[length] = 0;
+	return str;
+}
+
 INTERFACE static pointer mk_vector(scheme *sc, int len)
 { return get_vector_object(sc,len,sc->NIL); }
 
@@ -1360,7 +1373,7 @@ static void gc(scheme *sc, pointer a, pointer b) {
 
 static void finalize_cell(scheme *sc, pointer a) {
   if(type(a)==T_STRING) {
-    sc->free(strvalue(sc, a));
+    sc->free(a->_object._string._svalue);
   } else if(is_port(a)) {
     if(a->_object._port->kind&port_file
        && a->_object._port->rep.stdio.closeit) {

@@ -64,11 +64,6 @@ void reset_test_allocator()
 
 /* Tests */
 
-void check_transients_is_initialized_to_null(scheme *sc)
-{
-	assert(!sc->transients);
-}
-
 void check_transients_are_recorded(scheme *sc)
 {
 	char *ptrs[3];
@@ -124,6 +119,7 @@ void run(void (* check) (scheme *))
 	scheme sc;
 	memset(&sc, 0xfd, sizeof(sc));
 	scheme_init_custom_alloc(&sc, test_malloc, test_free);
+	free_transients(&sc);
 
 	check(&sc);
 
@@ -133,7 +129,6 @@ void run(void (* check) (scheme *))
 
 int main(int argc, char **argv)
 {
-	run(check_transients_is_initialized_to_null);
 	run(check_transients_are_recorded);
 	run(check_free_transients_clears_list);
 	run(check_free_transients_frees_all_allocated_transients);
