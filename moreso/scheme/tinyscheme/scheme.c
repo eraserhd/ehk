@@ -3427,9 +3427,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
         }
 
      case OP_SYM2STR: /* symbol->string */
-          x=mk_string(sc,symname(sc, car(sc->args)));
-          setimmutable(x);
-          s_return(sc,x);
+          s_return(sc,car(car(sc->args)));
 
      case OP_ATOM2STR: /* atom->string */ {
           long pf = 0;
