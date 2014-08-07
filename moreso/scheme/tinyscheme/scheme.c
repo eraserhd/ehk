@@ -1924,21 +1924,19 @@ static void printslashstring(scheme * sc, pointer p)
 			case '\\':
 				putcharacter(sc, '\\');
 				break;
-			default:{
+			default: {
 					int d = s / 16;
 					putcharacter(sc, 'x');
 					if (d < 10) {
 						putcharacter(sc, d + '0');
 					} else {
-						putcharacter(sc,
-							     d - 10 + 'A');
+						putcharacter(sc, d - 10 + 'A');
 					}
 					d = s % 16;
 					if (d < 10) {
 						putcharacter(sc, d + '0');
 					} else {
-						putcharacter(sc,
-							     d - 10 + 'A');
+						putcharacter(sc, d - 10 + 'A');
 					}
 				}
 			}
@@ -4495,45 +4493,42 @@ static pointer mk_proc(scheme *sc, enum scheme_opcodes op) {
 }
 
 /* Hard-coded for the given keywords. Remember to rewrite if more are added! */
-static int syntaxnum(pointer p) {
-     int i, length;
-     char s[15];
-
-     length = vector_length(car(p));
-     for (i = 0; i < length; ++i)
-	     s[i] = charvalue(vector_ref(car(p), i));
-     s[length] = 0;
-
-     switch (length) {
-     case 2:
-          if(s[0]=='i') return OP_IF0;        /* if */
-          else return OP_OR0;                 /* or */
-     case 3:
-          if(s[0]=='a') return OP_AND0;      /* and */
-          else return OP_LET0;               /* let */
-     case 4:
-          switch(s[3]) {
-          case 'e': return OP_CASE0;         /* case */
-          case 'd': return OP_COND0;         /* cond */
-          case '*': return OP_LET0AST;       /* let* */
-          default: return OP_SET0;           /* set! */
-          }
-     case 5:
-          switch(s[2]) {
-          case 'g': return OP_BEGIN;         /* begin */
-          case 'l': return OP_DELAY;         /* delay */
-          case 'c': return OP_MACRO0;        /* macro */
-          default: return OP_QUOTE;          /* quote */
-          }
-     case 6:
-          switch(s[2]) {
-          case 'm': return OP_LAMBDA;        /* lambda */
-          case 'f': return OP_DEF0;          /* define */
-          default: return OP_LET0REC;        /* letrec */
-          }
-     default:
-          return OP_C0STREAM;                /* cons-stream */
-     }
+static int syntaxnum(pointer p)
+{
+	switch (vector_length(car(p))) {
+	case 2:
+		switch (charvalue(vector_ref(car(p), 0))) {
+		case 'i': return OP_IF0;	/* if */
+		default: return OP_OR0;	        /* or */
+	        }
+	case 3:
+		switch (charvalue(vector_ref(car(p), 0))) {
+		case 'a': return OP_AND0;	/* and */
+		default: return OP_LET0;	/* let */
+		}
+	case 4:
+		switch (charvalue(vector_ref(car(p), 3))) {
+		case 'e': return OP_CASE0;	/* case */
+		case 'd': return OP_COND0;	/* cond */
+		case '*': return OP_LET0AST;	/* let* */
+		default: return OP_SET0;	/* set! */
+		}
+	case 5:
+		switch (charvalue(vector_ref(car(p), 2))) {
+		case 'g': return OP_BEGIN;	/* begin */
+		case 'l': return OP_DELAY;	/* delay */
+		case 'c': return OP_MACRO0;	/* macro */
+		default: return OP_QUOTE;	/* quote */
+		}
+	case 6:
+		switch (charvalue(vector_ref(car(p), 2))) {
+		case 'm': return OP_LAMBDA;	/* lambda */
+		case 'f': return OP_DEF0;	/* define */
+		default: return OP_LET0REC;	/* letrec */
+		}
+	default:
+		return OP_C0STREAM;	        /* cons-stream */
+	}
 }
 
 /* initialization of TinyScheme */
