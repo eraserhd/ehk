@@ -354,7 +354,7 @@ static void finalize_cell(scheme *sc, pointer a);
 static int count_consecutive_cells(pointer x, int needed);
 static pointer find_slot_in_env(scheme *sc, pointer env, pointer sym, int all);
 static pointer mk_number(scheme *sc, num n);
-static char *store_string(scheme *sc, const char *str);
+static char *allocate_copy_of_string(scheme *sc, const char *str);
 static pointer mk_vector(scheme *sc, int len);
 static pointer mk_atom(scheme *sc, char *q);
 static pointer mk_sharp_const(scheme *sc, char *name);
@@ -980,8 +980,7 @@ static pointer mk_number(scheme *sc, num n) {
  }
 }
 
-/* allocate name to string area */
-static char *store_string(scheme * sc, const char *str)
+static char *allocate_copy_of_string(scheme * sc, const char *str)
 {
 	int length;
 	char *allocated_string;
@@ -1389,7 +1388,7 @@ static int file_push(scheme *sc, const char *fname) {
 #if SHOW_ERROR_LINE
     sc->load_stack[sc->file_i].rep.stdio.curr_line = 0;
     if(fname)
-      sc->load_stack[sc->file_i].rep.stdio.filename = store_string(sc, fname);
+      sc->load_stack[sc->file_i].rep.stdio.filename = allocate_copy_of_string(sc, fname);
 #endif
   }
   return fin!=0;
@@ -1429,7 +1428,7 @@ static port *port_rep_from_filename(scheme *sc, const char *fn, int prop) {
 
 #if SHOW_ERROR_LINE
   if(fn)
-    pt->rep.stdio.filename = store_string(sc, fn);
+    pt->rep.stdio.filename = allocate_copy_of_string(sc, fn);
 
   pt->rep.stdio.curr_line = 0;
 #endif
@@ -4841,7 +4840,7 @@ void scheme_load_named_file(scheme *sc, FILE *fin, const char *filename) {
 #if SHOW_ERROR_LINE
   sc->load_stack[0].rep.stdio.curr_line = 0;
   if(fin!=stdin && filename)
-    sc->load_stack[0].rep.stdio.filename = store_string(sc, filename);
+    sc->load_stack[0].rep.stdio.filename = allocate_copy_of_string(sc, filename);
 #endif
 
   sc->inport=sc->loadport;
