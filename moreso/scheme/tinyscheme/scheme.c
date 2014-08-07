@@ -1052,6 +1052,27 @@ static pointer vector_set_x(pointer vec, int ielem, pointer a)
 	}
 }
 
+static pointer vector_append(scheme *sc, pointer vectors)
+{
+	int i, offset, length;
+	pointer x, result;
+
+	length = 0;
+	for (x = vectors; x != sc->NIL; x = cdr(x))
+		length += vector_length(car(x));
+
+	result = mk_vector(sc, length);
+	offset = 0;
+	for (x = vectors; x != sc->NIL; x = cdr(x)) {
+		for (i = 0; i < vector_length(car(x)); ++i)
+			vector_set_x(result, offset+i, vector_ref(car(x), i));
+
+		offset += ivalue_unchecked(car(x));
+	}
+
+	return result;
+}
+
 /* -- strings -- */
 
 pointer mk_string(scheme * sc, const char *str)
@@ -3455,25 +3476,8 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
           }
         }
 
-     case OP_VECTOR_APPEND: { /* vector-append */
-	int i, offset, length;
-	pointer result;
-
-	length = 0;
-	for (x = sc->args; x != sc->NIL; x = cdr(x))
-		length += ivalue_unchecked(car(x));
-
-	result = mk_vector(sc, length);
-	offset = 0;
-	for (x = sc->args; x != sc->NIL; x = cdr(x)) {
-		for (i = 0; i < ivalue_unchecked(car(x)); ++i)
-			vector_set_x(result, offset+i, vector_ref(car(x), i));
-
-		offset += ivalue_unchecked(car(x));
-	}
-
-	s_return(sc, result);
-     }
+     case OP_VECTOR_APPEND: /* vector-append */
+	s_return(sc, vector_append(sc, sc->args));
 
      case OP_SUBSECTION: { /* subsection */
 	pointer source;
