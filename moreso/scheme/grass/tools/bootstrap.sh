@@ -26,7 +26,7 @@ $cc -Ibootstrap $cflags \
   bootstrap/runtime.c \
   bootstrap/library.c \
   bootstrap/build-version.c \
-  bootstrap/chicken-grass.c \
+  bootstrap/chicken-moreso.c \
   bootstrap/numbers.c \
   $ldflags \
-  $applyhack -o chicken-grass "$@"
+  $applyhack -o chicken-moreso "$@"
