@@ -24,9 +24,9 @@
 (define prg (expand-program spec))
 (display "expanding syntax\n")
 
-(define version (call-with-input-file ".bky/HEAD" %read))
+(define version (call-with-input-file "VERSION" read))
 
 (let ((out (open-output-file "build/core.scm")))
-  (pp `(define *grass-version* ,version) out)
+  (pp `(define *moreso-version* ,version) out)
   (pp (car (normalize (%%expand prg))) out)
   (close-output-port out))
