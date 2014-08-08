@@ -18,7 +18,7 @@
 (load "lib/normalize.scm")
 (load "pp.scm")
 
-(define spec (call-with-input-file "grass.scm" read))
+(define spec (call-with-input-file "moreso.scm" read))
 (display "expanding program\n")
 (define prg (expand-program spec))
 (display "expanding syntax\n")

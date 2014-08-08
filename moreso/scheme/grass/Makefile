@@ -6,7 +6,7 @@ PLATFORM = linux
 
 DEFAULT_IMPLEMENTATION = chicken
 BOOTSTRAP_MODULES = lib/syntax lib/match lib/misc read alexpand \
-	program pp lib/normalize dtype write eval top env
+	pp lib/normalize dtype write eval top env
 CHICKEN_VERSION = 4.8.0.3
 CHICKEN_DOWNLOAD_ADDRESS = http://code.call-cc.org/releases/4.8.0/chicken-$(CHICKEN_VERSION).tar.gz
 
