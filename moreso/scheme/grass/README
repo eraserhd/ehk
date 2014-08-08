@@ -4,11 +4,6 @@
 
 
 
-	"... words, simple as grass, uncomb'd head, laughter, naivete, ..."
-
-					   (Walt Whitman, "Song of Myself")
-
-
 This is an implementation of R5RS Scheme, written in Scheme. The
 system can be hosted on a variety of Scheme implementations, including
 itself. GRASS has been tested on CHICKEN, Scheme48, Gambit-C and
