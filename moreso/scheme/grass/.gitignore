@@ -1,5 +1,6 @@
 build
 numbers.import.scm
-chicken-grass
-chicken-grass.c
+chicken-moreso
+chicken-moreso.c
 *.o
+*~
