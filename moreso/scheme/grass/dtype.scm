@@ -156,8 +156,8 @@
 	((>= i n) s)
       (string-set! s i (vector-ref x i)))))
 
-(define (string->char->vector x)
-  (let* ((n (sdtring-length x))
+(define (string->char-vector x)
+  (let* ((n (string-length x))
 	 (s (make-vector n)))
     (do ((i 0 (+ i 1)))
 	((>= i n) s)
