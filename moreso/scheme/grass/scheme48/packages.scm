@@ -41,7 +41,7 @@
 	grass-base)
   (files "../build/core.scm"))
 
-(define-structure grass-main (export run-main set-library-path)
+(define-structure moreso-main (export run-main set-library-path)
   (open scheme 
 	os-strings
 	load-dynamic-externals
