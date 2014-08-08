@@ -14,7 +14,6 @@
 	"read.scm"
 	"write.scm"
 	"pp.scm"
-	"program.scm"
 	"eval.scm"
 	"env.scm"
 	"top.scm"))
