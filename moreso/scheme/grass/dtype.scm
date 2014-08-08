@@ -138,3 +138,63 @@
 
 (define (%newline . port)
   (newline (optional port %output-port)))
+
+
+;;; char-vector operations
+
+(define (char-vector? x)
+  (and (vector? x)
+       (let loop ((i (- (vector-length x) 1)))
+	 (or (negative? i)
+	     (and (char? (vector-ref x i))
+		  (loop (- i 1)))))))
+
+(define (char-vector->string x)
+  (let* ((n (vector-length x))
+	 (s (make-string n)))
+    (do ((i 0 (+ i 1)))
+	((>= i n) s)
+      (string-set! s i (vector-ref x i)))))
+
+(define (string->char->vector x)
+  (let* ((n (sdtring-length x))
+	 (s (make-vector n)))
+    (do ((i 0 (+ i 1)))
+	((>= i n) s)
+      (vector-set! s i (string-ref x i)))))
+
+(define (char-vector->symbol x)
+  (string->symbol (char-vector->string x)))
+
+(define (symbol->char-vector x)
+  (string->char-vector (symbol->string x)))
+
+(define (number->char-vector x . y)
+  (string->char-vector (apply number->string x y)))
+
+(define (char-vector->number x . y)
+  (apply string->number (char-vector->string x) y))
+
+(define (subvector x y . z)
+  (let* ((len (vector-length x))
+	 (end (optional z len))
+	 (vlen (- end y))
+	 (v (make-vector vlen)))
+    (do ((i 0 (+ i 1)))
+	((>= i vlen) v)
+      (vector-set! v i (vector-ref x (+ y i))))))
+
+(define (vector-append . vs)
+  (let loop1 ((len 0) (vs1 vs))
+    (if (null? vs1)
+	(let ((v (make-vector len)))
+	  (let loop2 ((p 0) (vs vs))
+	    (if (null? vs) 
+		v
+		(let* ((v0 (car vs))
+		       (len1 (vector-length v0)))
+		  (do ((i 0 (+ i 1))
+		       (p p (+ p 1)))
+		      ((>= i len1) (loop2 p (cdr vs)))
+		    (vector-set! v p (vector-ref v0 i)))))))
+	(loop1 (+ len (vector-length (car vs1))) (cdr vs1)))))
