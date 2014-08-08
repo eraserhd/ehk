@@ -92,7 +92,7 @@
 	    ,@(map (lambda (name) (read-forms (locate-library name) %read)) names)))
 	(('files fns ...)
 	 `(begin
-	    ,@(map (lambda (fn) (read-forms (localize fn src) %read)) fns)))
+	    ,@(map (lambda (fn) (read-forms (localize fn src) read)) fns)))
 	(('code exps ...)
 	 `(begin ,@exps))
 	(((or 'feature-cond 'cond) clauses ...)
@@ -121,7 +121,7 @@
   (fluid-let ((*current-source-filename* filename))
     ((optional evaluator %eval)
      (expand-program 
-      (call-with-input-file filename (lambda (in) (%read in)))
+      (call-with-input-file filename (lambda (in) (read in)))
       filename))))
 
 (define (%library name)

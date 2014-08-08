@@ -58,8 +58,6 @@
   (define (eval-file in)
     (fluid-let ((*current-source-filename* in))
       (match (read-forms in %read)
-	(('begin (and spec ('program . _)))
-	 (%eval (expand-program spec in)))
 	(('begin forms ...)
 	 (for-each %eval forms)))))
   (define (eval-strings args)
