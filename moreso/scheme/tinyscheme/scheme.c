@@ -3479,7 +3479,7 @@ static pointer opexe_2(scheme *sc, enum scheme_opcodes op) {
      case OP_VECTOR_APPEND: /* vector-append */
 	s_return(sc, vector_append(sc, sc->args));
 
-     case OP_SUBSECTION: { /* subsection */
+     case OP_SUBVECTOR: { /* subvector */
 	pointer source;
 	int source_length;
 	int start, end;

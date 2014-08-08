@@ -64,13 +64,13 @@ void check_string_p_returns_t_for_char_vectors()
 	check("(string? 42)", "#f");
 }
 
-void check_subsection_works()
+void check_subvector_works()
 {
-	check("(subsection #(#\\a #\\b #\\c) 1 2)", "#(#\\b)");
-	check("(subsection #(#\\a #\\b #\\c) 1)", "#(#\\b #\\c)");
-	check("(subsection #(#\\a #\\b #\\c) 0)", "#(#\\a #\\b #\\c)");
-	check("(subsection #(#\\a #\\b #\\c) 3)", "#()");
-	check("(subsection #(1 2 3) 1 2)", "#(2)");
+	check("(subvector #(#\\a #\\b #\\c) 1 2)", "#(#\\b)");
+	check("(subvector #(#\\a #\\b #\\c) 1)", "#(#\\b #\\c)");
+	check("(subvector #(#\\a #\\b #\\c) 0)", "#(#\\a #\\b #\\c)");
+	check("(subvector #(#\\a #\\b #\\c) 3)", "#()");
+	check("(subvector #(1 2 3) 1 2)", "#(2)");
 }
 
 void check_vector_copy()
@@ -92,7 +92,7 @@ void check_vector_length()
 int main(int argc, char **argv)
 {
 	check_string_p_returns_t_for_char_vectors();
-	check_subsection_works();
+	check_subvector_works();
 	check_vector_copy();
 	check_vector_ref();
 	check_vector_length();

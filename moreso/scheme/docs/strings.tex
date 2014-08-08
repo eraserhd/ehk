@@ -20,9 +20,9 @@ character, and \schfalse\ otherwise:
 \end{scheme}
 \end{entry}
 
-\begin{entry}{\proto{subsection}{ vector start end}{library procedure}}
+\begin{entry}{\proto{subvector}{ vector start end}{library procedure}}
 
-{\cf Subsection} returns a fresh vector containing the objects from
+{\cf subvector} returns a fresh vector containing the objects in
 \var{vector} from index \var{start} (inclusive) to index \var{end}
 (exclusive).
 \end{entry}
@@ -34,7 +34,7 @@ Returns a vector containing the concatenation of the supplied vectors.
 
 \begin{entry}{\proto{vector-copy}{ vector}{library procedure}}
 
-Returns a fresh vector copy of \var{vector}.
+Returns a shallow copy of \var{vector}.
 \end{entry}
 
 \subsection{Removed Procedures}
