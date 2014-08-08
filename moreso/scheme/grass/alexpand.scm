@@ -948,9 +948,10 @@
 	  ((or (number? sexp) (boolean? sexp) (string? sexp) (char? sexp) 
 	       (eof-object? sexp))
 	   ((get-ek sexp) sexp))
+	  ((vector? sexp) 
+	   ((get-ek sexp) `',(unwrap-vecs sexp)))
 	  (else (expand-error (cond ((pair? sexp) "Improper list: ")
 				    ((null? sexp) "Empty list: ")
-				    ((vector? sexp) "Vector: ")
 				    (else "Non-S-Expression: "))
 			      sexp
 			      " used as an expression, syntax, or definition.")))))
