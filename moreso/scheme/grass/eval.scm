@@ -10,12 +10,40 @@
 (define *uninitialized* (list '*uninitialized*))
 (define *unbound-variables* #f)
 (define *toplevel-environment* #f)
+(define *enable-call-trace* #f)
+(define trace-buffer '())
+(define trace-buffer-end '())
+(define trace-buffer-length 0)
+(define trace-buffer-max 10)
 
 (define (abort-continuation) (%exit 1))
 
 (define report-error
   (let ((pp pp))
     (lambda (msg args)
+      (define (fragment exp maxdepth)
+	(define (walk x d)
+	  (if (> d maxdepth)
+	      '...
+	      (cond ((vector? x) (list->vector (walk (vector->list x) d)))
+		    ((pair? x)
+		     (let loop ((x x) (n maxdepth))
+		       (cond ((null? x) '())
+			     ((zero? n) '(...))
+			     ((pair? x) (cons (walk (car x) (+ d 1)) (loop (cdr x) (- n 1))))
+			     (else x))))
+		    (else x))))
+	(walk exp 1))
+      (define (print-trace-buffer)
+	(when (pair? trace-buffer)
+	  (let ((out %error-port))
+	    (display "Call trace:\n" out)
+	    (for-each
+	     (lambda (exp)
+	       (display "\n  " out)
+	       (write (fragment exp 10) out) )
+	     trace-buffer)
+	    (display "   <---\n\n" out))))
       (let ((out %error-port))
 	(%flush-output %output-port)
 	(display "\nError: " out)
@@ -28,6 +56,7 @@
 	     (pp x out))
 	   args))
 	(newline out)
+	(when *enable-call-trace* (print-trace-buffer))
 	(%flush-output out)))))
 
 (define (error-handler msg args)
@@ -55,10 +84,6 @@
       ((_ llist info body ...)
        (lambda llist body ...))))
 
-  (define-syntax compile-procedure-call
-    (syntax-rules ()	
-      ((_ form env name here tail default) default)))
-
   (define-syntax compile-form
     (syntax-rules ()	
       ((_ form env name here tail default) default)))
@@ -66,6 +91,26 @@
   (define-syntax compile-procedure-check
     (syntax-rules ()
       ((_ opexp default) default)))
+
+  (define-syntax compile-trace
+    (syntax-rules ()
+      ((_ exp)
+       (when *enable-call-trace* (trace exp)))))
+
+  (define (trace exp)
+    (cond ((eq? trace-buffer-length 0)
+	   (set! trace-buffer-length 1)
+	   (set! trace-buffer (list exp))
+	   (set! trace-buffer-end trace-buffer))
+	  (else
+	   (let ((last (car trace-buffer-end)))
+	     (unless (eq? ': last)
+	       (if (eq? trace-buffer-length trace-buffer-max)
+		   (set! trace-buffer (cdr trace-buffer))
+		   (set! trace-buffer-length (+ trace-buffer-length 1)))
+	       (let ((n (list (if (eq? exp last) ': exp))))
+		 (set-cdr! trace-buffer-end n)
+		 (set! trace-buffer-end n)))))))
 
   (define (potentially-unbound a set)
     (when (and *unbound-variables* (not set))
@@ -132,11 +177,6 @@
 	    (else (fail)))))
 
   (define (comp-call form env name here tail)
-    (compile-procedure-call 
-     form env name here tail
-     (comp-call1 form env name here tail)))
-
-  (define (comp-call1 form env name here tail)
     (check '(_ ...) form)
     (let* ((op (car form))
 	   ;;XXX alexpander unfortunately doesn't let this through:
@@ -174,21 +214,25 @@
       (case argc
 	((0) (compiled-lambda
 	      (e) (,here ,tail <call> ,form)
+	      (compile-trace form)
 	      ((compile-procedure-check (op e) (checkf e)))))
 	((1) (let ((a1 (comp (car args) env #f here #f)))
 	       (compiled-lambda
 		(e) (,here ,tail <call> ,form)
+		(compile-trace form)
 		((compile-procedure-check (op e) (checkf e)) (a1 e)))))
 	((2) (let ((a1 (comp (car args) env #f here #f))
 		   (a2 (comp (cadr args) env #f here #f)))
 	       (compiled-lambda 
 		(e) (,here ,tail <call> ,form)
+		(compile-trace form)
 		((compile-procedure-check (op e) (checkf e)) (a1 e) (a2 e)))))
 	((3) (let ((a1 (comp (car args) env #f here #f))
 		   (a2 (comp (cadr args) env #f here #f))
 		   (a3 (comp (caddr args) env #f here #f)))
 	       (compiled-lambda
 		(e) (,here ,tail <call> ,form)
+		(compile-trace form)
 		((compile-procedure-check (op e) (checkf e)) (a1 e) (a2 e) (a3 e)))))
 	((4) (let ((a1 (comp (car args) env #f here #f))
 		   (a2 (comp (cadr args) env #f here #f))
@@ -196,11 +240,13 @@
 		   (a4 (comp (cadddr args) env #f here #f)))
 	       (compiled-lambda
 		(e) (,here ,tail <call> ,form)
+		(compile-trace form)
 		((compile-procedure-check (op e) (checkf e)) (a1 e) (a2 e) (a3 e) (a4 e)))))
 	(else
 	 (let ((as (map (lambda (a) (comp a env #f here #f)) args)))
 	   (compiled-lambda
 	    (e) (,here ,tail <call> ,form)
+	    (compile-trace form)
 	    (let ((fn (compile-procedure-check (op e) (checkf e))))
 	      (apply fn (map (lambda (a) (a e)) as)))))))))
   
@@ -579,8 +625,10 @@
 			  (cond ((eof-object? x) (return x))
 				(else
 				 (when (eqv? (%peek-char) #\newline) (%read-char))
-				 (call-with-values
-				     (cut eval x)
+				 (set! trace-buffer '())
+				 (set! trace-buffer-end '())
+				 (set! trace-buffer-length 0)
+				 (call-with-values (cut eval x)
 				   (lambda rs
 				     (report-unbound)
 				     (match rs
