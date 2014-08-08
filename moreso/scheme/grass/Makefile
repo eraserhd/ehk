@@ -1,4 +1,4 @@
-### Makefile for GRASS
+### Makefile for MORESO
 
 
 PREFIX = $(HOME)
@@ -27,7 +27,7 @@ GSCFLAGS =
 RACO = raco
 RACOFLAGS =
 
-SCHEME = $(DEFAULT_IMPLEMENTATION)-grass
+MORESO = $(DEFAULT_IMPLEMENTATION)-moreso
 
 TOPLEVEL_TARGETS = all clean spotless check check-chicken check-scheme48 check-gambit \
 	check-racket dist install bootstrap distfiles help
@@ -36,26 +36,26 @@ TOPLEVEL_TARGETS = all clean spotless check check-chicken check-scheme48 check-g
 .PHONY: $(TOPLEVEL_TARGETS)
 
 
-all: $(SCHEME) build/grass-grass.scm
+all: $(MORESO)
 
 
 bootstrap: 
-	sh tools/bootstrap.sh $(CC) -o chicken-grass
+	sh tools/bootstrap.sh $(CC) -o chicken-moreso
 
 clean:
-	rm -f *-grass.scm scheme48-grass.image chicken-grass build/*.o
+	rm -f *-moreso.scm scheme48-moreso.image chicken-moreso build/*.o
 
 spotless: clean
-	rm -f build/core.scm scheme48-grass
+	rm -f build/core.scm scheme48-moreso
 
-dist: bootstrap/chicken-grass.c bootstrap/runtime.c build/core.scm
+dist: bootstrap/chicken-moreso.c bootstrap/runtime.c build/core.scm
 	sh tools/dist.sh
 
-distfiles: bootstrap/chicken-grass.c bootstrap/runtime.c build/core.scm
+distfiles: bootstrap/chicken-moreso.c bootstrap/runtime.c build/core.scm
 
-bootstrap/chicken-grass.c: chicken-grass
+bootstrap/chicken-moreso.c: chicken-moreso
 	mkdir -p bootstrap
-	cp chicken-grass.c bootstrap
+	cp chicken-moreso.c bootstrap
 
 bootstrap/runtime.c:
 	mkdir -p bootstrap
@@ -69,57 +69,46 @@ bootstrap/runtime.c:
 build/core.scm: chicken/base.scm tools/bootstrap.scm $(BOOTSTRAP_MODULES:%=%.scm)
 	$(CSI) -bnq chicken/base.scm tools/bootstrap.scm
 
-build/grass-grass.scm: grass/base.scm build/core.scm grass/main.scm
-	cat $^ >$@
-
-chicken-grass: chicken/base.scm build/core.scm chicken/main.scm build/numbers.o
+chicken-moreso: chicken/base.scm build/core.scm chicken/main.scm build/numbers.o
 	$(CSC) $(CSCFLAGS) chicken/main.scm -o $@ -x build/numbers.o
 
 build/numbers.o: chicken/numbers.scm chicken/numbers-c.c chicken/numbers-c.h
 	$(CSC) -c $(CSCFLAGS) $< -o $@ -x -unit numbers -J -Ichicken
 
-scheme48-grass: scheme48-grass.image
+scheme48-moreso: scheme48-moreso.image
 	echo '#!/bin/sh' >$@
-	echo 'exec $(S48VM) $(S48VMFLAGS) -i $(PREFIX)/.scheme/scheme48-grass.image -a "$$@"' >>$@
+	echo 'exec $(S48VM) $(S48VMFLAGS) -i $(PREFIX)/.scheme/scheme48-moreso.image -a "$$@"' >>$@
 	chmod +x $@
 
-scheme48-grass.image: scheme48/base.scm build/core.scm scheme48/main.scm \
+scheme48-moreso.image: scheme48/base.scm build/core.scm scheme48/main.scm \
 	scheme48/packages.scm
 	(echo ',config ,load "scheme48/packages.scm"'; \
-	echo ',open grass-main load-dynamic-externals'; \
+	echo ',open moreso-main load-dynamic-externals'; \
 	echo '(set-library-path "$(S48LIBPATH)")'; \
-	echo ',build run-main "scheme48-grass.image" no-warnings'; \
+	echo ',build run-main "scheme48-moreso.image" no-warnings'; \
 	echo ',exit') | $(S48)
 
-gambit-grass: gambit/base.scm build/core.scm \
+gambit-moreso: gambit/base.scm build/core.scm \
 	gambit/main.scm 
 	$(GSC) $(GSCFLAGS) -o $@ -exe gambit/main.scm
 
-build/racket-grass.scm: racket/prefix.scm racket/base.scm build/core.scm \
+build/racket-moreso.scm: racket/prefix.scm racket/base.scm build/core.scm \
 	racket/main.scm
 	echo "#lang r5rs" >$@
 	cat $^ >>$@
 
-racket-grass: build/racket-grass.scm
+racket-moreso: build/racket-moreso.scm
 	$(RACO) exe $(RACOFLAGS) -o $@ $<
 
-check: all build/grass-grass.scm
+###XXX these need to be adapted or replaced
+check: all 
 	@cd tests; \
-	../$(SCHEME) fac.scm; \
-	../$(SCHEME) '(case-sensitive #f) (load "r4rstest.scm")'; \
-	../$(SCHEME) r5rs_pitfalls.scm; \
-	../$(SCHEME) compiler.scm; \
-	../$(SCHEME) '(begin (load "../lib/ec.scm") (load "ec-tests.scm"))'; \
-	../$(SCHEME) ../build/grass-grass.scm '(case-sensitive #f) (load "r4rstest.scm")'; \
-	../$(SCHEME) ../build/grass-grass.scm r5rs_pitfalls.scm; \
-	../$(SCHEME) '(begin (load "../lib/megalet.scm") (load "test-megalet.scm"))'; \
-	echo; \
-	echo === $(SCHEME) executing grass ===; \
-	time ../$(SCHEME) ../build/grass-grass.scm fac.scm; \
-	echo; \
-	echo === $(SCHEME) executing grass executing grass ===; \
-	time ../$(SCHEME) ../build/grass-grass.scm \
-	  ../build/grass-grass.scm fac.scm
+	../$(MORESO) fac.scm; \
+	../$(MORESO) '(case-sensitive #f) (load "r4rstest.scm")'; \
+	../$(MORESO) r5rs_pitfalls.scm; \
+	../$(MORESO) compiler.scm; \
+	../$(MORESO) '(begin (load "../lib/ec.scm") (load "ec-tests.scm"))'; \
+	../$(MORESO) '(begin (load "../lib/megalet.scm") (load "test-megalet.scm"))'
 
 check-chicken:	
 	$(MAKE) DEFAULT_IMPLEMENTATION=chicken all check
@@ -132,7 +121,7 @@ check-racket:
 
 install: all
 	mkdir -p $(PREFIX)/bin
-	ln -sf $$PWD/$(SCHEME) $(PREFIX)/bin/scheme
+	ln -sf $$PWD/$(MORESO) $(PREFIX)/bin/moreso
 
 help:
 	@echo
