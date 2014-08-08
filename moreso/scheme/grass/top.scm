@@ -1,6 +1,6 @@
 ;;;; top.scm - command-line parsing and startup
 ;
-; expand.scm eval.scm pp.scm write.scm dtype.scm match.scm program.scm
+; expand.scm eval.scm env.scm pp.scm write.scm dtype.scm match.scm
 
 
 (add-feature 'grass)
@@ -25,9 +25,11 @@
 	     #t)
 	    (else #f))))
   (set! pretty-print-hook
-    (lambda (x out)
+    (lambda (x out wr)
       (cond ((%procedure? x)
 	     (out (proc->string x)))
+	    ((char-vector? x)
+	     (wr (char-vector->string x)))
 	    ((%environment? x)
 	     (out "#<environment ")
 	     (out (%environment-data-name (%environment-data x)))

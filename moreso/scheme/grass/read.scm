@@ -135,7 +135,7 @@
 	      (cond ((eof-object? c)
 		     (error "unexpected EOF while reading string"))
 		    ((char=? #\" c) 
-		     (list->string (reverse lst)))
+		     (list->vector (reverse lst)))
 		    ((char=? #\\ c)
 		     (let ((c (read-char port)))
 		       (if (eof-object? c)

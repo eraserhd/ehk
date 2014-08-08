@@ -9,7 +9,7 @@
 ; modified for use with this Scheme system
 
 (define *pretty-print-width* 79)
-(define (pretty-print-hook x out) #f)	; must tail-call "out"!
+(define (pretty-print-hook x out wr) #f)	; must tail-call "out" or "wr"!
 
 (define (pretty-print obj . opt)
   (let ((port (if (pair? opt) (car opt) %output-port)))
@@ -66,7 +66,7 @@
 			(else      (out ")" (wr l (out " . " col))))))
 		(out "()" col)))
 	  
-	  (cond ((pretty-print-hook obj (out/col col)))
+	  (cond ((pretty-print-hook obj (out/col col) (cut wr <> col)))
 		((pair? obj)        (wr-expr obj col))
 		((null? obj)        (wr-lst obj col))
 		((boolean? obj)     (out (if obj "#t" "#f") col))

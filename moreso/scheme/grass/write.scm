@@ -12,6 +12,8 @@
     (define (out1 x) (display x port))
     (let show ((x x))
       (cond ((%write-hook x port))
+	    ((char-vector? x)
+	     (wr (char-vector->string x)))
 	    ((vector? x)
 	     (let ((len (vector-length x)))
 	       (out1 "#")
