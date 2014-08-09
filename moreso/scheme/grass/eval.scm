@@ -25,7 +25,8 @@
 	(define (walk x d)
 	  (if (> d maxdepth)
 	      '...
-	      (cond ((vector? x) (list->vector (walk (vector->list x) d)))
+	      (cond ((char-vector? x) x)
+		    ((vector? x) (list->vector (walk (vector->list x) d)))
 		    ((pair? x)
 		     (let loop ((x x) (n maxdepth))
 		       (cond ((null? x) '())
@@ -41,7 +42,7 @@
 	    (for-each
 	     (lambda (exp)
 	       (display "\n  " out)
-	       (write (fragment exp 10) out) )
+	       (%write (fragment exp 10) out) )
 	     trace-buffer)
 	    (display "   <---\n\n" out))))
       (let ((out %error-port))
