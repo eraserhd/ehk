@@ -13,7 +13,7 @@
     (let show ((x x))
       (cond ((%write-hook x port))
 	    ((char-vector? x)
-	     (wr (char-vector->string x)))
+	     (out (char-vector->string x)))
 	    ((vector? x)
 	     (let ((len (vector-length x)))
 	       (out1 "#")
