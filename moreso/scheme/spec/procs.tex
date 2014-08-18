@@ -470,8 +470,8 @@ range are approached.
 \vest An implementation of Scheme must support exact integers
 throughout the range of numbers that may be used for indexes of
 lists, vectors, and strings or that may result from computing the length of a
-list, vector, or string.  The \ide{length}, \ide{vector-length},
-and \ide{string-length} procedures must return an exact
+list, vector, or string.  The \ide{length} and \ide{vector-length} procedures
+must return an exact
 integer, and it is an error to use anything but an exact integer as an
 index.  Furthermore any integer constant within the index range, if
 expressed by an exact integer syntax, will indeed be read as an exact
@@ -2154,13 +2154,6 @@ are initialized to \var{char}, otherwise the contents of the
 Returns a newly allocated string composed of the arguments.
 
 \end{entry}
-
-\begin{entry}{%
-\proto{string-length}{ string}{procedure}}
-
-Returns the number of characters in the given \var{string}.
-\end{entry}
-
 
 \begin{entry}{%
 \proto{string-ref}{ string \vr{k}}{procedure}}
