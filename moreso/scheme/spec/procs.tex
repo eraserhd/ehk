@@ -2169,15 +2169,6 @@ the corresponding numerical predicates.
 \end{entry}
 
 
-\begin{entry}{%
-\proto{string-append}{ \var{string} \dotsfoo}{library procedure}}
-
-Returns a newly allocated string whose characters form the concatenation of the
-given strings.
-
-\end{entry}
-
-
 \subsection{Vectors}
 \label{vectorsection}
 
@@ -2306,6 +2297,15 @@ created vector initialized to the elements of the list \var{list}.
 \proto{vector-copy}{ vector}{library procedure}}
 
 Returns a newly allocated copy of the given \var{vector}.
+
+\end{entry}
+
+
+\begin{entry}{%
+\proto{vector-append}{ \var{vector} \dotsfoo}{library procedure}}
+
+Returns a newly allocated vector whose elements form the concatenation of the
+given vectors.
 
 \end{entry}
 
