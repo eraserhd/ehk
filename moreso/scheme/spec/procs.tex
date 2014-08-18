@@ -2133,19 +2133,6 @@ Returns \schtrue{} if \var{obj} is a string, otherwise returns \schfalse.
 
 
 \begin{entry}{%
-\proto{make-string}{ \vr{k}}{procedure}
-\rproto{make-string}{ \vr{k} char}{procedure}}
-
-%\domain{\vr{k} must be a non-negative integer, and \var{char} must be
-%a character.}  
-{\cf Make-string} returns a newly allocated string of
-length \vr{k}.  If \var{char} is given, then all elements of the string
-are initialized to \var{char}, otherwise the contents of the
-\var{string} are unspecified.
-
-\end{entry}
-
-\begin{entry}{%
 \proto{string}{ char \dotsfoo}{library procedure}}
 
 Returns a newly allocated string composed of the arguments.
