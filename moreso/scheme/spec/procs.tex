@@ -2239,23 +2239,6 @@ given strings.
 
 
 \begin{entry}{%
-\proto{string->list}{ string}{library procedure}
-\proto{list->string}{ list}{library procedure}}
-
-{\cf String\coerce{}list} returns a newly allocated list of the
-characters that make up the given string.  {\cf List\coerce{}string}
-returns a newly allocated string formed from the characters in the list
-\var{list}, which must be a list of characters. {\cf String\coerce{}list}
-and {\cf list\coerce{}string} are
-inverses so far as {\cf equal?}\ is concerned.  
-%Implementations that provide
-%destructive operations on strings should ensure that the result of
-%{\cf list\coerce{}string} is newly allocated.
-
-\end{entry}
-
-
-\begin{entry}{%
 \proto{string-copy}{ string}{library procedure}}
 
 Returns a newly allocated copy of the given \var{string}.
