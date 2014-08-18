@@ -1864,7 +1864,7 @@ case---some implementations will prefer upper case, others lower case.
 If the symbol was returned by {\cf string\coerce{}symbol}, the case of
 characters in the string returned will be the same as the case in the
 string that was passed to {\cf string\coerce{}symbol}.  It is an error
-to apply mutation procedures like \ide{string-set!} to strings returned
+to apply mutation procedures like \ide{vector-set!} to strings returned
 by this procedure.
 
 The following examples assume that the implementation's standard case is
@@ -2087,9 +2087,6 @@ result of {\cf char-downcase} is lower case.
 \label{stringsection}
 
 Strings are sequences of characters.  
-%In some implementations of Scheme
-%they are immutable; other implementations provide destructive procedures
-%such as {\cf string-set!}\ that alter string objects.
 \vest Strings are written as sequences of characters enclosed within doublequotes
 ({\cf "}).  A doublequote can be written inside a string only by escaping
 it with a backslash (\backwhack{}), as in
@@ -2154,28 +2151,6 @@ are initialized to \var{char}, otherwise the contents of the
 Returns a newly allocated string composed of the arguments.
 
 \end{entry}
-
-\begin{entry}{%
-\proto{string-set!}{ string k char}{procedure}}
-
-\domain{%\var{String} must be a string, 
-\vr{k} must be a valid index of \var{string}%, and \var{char} must be a character
-.}
-{\cf String-set!} stores \var{char} in element \vr{k} of \var{string}
-and returns an unspecified value.  % <!>
-
-\begin{scheme}
-(define (f) (make-string 3 \sharpsign\backwhack{}*))
-(define (g) "***")
-(string-set! (f) 0 \sharpsign\backwhack{}?)  \ev  \unspecified
-(string-set! (g) 0 \sharpsign\backwhack{}?)  \ev  \scherror
-(string-set! (symbol->string 'immutable)
-             0
-             \sharpsign\backwhack{}?)  \ev  \scherror%
-\end{scheme}
-
-\end{entry}
-
 
 \begin{entry}{%
 \proto{string=?}{ \vari{string} \varii{string}}{library procedure}

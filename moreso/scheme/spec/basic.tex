@@ -154,7 +154,7 @@ Variables and objects such as pairs, vectors, and strings implicitly
 denote locations\mainindex{location} or sequences of locations.  A string, for
 example, denotes as many locations as there are characters in the string. 
 (These locations need not correspond to a full machine word.) A new value may be
-stored into one of these locations using the {\tt string-set!} procedure, but
+stored into one of these locations using the {\tt vector-set!} procedure, but
 the string continues to denote the same locations as before.
 
 An object fetched from a location, by a variable reference or by
