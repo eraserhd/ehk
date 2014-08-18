@@ -2178,14 +2178,6 @@ given strings.
 \end{entry}
 
 
-\begin{entry}{%
-\proto{string-copy}{ string}{library procedure}}
-
-Returns a newly allocated copy of the given \var{string}.
-
-\end{entry}
-
-
 \subsection{Vectors}
 \label{vectorsection}
 
@@ -2307,6 +2299,14 @@ created vector initialized to the elements of the list \var{list}.
 (vector->list '\#(dah dah didah))  \lev  (dah dah didah)
 (list->vector '(dididit dah))   \lev  \#(dididit dah)%
 \end{scheme}
+\end{entry}
+
+
+\begin{entry}{%
+\proto{vector-copy}{ vector}{library procedure}}
+
+Returns a newly allocated copy of the given \var{vector}.
+
 \end{entry}
 
 
