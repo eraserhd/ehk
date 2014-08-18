@@ -2230,18 +2230,6 @@ the corresponding numerical predicates.
 
 
 \begin{entry}{%
-\proto{substring}{ string start end}{library procedure}}
-
-\domain{\var{String} must be a string, and \var{start} and \var{end}
-must be exact integers satisfying
-$$0 \leq \var{start} \leq \var{end} \leq \hbox{\tt(string-length \var{string})\rm.}$$}
-{\cf Substring} returns a newly allocated string formed from the characters of
-\var{string} beginning with index \var{start} (inclusive) and ending with index
-\var{end} (exclusive).
-\end{entry}
-
-
-\begin{entry}{%
 \proto{string-append}{ \var{string} \dotsfoo}{library procedure}}
 
 Returns a newly allocated string whose characters form the concatenation of the
@@ -2271,15 +2259,6 @@ inverses so far as {\cf equal?}\ is concerned.
 \proto{string-copy}{ string}{library procedure}}
 
 Returns a newly allocated copy of the given \var{string}.
-
-\end{entry}
-
-
-\begin{entry}{%
-\proto{string-fill!}{ string char}{library procedure}}
-
-Stores \var{char} in every element of the given \var{string} and returns an
-unspecified value.  % <!>
 
 \end{entry}
 
@@ -2414,6 +2393,18 @@ created vector initialized to the elements of the list \var{list}.
 Stores \var{fill} in every element of \var{vector}.
 The value returned by {\cf vector-fill!}\ is unspecified.  % <!>
 
+\end{entry}
+
+
+\begin{entry}{%
+\proto{subvector}{ vector start end}{library procedure}}
+
+\domain{\var{Vector} must be a vector, and \var{start} and \var{end}
+must be exact integers satisfying
+$$0 \leq \var{start} \leq \var{end} \leq \hbox{\tt(vector-length \var{vector})\rm.}$$}
+{\cf Subvector} returns a newly allocated vector formed from the elements of
+\var{vector} beginning with index \var{start} (inclusive) and ending with index
+\var{end} (exclusive).
 \end{entry}
 
 

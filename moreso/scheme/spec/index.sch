@@ -2,10 +2,11 @@
 
 ; Script for running this in Chez (delete the old index.tex first):
 ;
-;  (define (sort-list list pred) (sort pred list))
 ;  (load "index.sch")
-;  (call-with-input-file "r5rs.idx" read-entries)
+;  (call-with-input-file "moreso.idx" read-entries)
 ;  (call-with-output-file "index.tex" create-index)
+
+(define sort-list sort)
 
 (define main 0)
 (define aux 1)
@@ -133,7 +134,7 @@
 (define *s1* (string-append "\\item{" (list->string '(#\\))))
 (define *s2* "{")
 (define *s3* "}}{\\hskip .75em}")
-(define *semi* "\; ")
+(define *semi* "; ")
 (define *comma* ", ")
 
 (define (write-entries key font main pages p)
@@ -155,3 +156,6 @@
                          (write page p))
                        (cdr pages))))
   (newline p))
+
+(call-with-input-file "moreso.idx" read-entries)
+(call-with-output-file "index.tex" create-index)
