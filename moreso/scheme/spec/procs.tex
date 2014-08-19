@@ -2083,92 +2083,6 @@ result of {\cf char-downcase} is lower case.
 \end{entry}
 
 
-\subsection{Strings}
-\label{stringsection}
-
-Strings are sequences of characters.  
-\vest Strings are written as sequences of characters enclosed within doublequotes
-({\cf "}).  A doublequote can be written inside a string only by escaping
-it with a backslash (\backwhack{}), as in
-
-\begin{scheme}
-"The word \backwhack{}"recursion\backwhack{}" has many meanings."%
-\end{scheme}
-
-A backslash can be written inside a string only by escaping it with another
-backslash.  Scheme does not specify the effect of a backslash within a
-string that is not followed by a doublequote or backslash.
-
-\vest A string constant may continue from one line to the next, but
-the exact contents of such a string are unspecified.
-% this is
-%usually a bad idea because 
-%the exact effect may vary from one computer
-%system to another.
-
-\vest The {\em length} of a string is the number of characters that it
-contains.  This number is an exact, non-negative integer that is fixed when the
-string is created.  The \defining{valid indexes} of a string are the
-exact non-negative integers less than the length of the string.  The first
-character of a string has index 0, the second has index 1, and so on.
-
-\vest In phrases such as ``the characters of \var{string} beginning with
-index \var{start} and ending with index \var{end},'' it is understood
-that the index \var{start} is inclusive and the index \var{end} is
-exclusive.  Thus if \var{start} and \var{end} are the same index, a null
-substring is referred to, and if \var{start} is zero and \var{end} is
-the length of \var{string}, then the entire string is referred to.
-
-\vest Some of the procedures that operate on strings ignore the
-difference between upper and lower case.  The versions that ignore case
-have \hbox{``{\cf -ci}''} (for ``case insensitive'') embedded in their
-names.
-
-
-\begin{entry}{%
-\proto{string?}{ obj}{procedure}}
-
-Returns \schtrue{} if \var{obj} is a string, otherwise returns \schfalse.
-\end{entry}
-
-
-\begin{entry}{%
-\proto{string=?}{ \vari{string} \varii{string}}{library procedure}
-\proto{string-ci=?}{ \vari{string} \varii{string}}{library procedure}}
-
-Returns \schtrue{} if the two strings are the same length and contain the same
-characters in the same positions, otherwise returns \schfalse.
-{\cf String-ci=?}\ treats
-upper and lower case letters as though they were the same character, but
-{\cf string=?}\ treats upper and lower case as distinct characters.
-
-\end{entry}
-
-
-\begin{entry}{%
-\proto{string<?}{ \vari{string} \varii{string}}{library procedure}
-\proto{string>?}{ \vari{string} \varii{string}}{library procedure}
-\proto{string<=?}{ \vari{string} \varii{string}}{library procedure}
-\proto{string>=?}{ \vari{string} \varii{string}}{library procedure}
-\proto{string-ci<?}{ \vari{string} \varii{string}}{library procedure}
-\proto{string-ci>?}{ \vari{string} \varii{string}}{library procedure}
-\proto{string-ci<=?}{ \vari{string} \varii{string}}{library procedure}
-\proto{string-ci>=?}{ \vari{string} \varii{string}}{library procedure}}
-
-These procedures are the lexicographic extensions to strings of the
-corresponding orderings on characters.  For example, {\cf string<?}\ is
-the lexicographic ordering on strings induced by the ordering
-{\cf char<?}\ on characters.  If two strings differ in length but
-are the same up to the length of the shorter string, the shorter string
-is considered to be lexicographically less than the longer string.
-
-Implementations may generalize these and the {\cf string=?}\ and
-{\cf string-ci=?} procedures to take more than two arguments, as with
-the corresponding numerical predicates.
-
-\end{entry}
-
-
 \subsection{Vectors}
 \label{vectorsection}
 
@@ -2328,6 +2242,92 @@ $$0 \leq \var{start} \leq \var{end} \leq \hbox{\tt(vector-length \var{vector})\r
 {\cf Subvector} returns a newly allocated vector formed from the elements of
 \var{vector} beginning with index \var{start} (inclusive) and ending with index
 \var{end} (exclusive).
+\end{entry}
+
+
+\subsection{Strings}
+\label{stringsection}
+
+Strings are sequences of characters.  
+\vest Strings are written as sequences of characters enclosed within doublequotes
+({\cf "}).  A doublequote can be written inside a string only by escaping
+it with a backslash (\backwhack{}), as in
+
+\begin{scheme}
+"The word \backwhack{}"recursion\backwhack{}" has many meanings."%
+\end{scheme}
+
+A backslash can be written inside a string only by escaping it with another
+backslash.  Scheme does not specify the effect of a backslash within a
+string that is not followed by a doublequote or backslash.
+
+\vest A string constant may continue from one line to the next, but
+the exact contents of such a string are unspecified.
+% this is
+%usually a bad idea because 
+%the exact effect may vary from one computer
+%system to another.
+
+\vest The {\em length} of a string is the number of characters that it
+contains.  This number is an exact, non-negative integer that is fixed when the
+string is created.  The \defining{valid indexes} of a string are the
+exact non-negative integers less than the length of the string.  The first
+character of a string has index 0, the second has index 1, and so on.
+
+\vest In phrases such as ``the characters of \var{string} beginning with
+index \var{start} and ending with index \var{end},'' it is understood
+that the index \var{start} is inclusive and the index \var{end} is
+exclusive.  Thus if \var{start} and \var{end} are the same index, a null
+substring is referred to, and if \var{start} is zero and \var{end} is
+the length of \var{string}, then the entire string is referred to.
+
+\vest Some of the procedures that operate on strings ignore the
+difference between upper and lower case.  The versions that ignore case
+have \hbox{``{\cf -ci}''} (for ``case insensitive'') embedded in their
+names.
+
+
+\begin{entry}{%
+\proto{string?}{ obj}{procedure}}
+
+Returns \schtrue{} if \var{obj} is a string, otherwise returns \schfalse.
+\end{entry}
+
+
+\begin{entry}{%
+\proto{string=?}{ \vari{string} \varii{string}}{library procedure}
+\proto{string-ci=?}{ \vari{string} \varii{string}}{library procedure}}
+
+Returns \schtrue{} if the two strings are the same length and contain the same
+characters in the same positions, otherwise returns \schfalse.
+{\cf String-ci=?}\ treats
+upper and lower case letters as though they were the same character, but
+{\cf string=?}\ treats upper and lower case as distinct characters.
+
+\end{entry}
+
+
+\begin{entry}{%
+\proto{string<?}{ \vari{string} \varii{string}}{library procedure}
+\proto{string>?}{ \vari{string} \varii{string}}{library procedure}
+\proto{string<=?}{ \vari{string} \varii{string}}{library procedure}
+\proto{string>=?}{ \vari{string} \varii{string}}{library procedure}
+\proto{string-ci<?}{ \vari{string} \varii{string}}{library procedure}
+\proto{string-ci>?}{ \vari{string} \varii{string}}{library procedure}
+\proto{string-ci<=?}{ \vari{string} \varii{string}}{library procedure}
+\proto{string-ci>=?}{ \vari{string} \varii{string}}{library procedure}}
+
+These procedures are the lexicographic extensions to strings of the
+corresponding orderings on characters.  For example, {\cf string<?}\ is
+the lexicographic ordering on strings induced by the ordering
+{\cf char<?}\ on characters.  If two strings differ in length but
+are the same up to the length of the shorter string, the shorter string
+is considered to be lexicographically less than the longer string.
+
+Implementations may generalize these and the {\cf string=?}\ and
+{\cf string-ci=?} procedures to take more than two arguments, as with
+the corresponding numerical predicates.
+
 \end{entry}
 
 
