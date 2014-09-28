@@ -18,4 +18,10 @@
   (test '(/ f (\\ x (\\ y (/ (/ - y) x)))) (normalize '(f \\x. \\y. - y x))))
 
 (test-group "denormalizing"
-  (test '(\\x. x) (denormalize '(\\ x x))))
+  (test '(\\x. x) (denormalize '(\\ x x)))
+  (test '(\\x. 1) (denormalize '(\\ x 1)))
+  (test '(\\y. \\x. 4) (denormalize '(\\ y (\\ x 4))))
+  (test '(x y) (denormalize '(/ x y)))
+  (test '(x y z) (denormalize '(/ (/ x y) z)))
+  (test '(x y z w) (denormalize '(/ (/ (/ x y) z) w)))
+  (test '(f \\x. \\y. - y x) (denormalize '(/ f (\\ x (\\ y (/ (/ - y) x)))))))

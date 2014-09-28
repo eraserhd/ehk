@@ -29,9 +29,24 @@
       [(A rest ...) (normalize-applications (normalize A) rest)]
       [x x]))
 
+  (define (contains-binding? l)
+    (match l
+      [((? binding) _ ...) #t]
+      [(_ rest ...) (contains-binding? rest)]
+      [_ #f]))
+
   (define denormalize
     (match-lambda
-      [('\\ a E) `(,(make-binding a) ,(denormalize E))]
+      [('\\ x (F ...)) (cons (make-binding x) (denormalize F))]
+      [('\\ x F) (list (make-binding x) (denormalize F))]
+      [('/ a b) (let ((a (denormalize a))
+		      (b (denormalize b)))
+		  (cond
+		    [(contains-binding? a) (list a b)]
+		    [(list? a) (append a (list b))]
+		    [(list? b) (cons a b)]
+		    [else (cons a (list b))]))]
       [x x]))
+
   
   )
