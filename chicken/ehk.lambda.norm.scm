@@ -14,10 +14,10 @@
 		(string->symbol (substring spelling 1 (- len 1)))))))
 
   (define (normalize-applications first rest)
-    (cond
-      [(null? rest) first]
-      [(binding (car rest)) `(/ ,first ,(normalize rest))]
-      [else (normalize-applications `(/ ,first ,(normalize (car rest))) (cdr rest))]))
+    (match rest
+      [() first]
+      [((? binding) _ ...) `(/ ,first ,(normalize rest))]
+      [(A rest ...) (normalize-applications `(/ ,first ,(normalize A)) rest)]))
 
   (define normalize
     (match-lambda
