@@ -1,11 +1,4 @@
 
-(test-group "can distinguish binding terms"
-  (test 'x (binding '\\x.))
-  (test 'y (binding '\\y.))
-  (test 'foo (binding '\\foo.))
-  (test #f (binding 'x))
-  (test #f (binding 42)))
-
 (test-group "normalizing lambda abstractions"
   (test '(\\ x x) (parenthesize '(\\x. x)))
   (test '(\\ x 1) (parenthesize '(\\x. 1)))
