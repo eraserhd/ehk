@@ -20,10 +20,10 @@
       [else (normalize-applications `(/ ,first ,(normalize (car rest))) (cdr rest))]))
 
   (define (normalize E)
-    (cond
-      [(not (list? E)) E]
-      [(= 1 (length E)) (car E)]
-      [(binding (car E)) `(\\ ,(binding (car E)) ,(normalize (cdr E)))]
-      [else (normalize-applications (normalize (car E)) (cdr E))]))
+    (match E
+      [(x) x]
+      [((? binding b) body ...) `(\\ ,(binding b) ,(normalize body))]
+      [(A rest ...) (normalize-applications (normalize A) rest)]
+      [x x]))
   
   )
