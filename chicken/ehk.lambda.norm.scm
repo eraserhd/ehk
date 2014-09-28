@@ -2,7 +2,7 @@
 
 (module ehk.lambda.norm (binding normalize)
 
-  (import scheme matchable)
+  (import scheme srfi-1 matchable)
 
   (define (binding term)
     (and (symbol? term)
@@ -15,13 +15,15 @@
 
   (define (normalize E)
     (cond
-      ((= 1 (length E))
-       (car E))
-
-      ((binding (car E))
-       `(\\ ,(binding (car E)) ,(normalize (cdr E))))
-
-      (else
-       E)))
+      [(not (list? E)) E]
+      [(= 1 (length E)) (car E)]
+      [(binding (car E)) `(\\ ,(binding (car E)) ,(normalize (cdr E)))]
+      [else
+	(let loop ((terms (cdr E))
+		   (applications (normalize (car E))))
+	  (cond
+	    [(null? terms) applications]
+	    [(binding (car terms)) `(/ ,applications ,(normalize terms))]
+	    [else (loop (cdr terms) `(/ ,applications ,(normalize (car terms))))]))]))
   
   )
