@@ -1,4 +1,4 @@
-(module ehk.lambda.norm (binding normalize denormalize)
+(module ehk.lambda.norm (binding parenthesize deparenthesize)
 
   (import chicken scheme)
   (use matchable srfi-1)
@@ -15,17 +15,17 @@
   (define (make-binding term)
     (string->symbol (string-append "\\" (symbol->string term) ".")))
 
-  (define (normalize-applications first rest)
+  (define (parenthesize-applications first rest)
     (match rest
       [() first]
-      [((? binding) _ ...) `(/ ,first ,(normalize rest))]
-      [(A rest ...) (normalize-applications `(/ ,first ,(normalize A)) rest)]))
+      [((? binding) _ ...) `(/ ,first ,(parenthesize rest))]
+      [(A rest ...) (parenthesize-applications `(/ ,first ,(parenthesize A)) rest)]))
 
-  (define normalize
+  (define parenthesize
     (match-lambda
       [(x) x]
-      [((? binding b) body ...) `(\\ ,(binding b) ,(normalize body))]
-      [(A rest ...) (normalize-applications (normalize A) rest)]
+      [((? binding b) body ...) `(\\ ,(binding b) ,(parenthesize body))]
+      [(A rest ...) (parenthesize-applications (parenthesize A) rest)]
       [x x]))
 
   ;; #t if appending a term to E (without further parenthesization) would make
@@ -36,12 +36,12 @@
       [(find binding E) #f]
       [else #t]))
 
-  (define denormalize
+  (define deparenthesize
     (match-lambda
-      [('\\ x (F ...)) (cons (make-binding x) (denormalize F))]
-      [('\\ x F) (list (make-binding x) (denormalize F))]
-      [('/ a b) (let* ((a* (denormalize a))
-		       (b* (denormalize b))
+      [('\\ x (F ...)) (cons (make-binding x) (deparenthesize F))]
+      [('\\ x F) (list (make-binding x) (deparenthesize F))]
+      [('/ a b) (let* ((a* (deparenthesize a))
+		       (b* (deparenthesize b))
 		       (b-list (if (list? b*) b* (list b*))))
 		  (if (applicable? a*)
 		    (append a* b-list)
