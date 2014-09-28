@@ -1,6 +1,6 @@
 (require-extension matchable)
 
-(module ehk.lambda.norm (binding normalize)
+(module ehk.lambda.norm (binding normalize denormalize)
 
   (import scheme matchable)
 
@@ -13,6 +13,9 @@
 		(char=? #\. (string-ref spelling (- len 1)))
 		(string->symbol (substring spelling 1 (- len 1)))))))
 
+  (define (make-binding term)
+    (string->symbol (string-append "\\" (symbol->string term) ".")))
+
   (define (normalize-applications first rest)
     (match rest
       [() first]
@@ -24,6 +27,11 @@
       [(x) x]
       [((? binding b) body ...) `(\\ ,(binding b) ,(normalize body))]
       [(A rest ...) (normalize-applications (normalize A) rest)]
+      [x x]))
+
+  (define denormalize
+    (match-lambda
+      [('\\ a E) `(,(make-binding a) ,(denormalize E))]
       [x x]))
   
   )
