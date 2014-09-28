@@ -1,5 +1,5 @@
 
-(test-group "normalizing lambda abstractions"
+(test-group "fully parenthesizing lambda abstractions"
   (test '(\\ x x) (parenthesize '(\\x. x)))
   (test '(\\ x 1) (parenthesize '(\\x. 1)))
   (test '(\\ y 4) (parenthesize '(\\y. 4)))
@@ -10,7 +10,7 @@
   (test '(/ (\\ x x) 4) (parenthesize '((\\x. x) 4)))
   (test '(/ f (\\ x (\\ y (/ (/ - y) x)))) (parenthesize '(f \\x. \\y. - y x))))
 
-(test-group "denormalizing"
+(test-group "removing unnecessary parentheses from lambda abstractions"
   (test '(\\x. x) (deparenthesize '(\\ x x)))
   (test '(\\x. 1) (deparenthesize '(\\ x 1)))
   (test '(\\y. \\x. 4) (deparenthesize '(\\ y (\\ x 4))))
