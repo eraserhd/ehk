@@ -1,8 +1,8 @@
-(compile -s -O2 -d1 ehk.lambda.norm.scm -unit ehk.lambda.norm)
-(compile -s -O2 -d1 ehk.lambda.norm.scm -j ehk.lambda.norm)
-(compile -s -O2 -d0 ehk.lambda.norm.import.scm)
+(compile -s -O2 -d1 ehk.lambda.parens.scm -unit ehk.lambda.parens)
+(compile -s -O2 -d1 ehk.lambda.parens.scm -j ehk.lambda.parens)
+(compile -s -O2 -d0 ehk.lambda.parens.import.scm)
 
 (install-extension
   'ehk
-  '("ehk.lambda.norm.import.so" "ehk.lambda.norm.so")
+  '("ehk.lambda.parens.import.so" "ehk.lambda.parens.so")
   '())

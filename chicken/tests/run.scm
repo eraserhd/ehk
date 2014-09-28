@@ -1,9 +1,9 @@
 (require-extension test)
 
-(load-relative "../ehk.lambda.norm.scm")
+(load-relative "../ehk.lambda.parens.scm")
 
-(import ehk.lambda.norm)
+(import ehk.lambda.parens)
 
 (test-begin)
-(load-relative "ehk.lambda.norm.scm")
+(load-relative "ehk.lambda.parens.scm")
 (test-end)

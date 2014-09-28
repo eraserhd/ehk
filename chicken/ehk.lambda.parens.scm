@@ -1,4 +1,4 @@
-(module ehk.lambda.norm (binding parenthesize deparenthesize)
+(module ehk.lambda.parens (binding parenthesize deparenthesize)
 
   (import chicken scheme)
   (use matchable srfi-1)
