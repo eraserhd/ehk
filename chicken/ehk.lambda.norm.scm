@@ -19,8 +19,8 @@
       [(binding (car rest)) `(/ ,first ,(normalize rest))]
       [else (normalize-applications `(/ ,first ,(normalize (car rest))) (cdr rest))]))
 
-  (define (normalize E)
-    (match E
+  (define normalize
+    (match-lambda
       [(x) x]
       [((? binding b) body ...) `(\\ ,(binding b) ,(normalize body))]
       [(A rest ...) (normalize-applications (normalize A) rest)]
