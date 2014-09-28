@@ -14,6 +14,14 @@
 		(string->symbol (substring spelling 1 (- len 1)))))))
 
   (define (normalize E)
-    `(\\ ,(binding (car E)) ,@(cdr E)))
+    (cond
+      ((= 1 (length E))
+       (car E))
+
+      ((binding (car E))
+       `(\\ ,(binding (car E)) ,(normalize (cdr E))))
+
+      (else
+       E)))
   
   )
