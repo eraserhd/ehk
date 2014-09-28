@@ -1,0 +1,8 @@
+(compile -s -O2 -d1 ehk.lambda.norm.scm -unit ehk.lambda.norm)
+(compile -s -O2 -d1 ehk.lambda.norm.scm -j ehk.lambda.norm)
+(compile -s -O2 -d0 ehk.lambda.norm.import.scm)
+
+(install-extension
+  'ehk
+  '("ehk.lambda.norm.import.so" "ehk.lambda.norm.so")
+  '())
