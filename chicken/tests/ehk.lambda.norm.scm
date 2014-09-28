@@ -24,4 +24,7 @@
   (test '(x y) (denormalize '(/ x y)))
   (test '(x y z) (denormalize '(/ (/ x y) z)))
   (test '(x y z w) (denormalize '(/ (/ (/ x y) z) w)))
-  (test '(f \\x. \\y. - y x) (denormalize '(/ f (\\ x (\\ y (/ (/ - y) x)))))))
+  (test '(f \\x. \\y. - y x) (denormalize '(/ f (\\ x (\\ y (/ (/ - y) x))))))
+  (test '((\\x. x) 4) (denormalize '(/ (\\ x x) 4)))
+  (test '((\\x. x) \\y. y) (denormalize '(/ (\\ x x) (\\ y y))))
+  )

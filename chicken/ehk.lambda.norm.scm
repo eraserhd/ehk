@@ -39,13 +39,13 @@
     (match-lambda
       [('\\ x (F ...)) (cons (make-binding x) (denormalize F))]
       [('\\ x F) (list (make-binding x) (denormalize F))]
-      [('/ a b) (let ((a (denormalize a))
-		      (b (denormalize b)))
+      [('/ a b) (let* ((a* (denormalize a))
+		       (b* (denormalize b))
+		       (b-list (if (list? b*) b* (list b*))))
 		  (cond
-		    [(contains-binding? a) (list a b)]
-		    [(list? a) (append a (list b))]
-		    [(list? b) (cons a b)]
-		    [else (cons a (list b))]))]
+		    [(contains-binding? a*) (cons a* b-list)]
+		    [(list? a*) (append a* b-list)]
+		    [else (cons a* b-list)]))]
       [x x]))
 
   
