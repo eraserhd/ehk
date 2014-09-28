@@ -1,8 +1,7 @@
-(require-extension matchable)
-
 (module ehk.lambda.norm (binding normalize denormalize)
 
-  (import scheme matchable)
+  (import chicken scheme)
+  (use matchable srfi-1)
 
   (define (binding term)
     (and (symbol? term)
@@ -29,11 +28,13 @@
       [(A rest ...) (normalize-applications (normalize A) rest)]
       [x x]))
 
-  (define (contains-binding? l)
-    (match l
-      [((? binding) _ ...) #t]
-      [(_ rest ...) (contains-binding? rest)]
-      [_ #f]))
+  ;; #t if appending a term to E (without further parenthesization) would make
+  ;; that term a parameter application to E
+  (define (applicable? E)
+    (cond
+      [(not (list? E)) #f]
+      [(find binding E) #f]
+      [else #t]))
 
   (define denormalize
     (match-lambda
@@ -42,11 +43,9 @@
       [('/ a b) (let* ((a* (denormalize a))
 		       (b* (denormalize b))
 		       (b-list (if (list? b*) b* (list b*))))
-		  (cond
-		    [(contains-binding? a*) (cons a* b-list)]
-		    [(list? a*) (append a* b-list)]
-		    [else (cons a* b-list)]))]
+		  (if (applicable? a*)
+		    (append a* b-list)
+		    (cons a* b-list)))]
       [x x]))
 
-  
   )
