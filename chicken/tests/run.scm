@@ -1,4 +1,4 @@
-(require-extension test)
+(use test)
 
 (load-relative "../ehk.lambda.parens.scm")
 (load-relative "../ehk.lambda.reduce.scm")
