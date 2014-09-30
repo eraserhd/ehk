@@ -17,4 +17,6 @@
   (test '(\\ x (/ (/ + x) x)) (η-reduce '(\\ x (/ (/ + x) x)))))
 
 (test-group "β-reduction"
-  (test 42 (β-reduce 42)))
+  (test 42 (β-reduce 42))
+  (test 42 (β-reduce '(/ (\\ x x) 42)))
+  (test '(/ (\\ y (/ y 1)) (\\ y (/ y 1))) (β-reduce '(/ (\\ x (/ x x)) (\\ y (/ y 1))))))

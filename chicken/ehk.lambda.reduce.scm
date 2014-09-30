@@ -29,6 +29,8 @@
       [F F]))
 
   (define (β-reduce E)
-    E)
+    (match E
+      [`(/ (\\ ,(? symbol? x) ,F) ,G) (E<M/x> F G x)]
+      [F F]))
 
   )
