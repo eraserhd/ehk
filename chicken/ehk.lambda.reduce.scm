@@ -25,7 +25,7 @@
       [`(\\ ,(? symbol? x) (/ ,F ,x)) 
 	(if (free? F x)
 	  E
-	  (η-reduce F))]
+	  F)]
       [F F]))
 
   )
