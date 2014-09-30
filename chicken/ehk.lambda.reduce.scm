@@ -22,7 +22,7 @@
 
   (define (η-reduce E)
     (match E
-      [`(\\ ,(? symbol? x) (/ ,F ,x)) 
+      [`(\\ ,x (/ ,F ,x)) 
 	(if (free? F x)
 	  E
 	  F)]
@@ -30,7 +30,7 @@
 
   (define (β-reduce E)
     (match E
-      [`(/ (\\ ,(? symbol? x) ,F) ,G) (E<M/x> F G x)]
+      [`(/ (\\ ,x ,F) ,G) (E<M/x> F G x)]
       [F F]))
 
   )
