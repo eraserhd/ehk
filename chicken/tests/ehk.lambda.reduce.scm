@@ -11,12 +11,13 @@
   (test-assert (match (E<M/x> '(\\ y (/ x y)) '(/ 1 (/ y y)) 'x)
 		 [`(\\ ,(? symbol? q) (/ (/ 1 (/ y y)) ,q)) #t])))
 
+(test-group "β-reduction"
+  (test 42 (β-reduce 42))
+  (test 42 (β-reduce '(/ (\\ x x) 42)))
+  (test '(/ (\\ y (/ y 1)) (\\ y (/ y 1))) (β-reduce '(/ (\\ x (/ x x)) (\\ y (/ y 1))))))
+
 (test-group "η-reduction"
   (test 42 (η-reduce 42))
   (test '(/ + 1) (η-reduce '(\\ x (/ (/ + 1) x))))
   (test '(\\ x (/ (/ + x) x)) (η-reduce '(\\ x (/ (/ + x) x)))))
 
-(test-group "β-reduction"
-  (test 42 (β-reduce 42))
-  (test 42 (β-reduce '(/ (\\ x x) 42)))
-  (test '(/ (\\ y (/ y 1)) (\\ y (/ y 1))) (β-reduce '(/ (\\ x (/ x x)) (\\ y (/ y 1))))))

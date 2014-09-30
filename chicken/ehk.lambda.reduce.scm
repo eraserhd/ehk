@@ -1,4 +1,4 @@
-(module ehk.lambda.reduce (E<M/x> free? η-reduce β-reduce)
+(module ehk.lambda.reduce (E<M/x> free? β-reduce η-reduce)
 
   (import chicken scheme)
   (use matchable)
@@ -20,17 +20,17 @@
 		   [else `(\\ ,y ,(E<M/x> F M x))])]
       [y (if (eq? x y) M y)]))
 
+  (define (β-reduce E)
+    (match E
+      [`(/ (\\ ,x ,F) ,G) (E<M/x> F G x)]
+      [F F]))
+
   (define (η-reduce E)
     (match E
       [`(\\ ,x (/ ,F ,x)) 
 	(if (free? F x)
 	  E
 	  F)]
-      [F F]))
-
-  (define (β-reduce E)
-    (match E
-      [`(/ (\\ ,x ,F) ,G) (E<M/x> F G x)]
       [F F]))
 
   )
