@@ -6,12 +6,12 @@
   (define (free? E x)
     (match E
       [('λ y F) (if (eq? x y) #f (free? F x))]
-      [('/ A B) (or (free? A x) (free? B x))]
+      [('$ A B) (or (free? A x) (free? B x))]
       [y (eq? x y)]))
 
   (define (E<M/x> E M x)
     (match E
-      [('/ A B) `(/ ,(E<M/x> A M x) ,(E<M/x> B M x))]
+      [('$ A B) `($ ,(E<M/x> A M x) ,(E<M/x> B M x))]
       [('λ y F) (cond
 		   [(eq? x y) E]
 		   [(and (free? M y) (free? F x))
@@ -22,12 +22,12 @@
 
   (define (β-reduce E)
     (match E
-      [`(/ (λ ,x ,F) ,G) (E<M/x> F G x)]
+      [`($ (λ ,x ,F) ,G) (E<M/x> F G x)]
       [F F]))
 
   (define (η-reduce E)
     (match E
-      [`(λ ,x (/ ,F ,x)) 
+      [`(λ ,x ($ ,F ,x)) 
 	(if (free? F x)
 	  E
 	  F)]
