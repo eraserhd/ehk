@@ -11,6 +11,9 @@
   (test-assert (match (E<M/x> '(λ y ($ x y)) '($ 1 ($ y y)) 'x)
 		 [`(λ ,(? symbol? q) ($ ($ 1 ($ y y)) ,q)) #t])))
 
+(test-group "α-convert"
+  (test '(λ z ($ z z)) (α-convert '(λ x ($ x x)) 'z)))
+
 (test-group "β-reduction"
   (test 42 (β-reduce 42))
   (test 42 (β-reduce '($ (λ x x) 42)))
