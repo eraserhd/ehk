@@ -3,7 +3,7 @@
 
 (category misc)
 
-(needs matchable)
+(needs matchable utf8)
 (test-depends test)
 
 (author "Jason Felice")
