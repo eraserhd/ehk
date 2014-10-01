@@ -5,19 +5,19 @@
   (test '42 (E<M/x> 'x 42 'x))
   (test '(/ 42 y) (E<M/x> '(/ x y) 42 'x))
   (test '(/ (/ y 42) 42) (E<M/x> '(/ (/ y x) x) 42 'x))
-  (test '(\\ z (/ f f)) (E<M/x> '(\\ z (/ x x)) 'f 'x))
-  (test '(\\ x (/ x x)) (E<M/x> '(\\ x (/ x x)) 'f 'x))
-  (test '(\\ z (/ (/ + 1) (/ + 1))) (E<M/x> '(\\ z (/ x x)) '(/ + 1) 'x))
-  (test-assert (match (E<M/x> '(\\ y (/ x y)) '(/ 1 (/ y y)) 'x)
-		 [`(\\ ,(? symbol? q) (/ (/ 1 (/ y y)) ,q)) #t])))
+  (test '(λ z (/ f f)) (E<M/x> '(λ z (/ x x)) 'f 'x))
+  (test '(λ x (/ x x)) (E<M/x> '(λ x (/ x x)) 'f 'x))
+  (test '(λ z (/ (/ + 1) (/ + 1))) (E<M/x> '(λ z (/ x x)) '(/ + 1) 'x))
+  (test-assert (match (E<M/x> '(λ y (/ x y)) '(/ 1 (/ y y)) 'x)
+		 [`(λ ,(? symbol? q) (/ (/ 1 (/ y y)) ,q)) #t])))
 
 (test-group "β-reduction"
   (test 42 (β-reduce 42))
-  (test 42 (β-reduce '(/ (\\ x x) 42)))
-  (test '(/ (\\ y (/ y 1)) (\\ y (/ y 1))) (β-reduce '(/ (\\ x (/ x x)) (\\ y (/ y 1))))))
+  (test 42 (β-reduce '(/ (λ x x) 42)))
+  (test '(/ (λ y (/ y 1)) (λ y (/ y 1))) (β-reduce '(/ (λ x (/ x x)) (λ y (/ y 1))))))
 
 (test-group "η-reduction"
   (test 42 (η-reduce 42))
-  (test '(/ + 1) (η-reduce '(\\ x (/ (/ + 1) x))))
-  (test '(\\ x (/ (/ + x) x)) (η-reduce '(\\ x (/ (/ + x) x)))))
+  (test '(/ + 1) (η-reduce '(λ x (/ (/ + 1) x))))
+  (test '(λ x (/ (/ + x) x)) (η-reduce '(λ x (/ (/ + x) x)))))
 

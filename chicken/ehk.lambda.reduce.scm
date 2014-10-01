@@ -5,29 +5,29 @@
 
   (define (free? E x)
     (match E
-      [('\\ y F) (if (eq? x y) #f (free? F x))]
+      [('λ y F) (if (eq? x y) #f (free? F x))]
       [('/ A B) (or (free? A x) (free? B x))]
       [y (eq? x y)]))
 
   (define (E<M/x> E M x)
     (match E
       [('/ A B) `(/ ,(E<M/x> A M x) ,(E<M/x> B M x))]
-      [('\\ y F) (cond
+      [('λ y F) (cond
 		   [(eq? x y) E]
 		   [(and (free? M y) (free? F x))
 		    (let ((z (gensym)))
-		      `(\\ ,z ,(E<M/x> (E<M/x> F z y) M x)))]
-		   [else `(\\ ,y ,(E<M/x> F M x))])]
+		      `(λ ,z ,(E<M/x> (E<M/x> F z y) M x)))]
+		   [else `(λ ,y ,(E<M/x> F M x))])]
       [y (if (eq? x y) M y)]))
 
   (define (β-reduce E)
     (match E
-      [`(/ (\\ ,x ,F) ,G) (E<M/x> F G x)]
+      [`(/ (λ ,x ,F) ,G) (E<M/x> F G x)]
       [F F]))
 
   (define (η-reduce E)
     (match E
-      [`(\\ ,x (/ ,F ,x)) 
+      [`(λ ,x (/ ,F ,x)) 
 	(if (free? F x)
 	  E
 	  F)]
