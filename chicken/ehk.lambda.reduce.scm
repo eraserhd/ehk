@@ -50,9 +50,7 @@
 
   (define (normal-order E)
     (cond
-      ((redex E) =>
-       (lambda (reducer)
-	 (cons reducer '())))
+      ((redex E) => list)
       (else
        (match E
 	[(_ a b) (cond
