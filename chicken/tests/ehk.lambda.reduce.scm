@@ -19,7 +19,6 @@
   (test '($ (λ y ($ y 1)) (λ y ($ y 1))) (β-reduce '($ (λ x ($ x x)) (λ y ($ y 1))))))
 
 (test-group "η-reduction"
-  (test 42 (η-reduce 42))
   (test '($ + 1) (η-reduce '(λ x ($ ($ + 1) x))))
   (test '(λ x ($ ($ + x) x)) (η-reduce '(λ x ($ ($ + x) x)))))
 

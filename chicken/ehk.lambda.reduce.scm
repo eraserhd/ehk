@@ -40,8 +40,7 @@
       [`(λ ,x ($ ,F ,x)) 
 	(if (free? F x)
 	  E
-	  F)]
-      [F F]))
+	  F)]))
 
   (define (redex E)
     (match E
