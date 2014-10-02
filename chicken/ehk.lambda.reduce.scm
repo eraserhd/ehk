@@ -5,8 +5,7 @@
 			   β-reduce
 			   η-reduce
 			   reduce
-			   normal-order
-			   old/normal-order)
+			   normal-order)
 
   (import chicken scheme)
   (use matchable)
@@ -49,12 +48,6 @@
       [`(λ ,x ($ ,F ,x)) η-reduce]
       [_ #f]))
 
-  (define (old/normal-order E)
-    (match E
-      [`($ (λ ,_ ,_) ,_) (β-reduce E)]
-      [`($ ,F ,G) `($ ,(old/normal-order F) ,G)]
-      [x x]))
-
   (define (normal-order E)
     (cond
       ((redex E) =>
@@ -73,10 +66,22 @@
 		    #f))]
 	[_ #f]))))
 
+  (define (update lst n fn)
+    (if (= 0 n)
+      (cons (fn (car lst)) (cdr lst))
+      (cons (car lst) (update (cdr lst) (- n 1) fn))))
+
+  (define (update-in E path reducer)
+    (if (null? path)
+      (reducer E)
+      (update E (car path) (cut update-in <> (cdr path) reducer))))
+
   (define (reduce step E)
-    (let loop ((E E))
-      (match E
-        [('$ . _) (loop (step E))]
-	[x x])))
+    (let loop ((E E)
+	       (next (step E)))
+      (if (not next)
+	E
+	(let ((E (update-in E (cdr next) (car next))))
+	  (loop E (step E))))))
 
   )
