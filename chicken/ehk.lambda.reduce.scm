@@ -1,5 +1,6 @@
 (module ehk.lambda.reduce (E<M/x>
 			   free?
+			   redex
 			   α-convert
 			   β-reduce
 			   η-reduce
@@ -42,6 +43,12 @@
 	  E
 	  F)]
       [F F]))
+
+  (define (redex E)
+    (match E
+      [`($ (λ ,_ ,_) ,_) β-reduce]
+      [`(λ ,x ($ ,F ,x)) η-reduce]
+      [_ #f]))
 
   (define (normal-order E)
     (match E

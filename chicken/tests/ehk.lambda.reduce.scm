@@ -24,6 +24,11 @@
   (test '($ + 1) (η-reduce '(λ x ($ ($ + 1) x))))
   (test '(λ x ($ ($ + x) x)) (η-reduce '(λ x ($ ($ + x) x)))))
 
+(test-group "redex"
+  (test-assert (not (redex 42)))
+  (test β-reduce (redex '($ (λ x 1) 2)))
+  (test η-reduce (redex '(λ x ($ z x)))))
+
 (test-group "normal-order reduction"
   (test 42 (reduce normal-order 42))
   (test '(λ x x) (reduce normal-order '(λ x x)))
