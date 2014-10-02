@@ -33,7 +33,6 @@
   (define (β-reduce E)
     (match E
       [`($ (λ ,x ,F) ,G) (E<M/x> F G x)]
-      [`($ ,(? procedure? f) ,G)]
       [F F]))
 
   (define (η-reduce E)
