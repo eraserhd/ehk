@@ -49,19 +49,17 @@
       [_ #f]))
 
   (define (normal-order E)
+    (define (path-prefix n)
+      (lambda (result)
+	(cons (car result) (cons n (cdr result)))))
     (cond
       ((redex E) => list)
       (else
        (match E
 	[(_ a b) (cond
-		   ((normal-order a) =>
-		    (lambda (result)
-		      (cons (car result) (cons 1 (cdr result)))))
-		   ((normal-order b) =>
-		    (lambda (result)
-		      (cons (car result) (cons 2 (cdr result)))))
-		   (else
-		    #f))]
+		   ((normal-order a) => (path-prefix 1))
+		   ((normal-order b) => (path-prefix 2))
+		   (else #f))]
 	[_ #f]))))
 
   (define (update lst n fn)
