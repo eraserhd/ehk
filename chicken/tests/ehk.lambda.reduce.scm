@@ -27,8 +27,8 @@
   (test β-reduce (redex '($ (λ x 1) 2)))
   (test η-reduce (redex '(λ x ($ z x)))))
 
-(test-group "normal-order reduction"
-  (test 42 (reduce normal-order 42))
-  (test '(λ x x) (reduce normal-order '(λ x x)))
-  (test 42 (reduce normal-order '($ (λ x x) 42)))
-  (test 42 (reduce normal-order '($ ($ (λ x x) (λ y y)) 42))))
+(test-group "old/normal-order reduction"
+  (test 42 (reduce old/normal-order 42))
+  (test '(λ x x) (reduce old/normal-order '(λ x x)))
+  (test 42 (reduce old/normal-order '($ (λ x x) 42)))
+  (test 42 (reduce old/normal-order '($ ($ (λ x x) (λ y y)) 42))))

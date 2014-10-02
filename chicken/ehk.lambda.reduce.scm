@@ -5,7 +5,7 @@
 			   β-reduce
 			   η-reduce
 			   reduce
-			   normal-order)
+			   old/normal-order)
 
   (import chicken scheme)
   (use matchable)
@@ -48,10 +48,10 @@
       [`(λ ,x ($ ,F ,x)) η-reduce]
       [_ #f]))
 
-  (define (normal-order E)
+  (define (old/normal-order E)
     (match E
       [`($ (λ ,_ ,_) ,_) (β-reduce E)]
-      [`($ ,F ,G) `($ ,(normal-order F) ,G)]
+      [`($ ,F ,G) `($ ,(old/normal-order F) ,G)]
       [x x]))
 
   (define (reduce step E)
