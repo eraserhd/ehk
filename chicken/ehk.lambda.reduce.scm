@@ -5,6 +5,7 @@
 			   β-reduce
 			   η-reduce
 			   reduce
+			   normal-order
 			   old/normal-order)
 
   (import chicken scheme)
@@ -53,6 +54,24 @@
       [`($ (λ ,_ ,_) ,_) (β-reduce E)]
       [`($ ,F ,G) `($ ,(old/normal-order F) ,G)]
       [x x]))
+
+  (define (normal-order E)
+    (cond
+      ((redex E) =>
+       (lambda (reducer)
+	 (cons reducer '())))
+      (else
+       (match E
+	[(_ a b) (cond
+		   ((normal-order a) =>
+		    (lambda (result)
+		      (cons (car result) (cons 1 (cdr result)))))
+		   ((normal-order b) =>
+		    (lambda (result)
+		      (cons (car result) (cons 2 (cdr result)))))
+		   (else
+		    #f))]
+	[_ #f]))))
 
   (define (reduce step E)
     (let loop ((E E))
