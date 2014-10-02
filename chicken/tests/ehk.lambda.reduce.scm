@@ -15,7 +15,6 @@
   (test '(λ z ($ z z)) (α-convert '(λ x ($ x x)) 'z)))
 
 (test-group "β-reduction"
-  (test 42 (β-reduce 42))
   (test 42 (β-reduce '($ (λ x x) 42)))
   (test '($ (λ y ($ y 1)) (λ y ($ y 1))) (β-reduce '($ (λ x ($ x x)) (λ y ($ y 1))))))
 
