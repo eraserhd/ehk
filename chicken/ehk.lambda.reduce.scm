@@ -77,11 +77,10 @@
       (update E (car path) (cut update-in <> (cdr path) reducer))))
 
   (define (reduce order E)
-    (let loop ((E E)
-	       (next (order E)))
-      (if (not next)
-	E
-	(let ((E (update-in E (cdr next) (car next))))
-	  (loop E (order E))))))
+    (let loop ((E E))
+      (let ((found (order E)))
+	(if found
+	  (loop (update-in E (cdr found) (car found)))
+	  E))))
 
   )
