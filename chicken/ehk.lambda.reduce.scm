@@ -41,6 +41,7 @@
   (define (normal-order-reduce E)
     (match E
       [`($ (λ ,_ ,_) ,_) (β-reduce E)]
+      [`($ ,F ,G) `($ ,(normal-order-reduce F) ,G)]
       [x x]))
 
   )
