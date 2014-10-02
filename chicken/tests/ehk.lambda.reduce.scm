@@ -24,8 +24,8 @@
   (test '($ + 1) (η-reduce '(λ x ($ ($ + 1) x))))
   (test '(λ x ($ ($ + x) x)) (η-reduce '(λ x ($ ($ + x) x)))))
 
-(test-group "normal-order-reduce"
-  (test 42 (normal-order-reduce 42))
-  (test '(λ x x) (normal-order-reduce '(λ x x)))
-  (test 42 (normal-order-reduce '($ (λ x x) 42)))
-  (test '($ (λ y y) 42) (normal-order-reduce '($ ($ (λ x x) (λ y y)) 42))))
+(test-group "normal-order reduction"
+  (test 42 (reduce normal-order 42))
+  (test '(λ x x) (reduce normal-order '(λ x x)))
+  (test 42 (reduce normal-order '($ (λ x x) 42)))
+  (test 42 (reduce normal-order '($ ($ (λ x x) (λ y y)) 42))))

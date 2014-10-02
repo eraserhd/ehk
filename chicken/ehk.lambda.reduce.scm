@@ -1,4 +1,10 @@
-(module ehk.lambda.reduce (E<M/x> free? α-convert β-reduce η-reduce normal-order-reduce)
+(module ehk.lambda.reduce (E<M/x>
+			   free?
+			   α-convert
+			   β-reduce
+			   η-reduce
+			   reduce
+			   normal-order)
 
   (import chicken scheme)
   (use matchable)
@@ -38,10 +44,16 @@
 	  F)]
       [F F]))
 
-  (define (normal-order-reduce E)
+  (define (normal-order E)
     (match E
       [`($ (λ ,_ ,_) ,_) (β-reduce E)]
-      [`($ ,F ,G) `($ ,(normal-order-reduce F) ,G)]
+      [`($ ,F ,G) `($ ,(normal-order F) ,G)]
       [x x]))
+
+  (define (reduce step E)
+    (let loop ((E E))
+      (match E
+        [('$ . _) (loop (step E))]
+	[x x])))
 
   )
