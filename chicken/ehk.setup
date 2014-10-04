@@ -1,6 +1,11 @@
+(compile -s -O2 -d1 ehk.util.coll.scm -unit ehk.util.coll)
+(compile -s -O2 -d1 ehk.util.coll.scm -j ehk.util.coll)
+(compile -s -O2 -d0 ehk.util.coll.import.scm)
+
 (compile -s -O2 -d1 ehk.lambda.parens.scm -unit ehk.lambda.parens)
 (compile -s -O2 -d1 ehk.lambda.parens.scm -j ehk.lambda.parens)
 (compile -s -O2 -d0 ehk.lambda.parens.import.scm)
+
 (compile -s -O2 -d1 ehk.lambda.reduce.scm -unit ehk.lambda.reduce)
 (compile -s -O2 -d1 ehk.lambda.reduce.scm -j ehk.lambda.reduce)
 (compile -s -O2 -d0 ehk.lambda.reduce.import.scm)

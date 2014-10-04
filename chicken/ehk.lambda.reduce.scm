@@ -8,7 +8,7 @@
 			   normal-order)
 
   (import chicken scheme)
-  (use matchable)
+  (use matchable ehk.util.coll)
 
   (define (free? E x)
     (match E
@@ -61,16 +61,6 @@
 		   ((normal-order b) => (path-prefix 2))
 		   (else #f))]
 	[_ #f]))))
-
-  (define (update lst n fn)
-    (if (= 0 n)
-      (cons (fn (car lst)) (cdr lst))
-      (cons (car lst) (update (cdr lst) (- n 1) fn))))
-
-  (define (update-in E path reducer)
-    (if (null? path)
-      (reducer E)
-      (update E (car path) (cut update-in <> (cdr path) reducer))))
 
   (define (reduce order E)
     (let loop ((E E))
