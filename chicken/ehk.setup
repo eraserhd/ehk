@@ -10,9 +10,14 @@
 (compile -s -O2 -d1 ehk.lambda.reduce.scm -j ehk.lambda.reduce)
 (compile -s -O2 -d0 ehk.lambda.reduce.import.scm)
 
+(compile -s -O2 -d1 ehk.lambda.boolean.scm -unit ehk.lambda.boolean)
+(compile -s -O2 -d1 ehk.lambda.boolean.scm -j ehk.lambda.boolean)
+(compile -s -O2 -d0 ehk.lambda.boolean.import.scm)
 
 (install-extension
   'ehk
-  '("ehk.lambda.parens.import.so" "ehk.lambda.parens.so"
-    "ehk.lambda.reduce.import.so" "ehk.lambda.reduce.so")
+  '("ehk.util.coll.import.so" "ehk.util.coll.so"
+    "ehk.lambda.parens.import.so" "ehk.lambda.parens.so"
+    "ehk.lambda.reduce.import.so" "ehk.lambda.reduce.so"
+    "ehk.lambda.boolean.import.so" "ehk.lambda.boolean.so")
   '())
