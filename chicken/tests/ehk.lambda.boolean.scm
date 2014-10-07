@@ -8,4 +8,8 @@
     42 (run '(IF TRUE 42 79)))
   (test "IF with FALSE returns its third argument"
     79 (run '(IF FALSE 42 79)))
-  (test (run 'TRUE) (run '(AND TRUE TRUE))))
+  (test-group "AND"
+    (test (run 'TRUE) (run '(AND TRUE TRUE)))
+    (test (run 'FALSE) (run '(AND TRUE FALSE)))
+    (test (run 'FALSE) (run '(AND FALSE TRUE)))
+    (test (run 'FALSE) (run '(AND FALSE FALSE)))))

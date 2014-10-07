@@ -11,10 +11,10 @@
 
   (define (booleans E)
     (bind-all
-      `((TRUE . (λt. λf. t))
+      `((AND . (λa. λb. IF a b FALSE))
+	(IF . (λc. λt. λf. c t f))
 	(FALSE . (λt. λf. f))
-	(AND . (λa. λb. IF a b FALSE))
-	(IF . (λc. λt. λf. c t f)))
+	(TRUE . (λt. λf. t)))
       E))
 
   )
