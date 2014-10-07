@@ -1,13 +1,19 @@
 (module ehk.lambda.boolean (booleans)
 
   (import chicken scheme)
-  (use ehk.lambda.parens)
+  (use matchable ehk.lambda.parens)
 
-  (define TRUE (parenthesize '(λt. λf. t)))
-  (define FALSE (parenthesize '(λt. λf. f)))
-  (define IF (parenthesize '(λc. λt. λf. c t f)))
+  (define (bind-all alist E)
+    (match alist
+      [() E]
+      [((name . value) . rest)
+       (bind-all rest `($ (λ ,name ,E) ,(parenthesize value)))]))
 
   (define (booleans E)
-    `($ (λ IF ($ (λ FALSE ($ (λ TRUE ,E) ,TRUE)) ,FALSE)) ,IF))
+    (bind-all
+      `((TRUE . (λt. λf. t))
+	(FALSE . (λt. λf. f))
+	(IF . (λc. λt. λf. c t f)))
+      E))
 
   )
