@@ -14,10 +14,19 @@
 (compile -s -O2 -d1 ehk.lambda.boolean.scm -j ehk.lambda.boolean)
 (compile -s -O2 -d0 ehk.lambda.boolean.import.scm)
 
+(compile -s -O2 -d1 ehk.lambda.boolean.scm -unit ehk.lambda.boolean)
+(compile -s -O2 -d1 ehk.lambda.boolean.scm -j ehk.lambda.boolean)
+(compile -s -O2 -d0 ehk.lambda.boolean.import.scm)
+
+(compile -s -O2 -d1 ehk.lambda.run.scm -unit ehk.lambda.run)
+(compile -s -O2 -d1 ehk.lambda.run.scm -j ehk.lambda.run)
+(compile -s -O2 -d0 ehk.lambda.run.import.scm)
+
 (install-extension
   'ehk
   '("ehk.util.coll.import.so" "ehk.util.coll.so"
     "ehk.lambda.parens.import.so" "ehk.lambda.parens.so"
     "ehk.lambda.reduce.import.so" "ehk.lambda.reduce.so"
-    "ehk.lambda.boolean.import.so" "ehk.lambda.boolean.so")
+    "ehk.lambda.boolean.import.so" "ehk.lambda.boolean.so"
+    "ehk.lambda.run.import.so" "ehk.lambda.run.so")
   '())
