@@ -12,4 +12,7 @@
     (test (run 'TRUE) (run '(AND TRUE TRUE)))
     (test (run 'FALSE) (run '(AND TRUE FALSE)))
     (test (run 'FALSE) (run '(AND FALSE TRUE)))
-    (test (run 'FALSE) (run '(AND FALSE FALSE)))))
+    (test (run 'FALSE) (run '(AND FALSE FALSE))))
+  (test-group "NOT"
+    (test (run 'TRUE) (run '(NOT FALSE)))
+    (test (run 'FALSE) (run '(NOT TRUE)))))

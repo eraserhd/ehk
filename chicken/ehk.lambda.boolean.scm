@@ -4,17 +4,19 @@
   (use matchable ehk.lambda.parens)
 
   (define (bind-all alist E)
-    (match alist
-      [() E]
-      [((name . value) . rest)
-       (bind-all rest `($ (λ ,name ,E) ,(parenthesize value)))]))
+    (foldr
+      (lambda (binding E)
+	`($ (λ ,(car binding) ,E) ,(parenthesize (cdr binding))))
+      E
+      alist))
 
   (define (booleans E)
     (bind-all
-      `((AND . (λa. λb. IF a b FALSE))
-	(IF . (λc. λt. λf. c t f))
+      `((TRUE . (λt. λf. t))
 	(FALSE . (λt. λf. f))
-	(TRUE . (λt. λf. t)))
+	(IF . (λc. λt. λf. c t f))
+	(AND . (λa. λb. IF a b FALSE))
+	(NOT . (λa. IF a FALSE TRUE)))
       E))
 
   )
