@@ -48,10 +48,11 @@
       [`(λ ,x ($ ,F ,x)) η-reduce]
       [_ #f]))
 
+  (define (path-prefix n)
+    (lambda (result)
+      (cons (car result) (cons n (cdr result)))))
+
   (define (normal-order E)
-    (define (path-prefix n)
-      (lambda (result)
-	(cons (car result) (cons n (cdr result)))))
     (cond
       ((redex E) => list)
       (else
