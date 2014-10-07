@@ -13,6 +13,7 @@
     (bind-all
       `((TRUE . (λt. λf. t))
 	(FALSE . (λt. λf. f))
+	(AND . (λa. λb. IF a b FALSE))
 	(IF . (λc. λt. λf. c t f)))
       E))
 
