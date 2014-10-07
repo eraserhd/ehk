@@ -15,4 +15,9 @@
     (test (run 'FALSE) (run '(AND FALSE FALSE))))
   (test-group "NOT"
     (test (run 'TRUE) (run '(NOT FALSE)))
-    (test (run 'FALSE) (run '(NOT TRUE)))))
+    (test (run 'FALSE) (run '(NOT TRUE))))
+  (test-group "OR"
+    (test (run 'TRUE) (run '(OR TRUE FALSE)))
+    (test (run 'TRUE) (run '(OR FALSE TRUE)))
+    (test (run 'TRUE) (run '(OR TRUE TRUE)))
+    (test (run 'FALSE) (run '(OR FALSE FALSE)))))

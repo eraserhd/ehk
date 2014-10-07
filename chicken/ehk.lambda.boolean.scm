@@ -16,7 +16,8 @@
 	(FALSE . (λt. λf. f))
 	(IF . (λc. λt. λf. c t f))
 	(AND . (λa. λb. IF a b FALSE))
-	(NOT . (λa. IF a FALSE TRUE)))
+	(NOT . (λa. IF a FALSE TRUE))
+	(OR . (λa. λb. IF a TRUE b)))
       E))
 
   )
