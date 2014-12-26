@@ -13,21 +13,6 @@ Fixpoint nat_of_letter {x} (l : Fin.t x) : nat :=
 Definition ascii_of_letter {n} (l : Fin.t n) : ascii :=
   ascii_of_nat (nat_of_letter l + 65).
 
-Fixpoint letter_of_nat (n x : nat) : Fin.t x + {n >= x}. 
-Proof.
-  refine (match x with
-          | O => inright (le_0_n n)
-          | S x' => match n with
-                    | O => inleft Fin.F1
-                    | S n' => match letter_of_nat n' x' with
-                              | inleft l => inleft (Fin.FS l)
-                              | inright p => _
-                              end
-                    end
-          end).
-  crush.  
-Defined.
-
 Definition is_ascii_letter (c : ascii) : Prop :=
   let n := nat_of_ascii c in
     n >= (nat_of_ascii "A") /\ n <= (nat_of_ascii "Z").
@@ -35,7 +20,7 @@ Definition is_ascii_letter (c : ascii) : Prop :=
 Definition letter_of_ascii (c : ascii) : letter + {~ is_ascii_letter c}.
   refine (let n := nat_of_ascii c in
           match ge_dec n (nat_of_ascii "A") with
-          | left ge_A_proof => match letter_of_nat (n - 65) 26 with
+          | left ge_A_proof => match Fin.of_nat (n - 65) 26 with
                                | inleft l => inleft l
                                | inright gt_Z_proof => inright _
                                end
