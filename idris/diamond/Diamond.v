@@ -13,14 +13,10 @@ Fixpoint nat_of_letter {x} (l : Fin.t x) : nat :=
 Definition ascii_of_letter {n} (l : Fin.t n) : ascii :=
   ascii_of_nat (nat_of_letter l + 65).
 
-Lemma all_nat_ge_0 : forall n : nat, n >= 0.
-  crush.
-Qed.
-
 Fixpoint letter_of_nat (n x : nat) : Fin.t x + {n >= x}. 
 Proof.
   refine (match x with
-          | O => inright (all_nat_ge_0 n)
+          | O => inright (le_0_n n)
           | S x' => match n with
                     | O => inleft Fin.F1
                     | S n' => match letter_of_nat n' x' with
