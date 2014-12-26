@@ -1,37 +1,30 @@
 Require Import CpdtTactics Ascii String List Arith.
+Require Coq.Vectors.Fin.
 
 (* Needed for quoted character literals *)
 Local Open Scope char_scope.
 Local Open Scope string_scope.
 
-(* This is basically stolen from Fin. *)
-Inductive letterT : nat -> Set :=
-| LO : forall {x}, letterT (S x)
-| LS : forall {x}, letterT x -> letterT (S x). 
+Definition letter := Fin.t 26.
 
-Definition letter := letterT 26.
+Fixpoint nat_of_letter {x} (l : Fin.t x) : nat :=
+  proj1_sig (Fin.to_nat l).
 
-Fixpoint nat_of_letter {x} (l : letterT x) : nat :=
-  match l with
-  | LO _ => O
-  | LS _ l' => S (nat_of_letter l')
-  end.
-
-Definition ascii_of_letter {n} (l : letterT n) : ascii :=
+Definition ascii_of_letter {n} (l : Fin.t n) : ascii :=
   ascii_of_nat (nat_of_letter l + 65).
 
 Lemma all_nat_ge_0 : forall n : nat, n >= 0.
   crush.
 Qed.
 
-Fixpoint letter_of_nat (n x : nat) : letterT x + {n >= x}. 
+Fixpoint letter_of_nat (n x : nat) : Fin.t x + {n >= x}. 
 Proof.
   refine (match x with
           | O => inright (all_nat_ge_0 n)
           | S x' => match n with
-                    | O => inleft LO
+                    | O => inleft Fin.F1
                     | S n' => match letter_of_nat n' x' with
-                              | inleft l => inleft (LS l)
+                              | inleft l => inleft (Fin.FS l)
                               | inright p => _
                               end
                     end
@@ -70,19 +63,19 @@ Fixpoint spaces (n : nat) : string :=
   | S n' => (" " ++ spaces n')%string
   end.
 
-Definition diamond_row {n} (l : letterT n) (outer_padding inner_padding : nat) : string :=
+Definition diamond_row {n} (l : Fin.t n) (outer_padding inner_padding : nat) : string :=
   let l_string := String (ascii_of_letter l) "" in
   let inner := match l with
-               | LO _ => l_string
-               | LS _ _ => l_string ++ spaces inner_padding ++ l_string
+               | Fin.F1 _ => l_string
+               | Fin.FS _ _ => l_string ++ spaces inner_padding ++ l_string
                end in
   spaces outer_padding ++ inner ++ spaces outer_padding.
 
-Fixpoint half_diamond {n} (l : letterT n) (outer_padding inner_padding : nat) : list string :=
+Fixpoint half_diamond {n} (l : Fin.t n) (outer_padding inner_padding : nat) : list string :=
   diamond_row l outer_padding inner_padding ::
   match l with
-    | LO _ => nil
-    | LS _ l' => half_diamond l' (S outer_padding) (pred (pred inner_padding))
+    | Fin.F1 _ => nil
+    | Fin.FS _ l' => half_diamond l' (S outer_padding) (pred (pred inner_padding))
   end.
 
 Fixpoint diamond (l : letter) : list string :=
