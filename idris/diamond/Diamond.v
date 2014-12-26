@@ -79,15 +79,20 @@ Definition diamond_row {n} (l : letterT n) (outer_padding inner_padding : nat) :
   spaces outer_padding ++ inner ++ spaces outer_padding.
 
 Fixpoint half_diamond {n} (l : letterT n) (outer_padding inner_padding : nat) : list string :=
-  diamond_row l outer_padding ::
+  diamond_row l outer_padding inner_padding ::
   match l with
     | LO _ => nil
-    | LS _ l' => half_diamond l' (S outer_padding) (pred inner_padding)
+    | LS _ l' => half_diamond l' (S outer_padding) (pred (pred inner_padding))
   end.
 
 Fixpoint diamond (l : letter) : list string :=
-  let inner_padding := 2 * nat_of_letter l in
+  let inner_padding := 2* nat_of_letter l in
   let half := half_diamond l O inner_padding in
   (rev half ++ tail half)%list.
 
-Eval compute in diamond (LS (LS (LS (LS LO)))).
+Theorem all_lines_of_a_diamond_have_the_same_length :
+  forall (l : letter) (a b : nat),
+    a < length (diamond l) ->
+    b < length (diamond l) ->
+    String.length (nth a (diamond l) "") = String.length (nth b (diamond l) "").
+  intros.
