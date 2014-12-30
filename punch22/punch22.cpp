@@ -22,7 +22,7 @@ struct S {
     }
 
     int distance() const {
-        int d = 0;
+        int hole_count = 0;
         for (int i = 0; i < 26; ++i)
             for (int j = 0;  j < 26; ++j) {
                 int v_missing = 1;
@@ -32,10 +32,15 @@ struct S {
                     if (first_punch[i] != -1 && ((first_punch[i] & v) != first_punch[i])) continue;
                     v_missing = 0;
                 }
-                d += v_missing;
+                hole_count += v_missing;
             }
 
-        return d;
+        int used_vs = 0;
+        for (int v = 0; v < 128; ++v)
+            if (mapping[v] != -1)
+                ++used_vs;
+
+        return hole_count * 1000 + used_vs;
     }
 };
 
