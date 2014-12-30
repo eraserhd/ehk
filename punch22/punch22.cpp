@@ -1,4 +1,5 @@
 #include <cstring>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
@@ -59,14 +60,14 @@ ostream& operator << (ostream& out, S const& rhs) {
     return out;
 }
 
-struct q_less {
+struct q_greater {
     bool operator () (pair<int, S> const& l, pair<int, S> const& r) const {
-        return l.first < r.first;
+        return l.first > r.first;
     }
 };
 
 int main() {
-    std::priority_queue<std::pair<int, S>, std::vector<std::pair<int, S> >, q_less> q;
+    std::priority_queue<std::pair<int, S>, std::vector<std::pair<int, S> >, q_greater> q;
     S start;
     q.push(make_pair(start.distance(), start));
 
