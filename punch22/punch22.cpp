@@ -23,24 +23,21 @@ struct S {
 
     int distance() const {
         int hole_count = 0;
+        int used_bits = 0;
         for (int i = 0; i < 26; ++i)
             for (int j = 0;  j < 26; ++j) {
                 int v_missing = 1;
-                for (int v = 0; v < 128; ++v) { // speed me up
+                for (int v = 0; v_missing && v < 128; ++v) { // speed me up
                     if (mapping[v] == -1) continue;
                     if (mapping[v] != j) continue;
                     if (first_punch[i] != -1 && ((first_punch[i] & v) != first_punch[i])) continue;
+                    used_bits += __builtin_popcount(v);
                     v_missing = 0;
                 }
                 hole_count += v_missing;
             }
 
-        int used_vs = 0;
-        for (int v = 0; v < 128; ++v)
-            if (mapping[v] != -1)
-                ++used_vs;
-
-        return hole_count * 1000 + used_vs;
+        return hole_count * 10000 + used_bits;
     }
 };
 
