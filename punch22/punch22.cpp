@@ -68,11 +68,11 @@ struct S {
 ostream& operator << (ostream& out, S const& rhs) {
     out << "distance = " << setbase(10) << rhs.distance() << endl;
     for (int i = 0; i < 26; ++i) {
-        out << setw(2) << i << ": ";
-        out << setw(2) << setbase(16);
+        out << setw(0) << ('A'+i) << ": ";
+        out << setw(7) << setbase(2);
 
         if (rhs.first_punch[i] == -1)
-            out << "-- ";
+            out << "------- ";
         else
             out << int(rhs.first_punch[i]) << " ";
 
