@@ -22,14 +22,16 @@ struct S {
     }
 
     int distance() const {
-        int hole_count = 0;
         int used_bits = 0;
+        int hole_count = 0;
 
         int lengths[26] = {};
         int lookup[26][128];
         for (int v = 0; v < 128; ++v)
-            if (mapping[v] != -1)
+            if (mapping[v] != -1) {
                 lookup[mapping[v]][lengths[mapping[v]]++] = v;
+                used_bits += __builtin_popcount(v);
+            }
 
         for (int i = 0; i < 26; ++i)
             for (int j = 0;  j < 26; ++j) {
@@ -37,11 +39,11 @@ struct S {
                 for (int vi = 0; vi < lengths[j]; ++vi) {
                     int v = lookup[j][vi];
                     if (first_punch[i] != -1 && ((first_punch[i] & v) != first_punch[i])) continue;
-                    used_bits += __builtin_popcount(v);
                     v_missing = 0;
                 }
                 hole_count += v_missing;
             }
+
 
         return hole_count * 10000 + used_bits;
     }
