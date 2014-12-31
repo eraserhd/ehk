@@ -29,7 +29,7 @@ struct S {
     }
 
     int distance() const {
-        int used_bits = 0;
+        int used_values = 0;
         int hole_count = 0;
 
         int lengths[26] = {};
@@ -37,7 +37,7 @@ struct S {
         for (int v = 0; v < 128; ++v)
             if (mapping[v] != -1) {
                 lookup[mapping[v]][lengths[mapping[v]]++] = v;
-                used_bits += __builtin_popcount(v);
+                ++used_values;
             }
 
         for (int i = 0; i < 26; ++i)
@@ -51,8 +51,7 @@ struct S {
                 hole_count += v_missing;
             }
 
-
-        return hole_count * 10000 + used_bits;
+        return hole_count * 1000 + used_values;
     }
 };
 
