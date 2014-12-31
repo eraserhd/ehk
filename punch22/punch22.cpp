@@ -24,12 +24,18 @@ struct S {
     int distance() const {
         int hole_count = 0;
         int used_bits = 0;
+
+        int lengths[26] = {};
+        int lookup[26][128];
+        for (int v = 0; v < 128; ++v)
+            if (mapping[v] != -1)
+                lookup[mapping[v]][lengths[mapping[v]]++] = v;
+
         for (int i = 0; i < 26; ++i)
             for (int j = 0;  j < 26; ++j) {
                 int v_missing = 1;
-                for (int v = 0; v_missing && v < 128; ++v) { // speed me up
-                    if (mapping[v] == -1) continue;
-                    if (mapping[v] != j) continue;
+                for (int vi = 0; vi < lengths[j]; ++vi) {
+                    int v = lookup[j][vi];
                     if (first_punch[i] != -1 && ((first_punch[i] & v) != first_punch[i])) continue;
                     used_bits += __builtin_popcount(v);
                     v_missing = 0;
