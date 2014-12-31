@@ -79,6 +79,15 @@ ostream& operator << (ostream& out, S const& rhs) {
 int main() {
     std::priority_queue<std::pair<int, S>, std::vector<std::pair<int, S> >, std::greater<std::pair<int, S> > > q;
     S start;
+
+    int v_count = 0;
+    for (int v = 0; v < 128 && v_count < 26; ++v) {
+        if (__builtin_popcount(v) > 2) continue;
+        start.first_punch[v_count] = v;
+        start.mapping[v] = v_count;
+        ++v_count;
+    }
+     
     q.push(make_pair(start.distance(), start));
 
     long ticks = 0;
