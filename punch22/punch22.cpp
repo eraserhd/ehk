@@ -87,7 +87,7 @@ int main() {
         pair<int, S> top = q.top(); q.pop();
 
         if (!ticks--) {
-            ticks = 100;
+            ticks = 10000;
             cout << top.second << endl;
         }
 
