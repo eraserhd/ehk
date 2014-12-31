@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iterator>
 #include <queue>
+#include <string>
 #include <utility>
 #include <vector>
 using namespace std;
@@ -65,21 +66,32 @@ struct S {
     }
 };
 
+std::string binary_string(int n) {
+    std::string result;
+    for (int i = 0; i < 7; ++i) {
+        if (n & (1<<i))
+            result += "1";
+        else
+            result += "0";
+    }
+    reverse(ALL(result));
+    return result;
+}
+
 ostream& operator << (ostream& out, S const& rhs) {
     out << "distance = " << setbase(10) << rhs.distance() << endl;
     for (int i = 0; i < 26; ++i) {
-        out << setw(0) << ('A'+i) << ": ";
-        out << setw(7) << setbase(2);
+        out << setw(0) << char('A'+i) << ": ";
 
         if (rhs.first_punch[i] == -1)
             out << "------- ";
         else
-            out << int(rhs.first_punch[i]) << " ";
+            out << setw(7) << setbase(2) << binary_string(rhs.first_punch[i]) << " ";
 
         for (int v = 0; v < 128; ++v)
             if (v != rhs.first_punch[i])
                 if (rhs.mapping[v] == i)
-                    out << int(v) << " ";
+                    out << setw(7) <<  binary_string(v) << " ";
 
         out << endl;
     }
