@@ -21,6 +21,13 @@ struct S {
         memcpy(mapping, rhs.mapping, sizeof(mapping));
     }
 
+    bool operator < (S const& rhs) const {
+        int a = memcmp(first_punch, rhs.first_punch, sizeof(first_punch));
+        if (a < 0) return true;
+        if (a > 0) return false;
+        return memcmp(mapping, rhs.mapping, sizeof(mapping)) < 0;
+    }
+
     int distance() const {
         int used_bits = 0;
         int hole_count = 0;
@@ -70,14 +77,8 @@ ostream& operator << (ostream& out, S const& rhs) {
     return out;
 }
 
-struct q_greater {
-    bool operator () (pair<int, S> const& l, pair<int, S> const& r) const {
-        return l.first > r.first;
-    }
-};
-
 int main() {
-    std::priority_queue<std::pair<int, S>, std::vector<std::pair<int, S> >, q_greater> q;
+    std::priority_queue<std::pair<int, S>, std::vector<std::pair<int, S> >, std::greater<std::pair<int, S> > > q;
     S start;
     q.push(make_pair(start.distance(), start));
 
