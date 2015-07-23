@@ -31,9 +31,9 @@ jump([A, B], Pegs, NewPegs) :-
 
 start([b, c, d, e, f, g, h, i, j, k, l, m, n, o]).
 
-solve(Pegs, Moves) :-
+solution(Pegs, Moves) :-
   (  length(Pegs, 1) -> Moves = []
   ;  jump([A, B], Pegs, NextPegs),
-     solve(NextPegs, NextMoves),
+     solution(NextPegs, NextMoves),
      append([[A, B]], NextMoves, Moves)
   ).
