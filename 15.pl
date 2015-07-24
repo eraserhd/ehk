@@ -22,11 +22,9 @@ adjacent([A, B, C]) :-
 
 jump([A, B], Pegs, NewPegs) :-
   adjacent([A, B, C]),
-  member(A, Pegs),
-  member(B, Pegs),
   not(member(C, Pegs)),
-  select(B, Pegs, NewPegs1),
-  select(A, NewPegs1, NewPegs2),
+  select(A, Pegs, NewPegs1),
+  select(B, NewPegs1, NewPegs2),
   append([C], NewPegs2, NewPegs).
 
 start([b, c, d, e, f, g, h, i, j, k, l, m, n, o]).
