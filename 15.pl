@@ -29,7 +29,6 @@ jump([A, B], Pegs, [C | NewPegs]) :-
 start([b, c, d, e, f, g, h, i, j, k, l, m, n, o]).
 
 solution([_], []).
-solution(Pegs, Moves) :-
+solution(Pegs, [[A, B] | RemainingMoves]) :-
   jump([A, B], Pegs, NextPegs),
-  solution(NextPegs, NextMoves),
-  append([[A, B]], NextMoves, Moves).
+  solution(NextPegs, RemainingMoves).
