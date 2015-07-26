@@ -20,12 +20,11 @@ adjacent([A, B, C]) :-
   ;  append([_, [C,B,A], _], Row)
   ).
 
-jump([A, B], Pegs, NewPegs) :-
+jump([A, B], Pegs, [C | NewPegs]) :-
   adjacent([A, B, C]),
   not(member(C, Pegs)),
   select(A, Pegs, NewPegs1),
-  select(B, NewPegs1, NewPegs2),
-  append([C], NewPegs2, NewPegs).
+  select(B, NewPegs1, NewPegs).
 
 start([b, c, d, e, f, g, h, i, j, k, l, m, n, o]).
 
