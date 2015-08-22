@@ -1,4 +1,4 @@
-:- dynamic seen/2.
+:- dynamic seen/1.
 
 readn(N, [N|Buffer], Buffer).
 readn(N, [], Buffer) :-
@@ -11,8 +11,9 @@ empty(q(X, Y)) :-
   X == Y.
 
 spush(state(N,A,B), InQ, OutQ) :-
-  ( seen(A,B) -> InQ = OutQ
-  ; asserta(seen(A,B)),
+  K is A * 40001 + B,
+  ( seen(K) -> InQ = OutQ
+  ; asserta(seen(K)),
     push(state(N,A,B), InQ, OutQ)
   ).
 
@@ -41,8 +42,8 @@ pour(A, B, C, Q, N) :-
   spush(state(N2, A3, B3), Q6, Q7),
   pour(A, B, C, Q7, N).
 pour(A, B, C, N) :-
-  retractall(seen(_, _)),
-  asserta(seen(0, 0)),
+  retractall(seen(_)),
+  asserta(seen(0)),
   queue(Q),
   push(state(0, 0, 0), Q, Q1),
   pour(A, B, C, Q1, N).
