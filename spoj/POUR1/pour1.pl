@@ -27,7 +27,7 @@ pour(_, _, _, Q, -1) :-
   !.
 pour(_, _, C, Q, N) :-
   pop(state(N, A, B), Q, _),
-  ( A = C ; B = C ),
+  ( A =:= C ; B =:= C ),
   !.
 pour(A, B, C, Q, N) :-
   pop(state(N1, A1, B1), Q, Q1),
