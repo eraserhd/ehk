@@ -2,14 +2,21 @@ module Main
 import Data.Fin
 import Data.Vect
 
+||| A recursive type to represent pan-digital numbers (permuations of 0-9).
+||| It expands as (Fin n, Fin n-1, ..., Fin 1, ()), so the first element is
+||| the first choice of digit, the second is the index of the digit from
+||| the remaining set, and so forth.
 PanDigitalNumber : (base : Nat) -> Type
 PanDigitalNumber Z = ()
 PanDigitalNumber (S n) = (Fin (S n), PanDigitalNumber n)
 
+||| Find the first pandigital number for some PanDigitalNumber n
 first : {n : Nat} -> PanDigitalNumber n
 first {n=Z}    = ()
 first {n=S n'} = (FZ, first)
 
+||| Increment a pan-digital-number, if possible.  Returns Nothing if we
+||| already have the highest number
 next : {n : Nat} -> PanDigitalNumber n -> Maybe (PanDigitalNumber n)
 next {n=Z}   _       = Nothing
 next {n=S _} (d, ds) = case strengthen (FS d) of
@@ -18,6 +25,11 @@ next {n=S _} (d, ds) = case strengthen (FS d) of
                                           Just nextDs => Just (FZ, nextDs)
                          Right nextD => Just (nextD, ds)
 
+||| So this part was kind of annoying.  First I generated a list of all the
+||| but that blew the stack (there are 10!).  I looked at Stream types, but
+||| streams are infinite and have no Nil.  I tried to do lazy lists, but couldn't
+||| get them to type-check because the head needs to be forced while the tail
+||| delayed (I might be missing something here).
 passing : {n : Nat} -> (PanDigitalNumber n -> Bool) -> List (PanDigitalNumber n)
 passing {n=Z}   _  = []
 passing {n=S n'} f =
@@ -47,6 +59,15 @@ toString pdn = pack $ map chr $ map (+ 48) $ toDigits pdn
 toInteger : {n : Nat} -> PanDigitalNumber n -> Integer
 toInteger pdn = foldl (\acc, x => acc * 10 + x) 0 (map cast $ toDigits pdn)
 
+||| The tests are right out of the problem statement.
+|||
+||| on the case:  I can't add a test at the end which says
+|||
+|||   _ impossible
+|||
+||| because Idris thinks it's possible, in spite of the type being Vect 10 Int.
+||| I wonder about this.  I'm not even sure what it thinks it could match so
+||| I could write `void' cases. :/
 ok : PanDigitalNumber 10 -> Bool
 ok pdn = 
   case toDigits pdn of
