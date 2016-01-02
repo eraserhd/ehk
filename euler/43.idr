@@ -54,9 +54,6 @@ toDigits {n=S x} pdn = digits pdn (map (toIntNat . finToNat) range)
     digits {n=Z}   _       left = []
     digits {n=S _} (d :: ds) left = index d left :: digits ds (deleteAt d left)
 
-toString : {n : Nat} -> Permutation n -> String
-toString pdn = pack $ map chr $ map (+ 48) $ toDigits pdn
-
 toInteger : {n : Nat} -> Permutation n -> Integer
 toInteger pdn = foldl (\acc, x => acc * 10 + x) 0 (map cast $ toDigits pdn)
 
