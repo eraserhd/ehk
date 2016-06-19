@@ -1,0 +1,67 @@
+\section{Strings}
+
+The R5RS notion of strings as a distinct type is removed; a Moreso string
+is a vector containing only characters.  Moreso has no special restrictions
+on what may be done with this kind of string, although some operations,
+such as replacing an element with a non-character, will make the object
+no longer considered a string.
+
+\subsection{New Procedures}
+\begin{entry}{\proto{string?}{ obj}{procedure}}
+
+Returns \schtrue\ if \var{obj} is a vector and every element in \var{obj} is a
+character, and \schfalse\ otherwise:
+
+\begin{scheme}
+(string? \sharpsign())                    \ev \schtrue
+(string? (vector \sharpsign\textbackslash{}c))           \ev \schtrue
+(string? (vector \sharpsign\textbackslash{}c \schfalse)) \ev \schfalse
+(string? \sharpsign{}t) \ev \schfalse
+\end{scheme}
+\end{entry}
+
+\begin{entry}{\proto{subvector}{ vector start end}{library procedure}}
+
+{\cf subvector} returns a fresh vector containing the objects in
+\var{vector} from index \var{start} (inclusive) to index \var{end}
+(exclusive).
+\end{entry}
+
+\begin{entry}{\proto{vector-append}{ vector \dotsfoo}{library procedure}}
+
+Returns a vector containing the concatenation of the supplied vectors.
+\end{entry}
+
+\begin{entry}{\proto{vector-copy}{ vector}{library procedure}}
+
+Returns a shallow copy of \var{vector}.
+\end{entry}
+
+\subsection{Removed Procedures}
+
+The following procedures are removed:
+\begin{scheme}
+make-string              string-set!
+string                   string-ref
+string-fill!             string->list
+string-length            list->string
+string-append            substring
+string-copy
+\end{scheme}
+
+\subsection{Quoted Literals}
+
+The quoted literal string syntax is kept, except that it is now read as a
+vector of characters.  That is,
+
+\begin{scheme}
+(vector? "x") \ev \schtrue
+(string? "x") \ev \schtrue
+(char? (vector-ref "x" 0)) \ev \schtrue
+\end{scheme}
+
+{\cf write} renders a string as a quoted literal.
+
+Moreso's {\cf display} writes strings in the same way as R5RS's {\cf display}.
+
+% vim:set ft=tex:

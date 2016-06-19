@@ -1,0 +1,6 @@
+*.o
+scheme
+*.a
+*.so
+test_*
+!test_*.c

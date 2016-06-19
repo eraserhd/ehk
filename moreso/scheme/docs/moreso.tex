@@ -1,0 +1,44 @@
+\documentclass[twoside,twocolumn]{algol60}
+%\documentclass[twoside]{algol60}
+
+\pagestyle{headings}
+\showboxdepth=0
+\makeindex
+\input{commands}
+
+\def\headertitle{Moreso}
+
+% Sizes and dimensions
+
+\topmargin -.375in       %    Nominal distance from top of page to top of
+                         %    box containing running head.
+\headsep 15pt            %    Space between running head and text.
+
+\textheight 663pt        % Height of text (including footnotes and figures, 
+                         % excluding running head and foot).
+
+\textwidth 523pt         % Width of text line.
+\columnsep 15pt          % Space between columns 
+\columnseprule 0pt       % Width of rule between columns.
+
+\parskip 5pt plus 2pt minus 2pt % Extra vertical space between paragraphs.
+\parindent 0pt                  % Width of paragraph indentation.
+\topsep 0pt plus 2pt            % Extra vertical space, in addition to 
+                                % \parskip, added above and below list and
+                                % paragraphing environments.
+
+\oddsidemargin  -.5in    % Left margin on odd-numbered pages.
+\evensidemargin -.5in    % Left margin on even-numbered pages.
+
+%% End of sizes and dimensions
+
+\begin{document}
+
+\parindent 0pt %!! 15pt                    % Width of paragraph indentation.
+
+\hfil {\bf 2 August 2014}
+%\hfil \today{}
+
+\input{strings}
+
+\end{document}

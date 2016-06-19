@@ -1,0 +1,6 @@
+build
+numbers.import.scm
+chicken-moreso
+chicken-moreso.c
+*.o
+*~
