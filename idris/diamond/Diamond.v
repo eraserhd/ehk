@@ -1,4 +1,4 @@
-Require Import CpdtTactics Ascii String List Arith.
+Require Import CpdtTactics Ascii String List Arith Omega.
 Require Coq.Vectors.Fin.
 
 (* Needed for quoted character literals *)
@@ -8,7 +8,10 @@ Local Open Scope string_scope.
 Definition letter := Fin.t 26.
 
 Fixpoint nat_of_letter {x} (l : Fin.t x) : nat :=
-  proj1_sig (Fin.to_nat l).
+  match l with
+  | Fin.F1 _ => 0
+  | Fin.FS _ l' => S (nat_of_letter l')
+  end.
 
 Definition ascii_of_letter {n} (l : Fin.t n) : ascii :=
   ascii_of_nat (nat_of_letter l + 65).
@@ -44,13 +47,81 @@ Fixpoint spaces (n : nat) : string :=
   | S n' => (" " ++ spaces n')%string
   end.
 
-Definition diamond_row {n} (l : Fin.t n) (outer_padding inner_padding : nat) : string :=
+Lemma lengths_sum : forall (a b : string), String.length (a ++ b) = String.length a + String.length b.
+  induction a; induction b; crush.
+Qed.
+
+Lemma spaces_n_has_length_n : forall n : nat, String.length (spaces n) = n.
+  intro.
+  induction n.
+  crush.
+  simpl.
+  crush.
+Qed.
+
+Lemma string_c_empty_length_is_1 : forall c : ascii, String.length (String c "") = 1.
+  crush.
+Qed.
+
+Definition diamond_row {n} (l : Fin.t n) (half_width : nat) (hw_ge_l : half_width >= nat_of_letter l) : string :=
   let l_string := String (ascii_of_letter l) "" in
-  let inner := match l with
-               | Fin.F1 _ => l_string
-               | Fin.FS _ _ => l_string ++ spaces inner_padding ++ l_string
-               end in
-  spaces outer_padding ++ inner ++ spaces outer_padding.
+  match l with
+  | Fin.F1 _ => spaces half_width ++ l_string ++ spaces half_width
+  | Fin.FS _ l' => let inner := nat_of_letter l' in
+                  let outer := half_width - inner - 1 in
+                  spaces outer ++ l_string ++ spaces inner ++ " "%string ++ spaces inner ++ l_string ++ spaces outer
+  end.
+
+Theorem pred_of_letter_successor :
+  forall (n : nat) (l : Fin.t n), pred (nat_of_letter (Fin.FS l)) = nat_of_letter l.
+  crush.
+Qed.
+
+Lemma funny_minus_assoc :  forall n m : nat, n >= m -> (m + (n - m)) = (m + n - m).
+  crush.
+Qed.
+
+Lemma foo :
+  forall (n : nat) (x : Fin.t n) (a : string),
+  String.length match x with | Fin.F1 _ => a | Fin.FS _ _ => b end =
+  match x with | Fin.F1 _ => String.length a | Fin.FS _ _ => String.length b end.
+  intros; induction x; crush.
+Qed.
+
+Theorem xxx : 
+  forall (l : letter) (half_width : nat) (hw_ge_l : half_width >= nat_of_letter l),
+  String.length (diamond_row l half_width hw_ge_l) = 2 * half_width + 1.
+
+  intros.
+  unfold diamond_row.
+  rewrite foo.
+
+  repeat match goal with
+                  | [ |- context[String.length (_ ++ _)] ] => rewrite lengths_sum
+                  | [ |- context[String.length (spaces _)] ] => rewrite spaces_n_has_length_n
+                  | [ |- context[String.length (String _ "")] ] => rewrite string_c_empty_length_is_1
+                  | [ |- context[pred (nat_of_letter (Fin.FS _))] ] => rewrite pred_of_letter_successor
+                  end.
+
+  crush.
+  rewrite funny_minus_assoc.
+  rewrite minus_plus with (n := 1) (m := half_width - nat_of_letter t).
+  rewrite funny_minus_assoc.
+  rewrite minus_plus.
+  repeat rewrite plus_assoc.
+
+  generalize (nat_of_letter t).
+  intro.
+  replace (1 + 1) with 2 by crush.
+
+  rewrite minus_plus.
+  
+
+  
+
+  replace (pred (nat_of_letter (Fin.FS t))) with (nat_of_letter t).
+  induction n.
+  replace (nat_of_letter Fin.F1) with 0 by crush.
 
 Fixpoint half_diamond {n} (l : Fin.t n) (outer_padding inner_padding : nat) : list string :=
   diamond_row l outer_padding inner_padding ::
