@@ -14,6 +14,11 @@
        expr
        #f))))
 
+(define (assume A)
+  (list A A))
+
+(assert (equal? (assume 'C) '(C C)))
+
 (define (and-I left-proof right-proof)
   (cons (list 'and (car left-proof) (car right-proof))
         (append (cdr left-proof)
