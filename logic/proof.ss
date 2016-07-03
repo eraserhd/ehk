@@ -1,11 +1,11 @@
 ;;   English       | formal logic | scheme syntax  
 ;;   ---------------------------------------------
 ;;   A             | A            | A              
-;;   if A then B   | A ⇒ B        | (=> A B)  
+;;   if A then B   | A ⇒ B        | (A => B)  
 ;;   A or B        | A ∨ B        | (or A B)       
 ;;   A and B       | A ∧ B        | (and A B)      
 ;;   contradiction | ⊥            | _              
-;;   not A         | ¬A           | (=> A _)
+;;   not A         | ¬A           | (A => _)
 ;; 
 ;; A proof is a list, where the car is a statement and the cdr is a list of
 ;; assumptions. The statement is true if the assumptions are true.
@@ -27,7 +27,7 @@
 
 (assert (equal? (assume 'C) '(C C)))
 
-(define (proves proof proposition)
+(define (proven! proof proposition)
   (assert (equal? proof (list proposition))))
 
 (define (introduce-and left-proof right-proof)
@@ -123,6 +123,6 @@
        (EM '(or A (A => _)))
        (both-cases (eliminate-or (assume EM) A-case not-A-case))
        (proof (introduce-implication both-cases EM)))
-  (proves proof '((or A (A => _)) => (((A => _) => _) => A))))
+  (proven! proof '((or A (A => _)) => (((A => _) => _) => A))))
 
 ;; vi:set sts=2 sw=2 ai et:
