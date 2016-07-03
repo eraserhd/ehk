@@ -92,6 +92,7 @@
 (assert (equal? (introduce-implication '(A X Y) 'B) '((B implies A) X Y)))
 
 (define (eliminate-implication left-proof implication-proof)
+  (assert (eq? 'implies (cadar implication-proof)))
   (assert (equal? (car left-proof) (caar implication-proof)))
   (cons (caddar implication-proof)
         (append
@@ -100,6 +101,7 @@
 
 (assert (equal? (eliminate-implication '(B A) '((B implies C) X)) '(C A X)))
 (assert (fails? (eliminate-implication '(G A) '((B implies C) X))))
+(assert (fails? (eliminate-implication '(B A) '((B or C) X))))
 
 (define (eliminate-contradiction bottom-proof proposition)
   (assert (eq? '_ (car bottom-proof)))
