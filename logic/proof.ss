@@ -75,4 +75,21 @@
 (assert (equal? (implies-I '(A B C) 'B) '((implies B A) C)))
 (assert (equal? (implies-I '(A X Y) 'B) '((implies B A) X Y)))
 
+(define (implies-E left-proof implication-proof)
+  (assert (equal? (car left-proof) (cadar implication-proof)))
+  (cons (caddar implication-proof)
+        (append
+          (cdr left-proof)
+          (cdr implication-proof))))
+
+(assert (equal? (implies-E '(B A) '((implies B C) X)) '(C A X)))
+(assert (fails? (implies-E '(G A) '((implies B C) X))))
+
+(define (bottom-E bottom-proof proposition)
+  (assert (eq? '_ (car bottom-proof)))
+  (cons proposition (cdr bottom-proof)))
+
+(assert (equal? (bottom-E '(_ X) 'A) '(A X)))
+(assert (fails? (bottom-E '(Y X) 'A)))
+
 ;; vi:set sts=2 sw=2 ai et:
