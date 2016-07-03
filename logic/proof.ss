@@ -22,13 +22,13 @@
        expr
        #f))))
 
-(define (assume A)
-  (list A A))
+(define (assume proposition)
+  (list proposition proposition))
 
 (assert (equal? (assume 'C) '(C C)))
 
-(define (proven! proof A)
-  (assert (equal? proof (list A))))
+(define (proven! proof proposition)
+  (assert (equal? proof (list proposition))))
 
 (define (and-I left-proof right-proof)
   (cons (list 'and (car left-proof) (car right-proof))
