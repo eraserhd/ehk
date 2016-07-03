@@ -7,6 +7,8 @@
 ;; A proof is a list where the car is a statement and the cdr is a list of
 ;; assumptions.
 
+(import (match))
+
 (define-syntax fails?
   (syntax-rules ()
     ((fails? expr)
@@ -18,6 +20,9 @@
   (list A A))
 
 (assert (equal? (assume 'C) '(C C)))
+
+(define (proven! proof A)
+  (assert (equal? proof (list A))))
 
 (define (and-I left-proof right-proof)
   (cons (list 'and (car left-proof) (car right-proof))
@@ -96,5 +101,20 @@
 
 (assert (equal? (bottom-E '(_ X) 'A) '(A X)))
 (assert (fails? (bottom-E '(Y X) 'A)))
+
+;; Proof: (A ∨ ¬A) ⇒ (¬¬A ⇒ A)
+(let* ((not-not-A '(implies (implies A _) _))
+       (A-case (implies-I (assume 'A) not-not-A))
+       (not-A-case (implies-I
+                     (bottom-E
+                       (implies-E
+                         (assume '(implies A _))
+                         (assume not-not-A))
+                       'A)
+                     not-not-A))
+       (EM '(or A (implies A _)))
+       (both-cases (or-E (assume EM) A-case not-A-case))
+       (proof (implies-I both-cases EM)))
+  (proven! proof '(implies (or A (implies A _)) (implies (implies (implies A _) _) A))))
 
 ;; vi:set sts=2 sw=2 ai et:
