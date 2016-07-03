@@ -45,12 +45,12 @@
 (assert (equal? (eliminate-and-left '((and A B))) '(A)))
 (assert (fails? (eliminate-and-left '((or A B) C))))
 
-(define (and-E2 proof)
+(define (eliminate-and-right proof)
   (assert (eq? (caar proof) 'and))
   (cons (caddar proof) (cdr proof)))
 
-(assert (equal? (and-E2 '((and A B) C)) '(B C)))
-(assert (fails? (and-E2 '((or A B) C))))
+(assert (equal? (eliminate-and-right '((and A B) C)) '(B C)))
+(assert (fails? (eliminate-and-right '((or A B) C))))
 
 (define (introduce-or-left left-proof right-proposition)
   (cons (list 'or (car left-proof) right-proposition)
