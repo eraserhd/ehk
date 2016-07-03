@@ -84,22 +84,22 @@
 (assert (fails? (or-E '((or A B) X) '(C Y) '(C B Z))))
 (assert (fails? (or-E '((or A B) X) '(C A Y) '(C Z))))
 
-(define (implies-I proof assumption)
+(define (introduce-implication proof assumption)
   (cons (list 'implies assumption (car proof))
         (remove assumption (cdr proof))))
 
-(assert (equal? (implies-I '(A B C) 'B) '((implies B A) C)))
-(assert (equal? (implies-I '(A X Y) 'B) '((implies B A) X Y)))
+(assert (equal? (introduce-implication '(A B C) 'B) '((implies B A) C)))
+(assert (equal? (introduce-implication '(A X Y) 'B) '((implies B A) X Y)))
 
-(define (implies-E left-proof implication-proof)
+(define (eliminate-implication left-proof implication-proof)
   (assert (equal? (car left-proof) (cadar implication-proof)))
   (cons (caddar implication-proof)
         (append
           (cdr left-proof)
           (cdr implication-proof))))
 
-(assert (equal? (implies-E '(B A) '((implies B C) X)) '(C A X)))
-(assert (fails? (implies-E '(G A) '((implies B C) X))))
+(assert (equal? (eliminate-implication '(B A) '((implies B C) X)) '(C A X)))
+(assert (fails? (eliminate-implication '(G A) '((implies B C) X))))
 
 (define (bottom-E bottom-proof proposition)
   (assert (eq? '_ (car bottom-proof)))
@@ -110,17 +110,17 @@
 
 ;; Proof: (A ∨ ¬A) ⇒ (¬¬A ⇒ A)
 (let* ((not-not-A '(implies (implies A _) _))
-       (A-case (implies-I (assume 'A) not-not-A))
-       (not-A-case (implies-I
+       (A-case (introduce-implication (assume 'A) not-not-A))
+       (not-A-case (introduce-implication
                      (bottom-E
-                       (implies-E
+                       (eliminate-implication
                          (assume '(implies A _))
                          (assume not-not-A))
                        'A)
                      not-not-A))
        (EM '(or A (implies A _)))
        (both-cases (or-E (assume EM) A-case not-A-case))
-       (proof (implies-I both-cases EM)))
+       (proof (introduce-implication both-cases EM)))
   (proven! proof '(implies (or A (implies A _)) (implies (implies (implies A _) _) A))))
 
 ;; vi:set sts=2 sw=2 ai et:
