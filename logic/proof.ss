@@ -37,13 +37,13 @@
 
 (assert (equal? (introduce-and '(A A) '(B B)) '((and A B) A B)))
 
-(define (and-E1 proof)
+(define (eliminate-and-left proof)
   (assert (eq? (caar proof) 'and))
   (cons (cadar proof) (cdr proof)))
 
-(assert (equal? (and-E1 '((and A B) C)) '(A C)))
-(assert (equal? (and-E1 '((and A B))) '(A)))
-(assert (fails? (and-E1 '((or A B) C))))
+(assert (equal? (eliminate-and-left '((and A B) C)) '(A C)))
+(assert (equal? (eliminate-and-left '((and A B))) '(A)))
+(assert (fails? (eliminate-and-left '((or A B) C))))
 
 (define (and-E2 proof)
   (assert (eq? (caar proof) 'and))
