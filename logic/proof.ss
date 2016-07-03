@@ -1,11 +1,11 @@
 ;;   English       | formal logic | scheme syntax  
 ;;   ---------------------------------------------
 ;;   A             | A            | A              
-;;   if A then B   | A ⇒ B        | (implies A B)  
+;;   if A then B   | A ⇒ B        | (=> A B)  
 ;;   A or B        | A ∨ B        | (or A B)       
 ;;   A and B       | A ∧ B        | (and A B)      
 ;;   contradiction | ⊥            | _              
-;;   not A         | ¬A           | (implies A _)
+;;   not A         | ¬A           | (=> A _)
 ;; 
 ;; A proof is a list, where the car is a statement and the cdr is a list of
 ;; assumptions. The statement is true if the assumptions are true.
@@ -27,7 +27,7 @@
 
 (assert (equal? (assume 'C) '(C C)))
 
-(define (proven! proof proposition)
+(define (proves proof proposition)
   (assert (equal? proof (list proposition))))
 
 (define (introduce-and left-proof right-proof)
@@ -85,22 +85,22 @@
 (assert (fails? (eliminate-or '((or A B) X) '(C A Y) '(C Z))))
 
 (define (introduce-implication proof assumption)
-  (cons (list assumption 'implies (car proof))
+  (cons (list assumption '=> (car proof))
         (remove assumption (cdr proof))))
 
-(assert (equal? (introduce-implication '(A B C) 'B) '((B implies A) C)))
-(assert (equal? (introduce-implication '(A X Y) 'B) '((B implies A) X Y)))
+(assert (equal? (introduce-implication '(A B C) 'B) '((B => A) C)))
+(assert (equal? (introduce-implication '(A X Y) 'B) '((B => A) X Y)))
 
 (define (eliminate-implication left-proof implication-proof)
-  (assert (eq? 'implies (cadar implication-proof)))
+  (assert (eq? '=> (cadar implication-proof)))
   (assert (equal? (car left-proof) (caar implication-proof)))
   (cons (caddar implication-proof)
         (append
           (cdr left-proof)
           (cdr implication-proof))))
 
-(assert (equal? (eliminate-implication '(B A) '((B implies C) X)) '(C A X)))
-(assert (fails? (eliminate-implication '(G A) '((B implies C) X))))
+(assert (equal? (eliminate-implication '(B A) '((B => C) X)) '(C A X)))
+(assert (fails? (eliminate-implication '(G A) '((B => C) X))))
 (assert (fails? (eliminate-implication '(B A) '((B or C) X))))
 
 (define (eliminate-contradiction bottom-proof proposition)
@@ -111,18 +111,18 @@
 (assert (fails? (eliminate-contradiction '(Y X) 'A)))
 
 ;; Proof: (A ∨ ¬A) ⇒ (¬¬A ⇒ A)
-(let* ((not-not-A '((A implies _) implies _))
+(let* ((not-not-A '((A => _) => _))
        (A-case (introduce-implication (assume 'A) not-not-A))
        (not-A-case (introduce-implication
                      (eliminate-contradiction
                        (eliminate-implication
-                         (assume '(A implies _))
+                         (assume '(A => _))
                          (assume not-not-A))
                        'A)
                      not-not-A))
-       (EM '(or A (A implies _)))
+       (EM '(or A (A => _)))
        (both-cases (eliminate-or (assume EM) A-case not-A-case))
        (proof (introduce-implication both-cases EM)))
-  (proven! proof '((or A (A implies _)) implies (((A implies _) implies _) implies A))))
+  (proves proof '((or A (A => _)) => (((A => _) => _) => A))))
 
 ;; vi:set sts=2 sw=2 ai et:
