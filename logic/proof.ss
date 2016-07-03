@@ -58,11 +58,11 @@
 
 (assert (equal? (introduce-or-left '(A A) 'B) '((or A B) A)))
 
-(define (or-I2 left-proposition right-proof)
+(define (introduce-or-right left-proposition right-proof)
   (cons (list 'or left-proposition (car right-proof))
         (cdr right-proof)))
 
-(assert (equal? (or-I2 'A '(B B)) '((or A B) B)))
+(assert (equal? (introduce-or-right 'A '(B B)) '((or A B) B)))
 
 (define (eliminate-or or-proof left-proof right-proof)
   (assert (eq? (caar or-proof) 'or))
