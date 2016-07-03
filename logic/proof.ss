@@ -53,12 +53,11 @@
   (assert (equal? (car left-proof) (car right-proof)))
   (assert (member (cadar or-proof) (cdr left-proof)))
   (assert (member (caddar or-proof) (cdr right-proof)))
-  (cons
-    (car left-proof)
-    (append
-      (cdr or-proof)
-      (remove (cadar or-proof) (cdr left-proof))
-      (remove (caddar or-proof) (cdr right-proof)))))
+  (cons (car left-proof)
+        (append
+          (cdr or-proof)
+          (remove (cadar or-proof) (cdr left-proof))
+          (remove (caddar or-proof) (cdr right-proof)))))
 
 (assert (equal? (or-E '((or A B) X) '(C A Y) '(C B Z))
                 '(C X Y Z)))
@@ -70,9 +69,8 @@
 (assert (fails? (or-E '((or A B) X) '(C A Y) '(C Z))))
 
 (define (implies-I proof assumption)
-  (cons
-    (list 'implies assumption (car proof))
-    (remove assumption (cdr proof))))
+  (cons (list 'implies assumption (car proof))
+        (remove assumption (cdr proof))))
 
 (assert (equal? (implies-I '(A B C) 'B) '((implies B A) C)))
 (assert (equal? (implies-I '(A X Y) 'B) '((implies B A) X Y)))
