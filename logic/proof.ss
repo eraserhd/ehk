@@ -101,18 +101,18 @@
 (assert (equal? (eliminate-implication '(B A) '((implies B C) X)) '(C A X)))
 (assert (fails? (eliminate-implication '(G A) '((implies B C) X))))
 
-(define (bottom-E bottom-proof proposition)
+(define (eliminate-contradiction bottom-proof proposition)
   (assert (eq? '_ (car bottom-proof)))
   (cons proposition (cdr bottom-proof)))
 
-(assert (equal? (bottom-E '(_ X) 'A) '(A X)))
-(assert (fails? (bottom-E '(Y X) 'A)))
+(assert (equal? (eliminate-contradiction '(_ X) 'A) '(A X)))
+(assert (fails? (eliminate-contradiction '(Y X) 'A)))
 
 ;; Proof: (A ∨ ¬A) ⇒ (¬¬A ⇒ A)
 (let* ((not-not-A '(implies (implies A _) _))
        (A-case (introduce-implication (assume 'A) not-not-A))
        (not-A-case (introduce-implication
-                     (bottom-E
+                     (eliminate-contradiction
                        (eliminate-implication
                          (assume '(implies A _))
                          (assume not-not-A))
