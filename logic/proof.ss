@@ -30,12 +30,12 @@
 (define (proven! proof proposition)
   (assert (equal? proof (list proposition))))
 
-(define (and-I left-proof right-proof)
+(define (introduce-and left-proof right-proof)
   (cons (list 'and (car left-proof) (car right-proof))
         (append (cdr left-proof)
                 (cdr right-proof))))
 
-(assert (equal? (and-I '(A A) '(B B)) '((and A B) A B)))
+(assert (equal? (introduce-and '(A A) '(B B)) '((and A B) A B)))
 
 (define (and-E1 proof)
   (assert (eq? (caar proof) 'and))
