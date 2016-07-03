@@ -52,11 +52,11 @@
 (assert (equal? (and-E2 '((and A B) C)) '(B C)))
 (assert (fails? (and-E2 '((or A B) C))))
 
-(define (or-I1 left-proof right-proposition)
+(define (introduce-or-left left-proof right-proposition)
   (cons (list 'or (car left-proof) right-proposition)
         (cdr left-proof)))
 
-(assert (equal? (or-I1 '(A A) 'B) '((or A B) A)))
+(assert (equal? (introduce-or-left '(A A) 'B) '((or A B) A)))
 
 (define (or-I2 left-proposition right-proof)
   (cons (list 'or left-proposition (car right-proof))
@@ -64,7 +64,7 @@
 
 (assert (equal? (or-I2 'A '(B B)) '((or A B) B)))
 
-(define (or-E or-proof left-proof right-proof)
+(define (eliminate-or or-proof left-proof right-proof)
   (assert (eq? (caar or-proof) 'or))
   (assert (equal? (car left-proof) (car right-proof)))
   (assert (member (cadar or-proof) (cdr left-proof)))
@@ -75,14 +75,14 @@
           (remove (cadar or-proof) (cdr left-proof))
           (remove (caddar or-proof) (cdr right-proof)))))
 
-(assert (equal? (or-E '((or A B) X) '(C A Y) '(C B Z))
+(assert (equal? (eliminate-or '((or A B) X) '(C A Y) '(C B Z))
                 '(C X Y Z)))
-(assert (equal? (or-E '((or A B) X) '(C A Y A) '(C B B Z))
+(assert (equal? (eliminate-or '((or A B) X) '(C A Y A) '(C B B Z))
                 '(C X Y Z)))
-(assert (fails? (or-E '((or A B) X) '(C A Y) '(D B Z))))
-(assert (fails? (or-E '((and A B) X) '(C A Y) '(C B Z))))
-(assert (fails? (or-E '((or A B) X) '(C Y) '(C B Z))))
-(assert (fails? (or-E '((or A B) X) '(C A Y) '(C Z))))
+(assert (fails? (eliminate-or '((or A B) X) '(C A Y) '(D B Z))))
+(assert (fails? (eliminate-or '((and A B) X) '(C A Y) '(C B Z))))
+(assert (fails? (eliminate-or '((or A B) X) '(C Y) '(C B Z))))
+(assert (fails? (eliminate-or '((or A B) X) '(C A Y) '(C Z))))
 
 (define (introduce-implication proof assumption)
   (cons (list 'implies assumption (car proof))
@@ -119,7 +119,7 @@
                        'A)
                      not-not-A))
        (EM '(or A (implies A _)))
-       (both-cases (or-E (assume EM) A-case not-A-case))
+       (both-cases (eliminate-or (assume EM) A-case not-A-case))
        (proof (introduce-implication both-cases EM)))
   (proven! proof '(implies (or A (implies A _)) (implies (implies (implies A _) _) A))))
 
