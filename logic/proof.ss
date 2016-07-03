@@ -1,11 +1,17 @@
-;;  A              ; A
-;;  (implies A B)  ; A ⇒ B
-;;  (or A B)       ; A ∨ B
-;;  (and A B)      ; A ∧ B
-;;  _              ; ⊥ 
+;;   English       | formal logic | scheme syntax  
+;;   ---------------------------------------------
+;;   A             | A            | A              
+;;   if A then B   | A ⇒ B        | (implies A B)  
+;;   A or B        | A ∨ B        | (or A B)       
+;;   A and B       | A ∧ B        | (and A B)      
+;;   contradiction | ⊥            | _              
+;;   not A         | ¬A           | (implies A _)
+;; 
+;; A proof is a list, where the car is a statement and the cdr is a list of
+;; assumptions. The statement is true if the assumptions are true.
 ;;
-;; A proof is a list where the car is a statement and the cdr is a list of
-;; assumptions.
+;; For example: A ∴ (A ∨ B), alternately, A ⇒ A ∨ B looks like this: 
+;; ((or A B) A)
 
 (import (match))
 
