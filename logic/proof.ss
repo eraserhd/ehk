@@ -85,21 +85,21 @@
 (assert (fails? (eliminate-or '((or A B) X) '(C A Y) '(C Z))))
 
 (define (introduce-implication proof assumption)
-  (cons (list 'implies assumption (car proof))
+  (cons (list assumption 'implies (car proof))
         (remove assumption (cdr proof))))
 
-(assert (equal? (introduce-implication '(A B C) 'B) '((implies B A) C)))
-(assert (equal? (introduce-implication '(A X Y) 'B) '((implies B A) X Y)))
+(assert (equal? (introduce-implication '(A B C) 'B) '((B implies A) C)))
+(assert (equal? (introduce-implication '(A X Y) 'B) '((B implies A) X Y)))
 
 (define (eliminate-implication left-proof implication-proof)
-  (assert (equal? (car left-proof) (cadar implication-proof)))
+  (assert (equal? (car left-proof) (caar implication-proof)))
   (cons (caddar implication-proof)
         (append
           (cdr left-proof)
           (cdr implication-proof))))
 
-(assert (equal? (eliminate-implication '(B A) '((implies B C) X)) '(C A X)))
-(assert (fails? (eliminate-implication '(G A) '((implies B C) X))))
+(assert (equal? (eliminate-implication '(B A) '((B implies C) X)) '(C A X)))
+(assert (fails? (eliminate-implication '(G A) '((B implies C) X))))
 
 (define (eliminate-contradiction bottom-proof proposition)
   (assert (eq? '_ (car bottom-proof)))
@@ -109,18 +109,18 @@
 (assert (fails? (eliminate-contradiction '(Y X) 'A)))
 
 ;; Proof: (A ∨ ¬A) ⇒ (¬¬A ⇒ A)
-(let* ((not-not-A '(implies (implies A _) _))
+(let* ((not-not-A '((A implies _) implies _))
        (A-case (introduce-implication (assume 'A) not-not-A))
        (not-A-case (introduce-implication
                      (eliminate-contradiction
                        (eliminate-implication
-                         (assume '(implies A _))
+                         (assume '(A implies _))
                          (assume not-not-A))
                        'A)
                      not-not-A))
-       (EM '(or A (implies A _)))
+       (EM '(or A (A implies _)))
        (both-cases (eliminate-or (assume EM) A-case not-A-case))
        (proof (introduce-implication both-cases EM)))
-  (proven! proof '(implies (or A (implies A _)) (implies (implies (implies A _) _) A))))
+  (proven! proof '((or A (A implies _)) implies (((A implies _) implies _) implies A))))
 
 ;; vi:set sts=2 sw=2 ai et:
