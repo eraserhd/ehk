@@ -120,9 +120,9 @@
                          (assume not-not-A))
                        'A)
                      not-not-A))
-       (EM '(A or (A => _)))
-       (both-cases (eliminate-or (assume EM) A-case not-A-case))
-       (proof (introduce-implication both-cases EM)))
+       (excluded-middle '(A or (A => _)))
+       (both-cases (eliminate-or (assume excluded-middle) A-case not-A-case))
+       (proof (introduce-implication both-cases excluded-middle)))
   (proves proof `((A or (A => _)) => (,not-not-A => A))))
 
 ;; vi:set sts=2 sw=2 ai et:
