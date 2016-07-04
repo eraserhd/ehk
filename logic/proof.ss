@@ -123,6 +123,6 @@
        (EM '(or A (A => _)))
        (both-cases (eliminate-or (assume EM) A-case not-A-case))
        (proof (introduce-implication both-cases EM)))
-  (proven! proof '((or A (A => _)) => (((A => _) => _) => A))))
+  (proven! proof `((or A (A => _)) => (,not-not-A => A))))
 
 ;; vi:set sts=2 sw=2 ai et:
