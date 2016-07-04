@@ -2,7 +2,7 @@
 ;;   ---------------------------------------------
 ;;   A             | A            | A              
 ;;   if A then B   | A ⇒ B        | (A => B)  
-;;   A or B        | A ∨ B        | (or A B)       
+;;   A or B        | A ∨ B        | (A or B)       
 ;;   A and B       | A ∧ B        | (and A B)      
 ;;   contradiction | ⊥            | _              
 ;;   not A         | ¬A           | (A => _)
@@ -43,46 +43,46 @@
 
 (assert (equal? (eliminate-and-left '((and A B) C)) '(A C)))
 (assert (equal? (eliminate-and-left '((and A B))) '(A)))
-(assert (fails? (eliminate-and-left '((or A B) C))))
+(assert (fails? (eliminate-and-left '((A or B) C))))
 
 (define (eliminate-and-right proof)
   (assert (eq? (caar proof) 'and))
   (cons (caddar proof) (cdr proof)))
 
 (assert (equal? (eliminate-and-right '((and A B) C)) '(B C)))
-(assert (fails? (eliminate-and-right '((or A B) C))))
+(assert (fails? (eliminate-and-right '((A or B) C))))
 
 (define (introduce-or-left left-proof right-proposition)
-  (cons (list 'or (car left-proof) right-proposition)
+  (cons (list (car left-proof) 'or right-proposition)
         (cdr left-proof)))
 
-(assert (equal? (introduce-or-left '(A A) 'B) '((or A B) A)))
+(assert (equal? (introduce-or-left '(A A) 'B) '((A or B) A)))
 
 (define (introduce-or-right left-proposition right-proof)
-  (cons (list 'or left-proposition (car right-proof))
+  (cons (list left-proposition 'or (car right-proof))
         (cdr right-proof)))
 
-(assert (equal? (introduce-or-right 'A '(B B)) '((or A B) B)))
+(assert (equal? (introduce-or-right 'A '(B B)) '((A or B) B)))
 
 (define (eliminate-or or-proof left-proof right-proof)
-  (assert (eq? (caar or-proof) 'or))
+  (assert (eq? (cadar or-proof) 'or))
   (assert (equal? (car left-proof) (car right-proof)))
-  (assert (member (cadar or-proof) (cdr left-proof)))
+  (assert (member (caar or-proof) (cdr left-proof)))
   (assert (member (caddar or-proof) (cdr right-proof)))
   (cons (car left-proof)
         (append
           (cdr or-proof)
-          (remove (cadar or-proof) (cdr left-proof))
+          (remove (caar or-proof) (cdr left-proof))
           (remove (caddar or-proof) (cdr right-proof)))))
 
-(assert (equal? (eliminate-or '((or A B) X) '(C A Y) '(C B Z))
+(assert (equal? (eliminate-or '((A or B) X) '(C A Y) '(C B Z))
                 '(C X Y Z)))
-(assert (equal? (eliminate-or '((or A B) X) '(C A Y A) '(C B B Z))
+(assert (equal? (eliminate-or '((A or B) X) '(C A Y A) '(C B B Z))
                 '(C X Y Z)))
-(assert (fails? (eliminate-or '((or A B) X) '(C A Y) '(D B Z))))
+(assert (fails? (eliminate-or '((A or B) X) '(C A Y) '(D B Z))))
 (assert (fails? (eliminate-or '((and A B) X) '(C A Y) '(C B Z))))
-(assert (fails? (eliminate-or '((or A B) X) '(C Y) '(C B Z))))
-(assert (fails? (eliminate-or '((or A B) X) '(C A Y) '(C Z))))
+(assert (fails? (eliminate-or '((A or B) X) '(C Y) '(C B Z))))
+(assert (fails? (eliminate-or '((A or B) X) '(C A Y) '(C Z))))
 
 (define (introduce-implication proof assumption)
   (cons (list assumption '=> (car proof))
@@ -120,9 +120,9 @@
                          (assume not-not-A))
                        'A)
                      not-not-A))
-       (EM '(or A (A => _)))
+       (EM '(A or (A => _)))
        (both-cases (eliminate-or (assume EM) A-case not-A-case))
        (proof (introduce-implication both-cases EM)))
-  (proves proof `((or A (A => _)) => (,not-not-A => A))))
+  (proves proof `((A or (A => _)) => (,not-not-A => A))))
 
 ;; vi:set sts=2 sw=2 ai et:
