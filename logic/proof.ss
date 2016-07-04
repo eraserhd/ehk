@@ -3,7 +3,7 @@
 ;;   A             | A            | A              
 ;;   if A then B   | A ⇒ B        | (A => B)  
 ;;   A or B        | A ∨ B        | (A or B)       
-;;   A and B       | A ∧ B        | (and A B)      
+;;   A and B       | A ∧ B        | (A and B)      
 ;;   contradiction | ⊥            | _              
 ;;   not A         | ¬A           | (A => _)
 ;; 
@@ -31,25 +31,25 @@
   (assert (equal? proof (list proposition))))
 
 (define (introduce-and left-proof right-proof)
-  (cons (list 'and (car left-proof) (car right-proof))
+  (cons (list (car left-proof) 'and (car right-proof))
         (append (cdr left-proof)
                 (cdr right-proof))))
 
-(assert (equal? (introduce-and '(A A) '(B B)) '((and A B) A B)))
+(assert (equal? (introduce-and '(A A) '(B B)) '((A and B) A B)))
 
 (define (eliminate-and-left proof)
-  (assert (eq? (caar proof) 'and))
-  (cons (cadar proof) (cdr proof)))
+  (assert (eq? (cadar proof) 'and))
+  (cons (caar proof) (cdr proof)))
 
-(assert (equal? (eliminate-and-left '((and A B) C)) '(A C)))
-(assert (equal? (eliminate-and-left '((and A B))) '(A)))
+(assert (equal? (eliminate-and-left '((A and B) C)) '(A C)))
+(assert (equal? (eliminate-and-left '((A and B))) '(A)))
 (assert (fails? (eliminate-and-left '((A or B) C))))
 
 (define (eliminate-and-right proof)
-  (assert (eq? (caar proof) 'and))
+  (assert (eq? (cadar proof) 'and))
   (cons (caddar proof) (cdr proof)))
 
-(assert (equal? (eliminate-and-right '((and A B) C)) '(B C)))
+(assert (equal? (eliminate-and-right '((A and B) C)) '(B C)))
 (assert (fails? (eliminate-and-right '((A or B) C))))
 
 (define (introduce-or-left left-proof right-proposition)
@@ -80,7 +80,7 @@
 (assert (equal? (eliminate-or '((A or B) X) '(C A Y A) '(C B B Z))
                 '(C X Y Z)))
 (assert (fails? (eliminate-or '((A or B) X) '(C A Y) '(D B Z))))
-(assert (fails? (eliminate-or '((and A B) X) '(C A Y) '(C B Z))))
+(assert (fails? (eliminate-or '((A and B) X) '(C A Y) '(C B Z))))
 (assert (fails? (eliminate-or '((A or B) X) '(C Y) '(C B Z))))
 (assert (fails? (eliminate-or '((A or B) X) '(C A Y) '(C Z))))
 
