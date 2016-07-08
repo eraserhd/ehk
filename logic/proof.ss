@@ -27,7 +27,7 @@
 
 (assert (equal? (assume 'C) '(C C)))
 
-(define (proves proof proposition)
+(define (therefore proof proposition)
   (assert (equal? proof (list proposition))))
 
 (define (introduce-and left-proof right-proof)
@@ -123,6 +123,6 @@
        (excluded-middle '(A or (A => _)))
        (both-cases (eliminate-or (assume excluded-middle) A-case not-A-case))
        (proof (introduce-implication both-cases excluded-middle)))
-  (proves proof `(,excluded-middle => (,not-not-A => A))))
+  (therefore proof `(,excluded-middle => (,not-not-A => A))))
 
 ;; vi:set sts=2 sw=2 ai et:
