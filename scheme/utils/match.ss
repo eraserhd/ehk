@@ -57,7 +57,7 @@
 
 ;; YOU'RE NOT ALLOWED TO REFER TO CATA VARS IN GUARDS. (reasonable!)
 
-(library (match)
+(library (utils match)
   (export match trace-match match+ trace-match+)
   (import (scheme))
 

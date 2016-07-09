@@ -22,7 +22,7 @@
           eliminate-contradiction
           verify-logic-proof)
   (import (rnrs)
-          (match))
+          (utils match))
 
   (define (assume proposition)
     (list proposition proposition))
