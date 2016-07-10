@@ -19,33 +19,31 @@
     (match rest
       [() first]
       [(,b ,_ ...) (guard (binding b)) `($ ,first ,(parenthesize rest))]
-      [(,A ,rest ...) (parenthesize-applications `($ ,first ,(parenthesize A)) rest)]))
+      [(,[parenthesize -> A] ,rest ...) (parenthesize-applications `($ ,first ,A) rest)]))
 
   (define (parenthesize expr)
     (match expr
       [(,x) x]
-      [(,b ,body ...) (guard (binding b)) `(λ ,(binding b) ,(parenthesize body))]
-      [(,A ,rest ...) (parenthesize-applications (parenthesize A) rest)]
+      [(,b . ,[body]) (guard (binding b)) `(λ ,(binding b) ,body)]
+      [(,[A] . ,rest) (parenthesize-applications A rest)]
       [,x x]))
 
   ;; #t if appending a term to E (without further parenthesization) would make
   ;; that term a parameter application to E
   (define (applicable? E)
-    (cond
-      [(not (list? E)) #f]
-      [(find binding E) #f]
-      [else #t]))
+    (and (list? E) (not (find binding E))))
+
+  (define (ensure-list x)
+    (if (list? x)
+      x
+      (list x)))
 
   (define (deparenthesize expr)
     (match expr
-      [(λ ,x (,F ...)) (cons (make-binding x) (deparenthesize F))]
-      [(λ ,x ,F) (list (make-binding x) (deparenthesize F))]
-      [($ ,a ,b) (let* ((a* (deparenthesize a))
-		        (b* (deparenthesize b))
-		        (b-list (if (list? b*) b* (list b*))))
-		  (if (applicable? a*)
-		    (append a* b-list)
-		    (cons a* b-list)))]
+      [(λ ,[make-binding -> x] ,[F]) `(,x . ,(ensure-list F))]
+      [($ ,[a] ,[b]) (if (applicable? a)
+		       (append a (ensure-list b))
+		       (cons a (ensure-list b)))]
       [,x x]))
 
   )
