@@ -13,8 +13,9 @@
 
   (define (free? E x)
     (match E
-      [(λ ,y ,F) (if (eq? x y) #f (free? F x))]
-      [($ ,A ,B) (or (free? A x) (free? B x))]
+      [(λ ,y ,F) (guard (eq? x y)) #f]
+      [(λ ,y ,[F]) F]
+      [($ ,[A] ,[B]) (or A B)]
       [,y (eq? x y)]))
 
   (define (E<M/x> E M x)
