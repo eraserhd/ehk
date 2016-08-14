@@ -4,6 +4,13 @@
         (utils match)
         (lambda reduce))
 
+(assert (free? 'x 'x))
+(assert (free? '(λ y x) 'x))
+(assert (free? '($ x x) 'x))
+(assert (not (free? '(λ x x) 'x)))
+(assert (not (free? 'y 'x)))
+(assert (free? '($ ($ z x) (λ q q)) 'x))
+
 (assert (equal? 42 (E<M/x> 42 79 'x)))
 (assert (equal? '42 (E<M/x> 'x 42 'x)))
 
