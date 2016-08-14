@@ -18,20 +18,18 @@
       [($ ,[A] ,[B]) (or A B)]
       [,y (eq? x y)]))
 
-  (define (E<M/x> E M x)
-    (match E
-      [($ ,[A] ,[B]) `($ ,A ,B)]
-      [(λ ,y ,F) (cond
-                   [(eq? x y) E]
-                   [(and (free? M y) (free? F x))
-                    (let ((z (gensym)))
-                      `(λ ,z ,(E<M/x> (E<M/x> F z y) M x)))]
-                   [else `(λ ,y ,(E<M/x> F M x))])]
-      [,y (if (eq? x y) M y)]))
-
   (define (α-convert E x)
     (match E
       [(λ ,y ,F) `(λ ,x ,(E<M/x> F x y))]))
+
+  (define (E<M/x> E M x)
+    (match E
+      [($ ,[A] ,[B]) `($ ,A ,B)]
+      [(λ ,y ,F) (guard (eq? x y)) `(λ ,y ,F)]
+      [(λ ,y ,F) (guard (and (free? M y) (free? F x)))
+       (E<M/x> (α-convert `(λ ,y ,F) (gensym)) M x)]
+      [(λ ,y ,[F]) `(λ ,y ,F)]
+      [,y (if (eq? x y) M y)]))
 
   (define (β-reduce E)
     (match E

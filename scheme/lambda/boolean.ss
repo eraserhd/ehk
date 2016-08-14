@@ -1,10 +1,10 @@
-(module ehk.lambda.boolean (booleans)
-
-  (import chicken scheme)
-  (use matchable ehk.lambda.parens)
+(library (lambda boolean)
+  (export booleans)
+  (import (rnrs)
+          (lambda parens))
 
   (define (bind-all alist E)
-    (foldr
+    (fold-right
       (lambda (binding E)
 	`($ (λ ,(car binding) ,E) ,(parenthesize (cdr binding))))
       E
