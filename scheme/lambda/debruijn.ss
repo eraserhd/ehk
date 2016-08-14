@@ -11,13 +11,8 @@
 
   (define (debruijnize expr bindings)
     (match expr
-      [(λ ,var ,body)
-       `(λ ,(debruijnize body (cons var bindings)))]
-
-      [($ ,a ,b)
-       `($ ,(debruijnize a bindings) ,(debruijnize b bindings))]
-
-      [,v (guard (symbol? v))
-       (level v bindings)]))
+      [(λ ,var ,body) `(λ ,(debruijnize body (cons var bindings)))]
+      [($ ,[a] ,[b]) `($ ,a ,b)]
+      [,v (guard (symbol? v)) (level v bindings)]))
 
 )
