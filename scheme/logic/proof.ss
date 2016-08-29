@@ -51,15 +51,15 @@
           (cdr right-proof)))
 
   (define (eliminate-or or-proof left-proof right-proof)
-    (assert (eq? (cadar or-proof) 'or))
-    (assert (equal? (car left-proof) (car right-proof)))
-    (assert (member (caar or-proof) (cdr left-proof)))
-    (assert (member (caddar or-proof) (cdr right-proof)))
-    (cons (car left-proof)
-          (append
-            (cdr or-proof)
-            (remove (caar or-proof) (cdr left-proof))
-            (remove (caddar or-proof) (cdr right-proof)))))
+    (match (list or-proof left-proof right-proof)
+      [(((,A or ,B) ,assuming-or ...)
+        (,C ,assuming-left ...)
+        (,C ,assuming-right ...))
+       (guard (and (member A assuming-left)
+                   (member B assuming-right)))
+       `(,C ,@(append assuming-or
+                      (remove A assuming-left)
+                      (remove B assuming-right)))]))
 
   (define (introduce-implication proof assumption)
     (cons (list assumption '=> (car proof))
