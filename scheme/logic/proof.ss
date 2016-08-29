@@ -35,12 +35,12 @@
                   (cdr right-proof))))
 
   (define (eliminate-and-left proof)
-    (assert (eq? (cadar proof) 'and))
-    (cons (caar proof) (cdr proof)))
+    (match proof
+      [((,A and ,B) ,assuming ...) `(,A ,@assuming)]))
 
   (define (eliminate-and-right proof)
-    (assert (eq? (cadar proof) 'and))
-    (cons (caddar proof) (cdr proof)))
+    (match proof
+      [((,A and ,B) ,assuming ...) `(,B ,@assuming)]))
 
   (define (introduce-or-left left-proof right-proposition)
     (cons (list (car left-proof) 'or right-proposition)
