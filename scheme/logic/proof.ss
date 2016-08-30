@@ -65,9 +65,9 @@
                     (remove A assuming-left)
                     (remove B assuming-right)))])
 
-  (define (introduce-implication proof assumption)
-    (cons (list assumption '=> (car proof))
-          (remove assumption (cdr proof))))
+  (match-define introduce-implication
+    [((,A ,assumptions ...) ,P)
+     `((,P => ,A) ,@(remove P assumptions))])
 
   (define (eliminate-implication left-proof implication-proof)
     (assert (eq? '=> (cadar implication-proof)))
