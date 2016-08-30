@@ -23,6 +23,13 @@
   (import (rnrs)
           (utils match))
 
+  (define-syntax match-define
+    (syntax-rules ()
+      ((_ name exprs ...)
+       (define (name . args)
+         (match args
+           exprs ...)))))
+
   (define (assume proposition)
     (list proposition proposition))
 
@@ -34,13 +41,11 @@
           (append (cdr left-proof)
                   (cdr right-proof))))
 
-  (define (eliminate-and-left proof)
-    (match proof
-      [((,A and ,B) ,assuming ...) `(,A ,@assuming)]))
+  (match-define eliminate-and-left
+    [(((,A and ,B) ,assuming ...)) `(,A ,@assuming)])
 
-  (define (eliminate-and-right proof)
-    (match proof
-      [((,A and ,B) ,assuming ...) `(,B ,@assuming)]))
+  (match-define eliminate-and-right
+    [(((,A and ,B) ,assuming ...)) `(,B ,@assuming)])
 
   (define (introduce-or-left left-proof right-proposition)
     (cons (list (car left-proof) 'or right-proposition)
@@ -50,16 +55,15 @@
     (cons (list left-proposition 'or (car right-proof))
           (cdr right-proof)))
 
-  (define (eliminate-or or-proof left-proof right-proof)
-    (match (list or-proof left-proof right-proof)
-      [(((,A or ,B) ,assuming-or ...)
-        (,C ,assuming-left ...)
-        (,C ,assuming-right ...))
-       (guard (and (member A assuming-left)
-                   (member B assuming-right)))
-       `(,C ,@(append assuming-or
-                      (remove A assuming-left)
-                      (remove B assuming-right)))]))
+  (match-define eliminate-or
+    [(((,A or ,B) ,assuming-or ...)
+      (,C ,assuming-left ...)
+      (,C ,assuming-right ...))
+     (guard (and (member A assuming-left)
+                 (member B assuming-right)))
+     `(,C ,@(append assuming-or
+                    (remove A assuming-left)
+                    (remove B assuming-right)))])
 
   (define (introduce-implication proof assumption)
     (cons (list assumption '=> (car proof))
