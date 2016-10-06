@@ -9,8 +9,8 @@ Definition letter := Fin.t 26.
 
 Fixpoint nat_of_letter {x} (l : Fin.t x) : nat :=
   match l with
-  | Fin.F1 _ => 0
-  | Fin.FS _ l' => S (nat_of_letter l')
+  | Fin.F1 => 0
+  | Fin.FS l' => S (nat_of_letter l')
   end.
 
 Definition ascii_of_letter {n} (l : Fin.t n) : ascii :=
@@ -66,10 +66,10 @@ Qed.
 Definition diamond_row {n} (l : Fin.t n) (half_width : nat) (hw_ge_l : half_width >= nat_of_letter l) : string :=
   let l_string := String (ascii_of_letter l) "" in
   match l with
-  | Fin.F1 _ => spaces half_width ++ l_string ++ spaces half_width
-  | Fin.FS _ l' => let inner := nat_of_letter l' in
-                  let outer := half_width - inner - 1 in
-                  spaces outer ++ l_string ++ spaces inner ++ " "%string ++ spaces inner ++ l_string ++ spaces outer
+  | Fin.F1 => spaces half_width ++ l_string ++ spaces half_width
+  | Fin.FS l' => let inner := nat_of_letter l' in
+                let outer := half_width - inner - 1 in
+                spaces outer ++ l_string ++ spaces inner ++ " "%string ++ spaces inner ++ l_string ++ spaces outer
   end.
 
 Theorem pred_of_letter_successor :
@@ -83,8 +83,8 @@ Qed.
 
 Lemma foo :
   forall (n : nat) (x : Fin.t n) (a : string),
-  String.length match x with | Fin.F1 _ => a | Fin.FS _ _ => b end =
-  match x with | Fin.F1 _ => String.length a | Fin.FS _ _ => String.length b end.
+  String.length match x with | Fin.F1 => a | Fin.FS _ => b end =
+  match x with | Fin.F1 => String.length a | Fin.FS _ => String.length b end.
   intros; induction x; crush.
 Qed.
 
