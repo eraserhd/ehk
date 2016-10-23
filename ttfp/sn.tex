@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{amsthm}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\title{Simply-Typed Calculus Strongly Normalizing Definitions and Lemmas}
+\begin{document}
+\begin{definition}
+An expression $e$ is {\em Strongly Noramlizing} if all reduction sequences
+are finite.  The notation $e\in SN$ is used.
+\end{definition}
+\begin{theorem}
+$\forall e, e\in SN$
+\end{theorem}
+\begin{definition}[Stability]
+$$
+\begin{array}{l}
+	\forall e : \tau, e\in B\to e\in SN\to e\in||\tau|| \\
+	\forall e : \sigma\Rightarrow\tau, (\forall e' : ||\sigma||, (e e')\in ||\tau||)\to e\in||\sigma\Rightarrow\tau||
+\end{array}
+$$
+\end{definition}
+\begin{lemma}
+$$
+\begin{array}{rl}
+	\mbox{\bf a.} &x\in SN\\
+	\mbox{\bf b.} &e_1,\ldots,e_k\in SN\to xe_1\ldots e_k\in SN\\
+	\mbox{\bf c.} &ex\in SN\to e\in SN\\
+	\mbox{\bf d.} &e\in SN\to (\lambda x. e)\in SN
+\end{array}
+$$
+\end{lemma}
+\begin{lemma}
+$$
+\begin{array}{rl}
+	\mbox{\bf a.} &e\in ||\tau||\to e\in SN \\
+	\mbox{\bf b.} &\forall x e_1\ldots e_n : \tau, e_1\ldots e_n\in SN\to x e_1\ldots e_n\in ||\tau|| \\
+	\mbox{\bf c.} &\forall x : \tau, x\in ||\tau||
+\end{array}
+$$
+\end{lemma}
+\begin{definition}[s-instance]
+	$ e' \equiv_{\mbox{df}} e[g_1/x_1,\ldots , g_r/x_r] $ where all $g_i$ are stable expressions.
+\end{definition}
+\begin{lemma}
+$$
+\begin{array}{rl}
+	\mbox{\bf a.} &\forall e\in ||\sigma\Rightarrow\tau||, \forall f\in ||\sigma||, (e f)\in ||\tau|| \\
+	\mbox{\bf b.} &\forall k, k\geq 0\to f[g/x]h_1\ldots h_k\in ||\tau||\to g\in SN\to (\lambda x. f)g h_1\ldots h_k\in ||\tau|| \\
+	\mbox{\bf c.} &\mbox{All s-instances of all expressions are stable.}
+\end{array}
+$$
+\end{lemma}
+
+\end{document}

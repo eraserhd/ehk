@@ -4,3 +4,7 @@ archive/*
 !archive/*.cpp
 work/*
 !work/*.cpp
+*.dvi
+*.ps
+*.log
+*.aux
