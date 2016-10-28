@@ -2,5 +2,5 @@
   (:require [midje.sweet :refer :all]
             [life-clj.core :refer :all]))
 
-(facts "about life"
-  (+ 2 2) => 4)
+(facts "about board->set"
+  (board->set [" "]) => #{})
