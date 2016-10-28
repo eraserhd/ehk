@@ -7,3 +7,7 @@
              j (range (count row))
              :when (not= \space (get row j))]
          [i j])))
+
+(defn set->board
+  [s]
+  [" "])
