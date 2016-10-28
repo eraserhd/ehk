@@ -15,6 +15,9 @@
   (set->board #{[0 0] [1 1]}) => ["X " " X"])
 
 (facts "about simulating life"
-  (-> [" "] board->set step set->board) => [" "]
-  (-> ["X"] board->set step set->board) => [" "]
+  (fact "nothing spontaneously generates"
+    (-> [" "] board->set step set->board) => [" "])
+  (fact "lonely cells die"
+    (-> ["X"] board->set step set->board) => [" "]
+    (-> ["XX"] board->set step set->board) => [" "])
   (-> ["XX" " X"] board->set step set->board) => ["XX" "XX"])

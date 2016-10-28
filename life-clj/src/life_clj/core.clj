@@ -34,7 +34,7 @@
                                neighbors)]
     (-> #{}
       (into
-        (filter #(<= 1 (or (get cell->neighbor-count %) 0) 4))
+        (filter #(<= 2 (or (get cell->neighbor-count %) 0) 4))
         alive)
       (into 
         (comp
