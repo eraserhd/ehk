@@ -33,6 +33,15 @@
       "X"  ==> " ")
     (example "cell with single neighbor dies"
       "XX" ==> " "))
+  (facts "about stable cells"
+    (example "cell with two neighbors lives"
+      "   "     "X"
+      "XXX" ==> "X"
+      "   "     "X") 
+    (example "cell with three neighbors lives"
+      " X "     "XXX"
+      "XXX" ==> "XXX"
+      "   "     " X "))
   (facts "about overcrowding cells dying"
     (example "4 neighbors"
       " X "     "XXX"
