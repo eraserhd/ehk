@@ -46,15 +46,15 @@
 
 (defn step
   [alive]
-  (let [neighbors (reduce
-                    #(update %1 %2 (fnil inc 0))
-                    {}
-                    (neighbors alive))
-        lives? (fn [p] (<= 2 (or (get neighbors p) 0) 3)) 
+  (let [neighbor-count (reduce
+                        #(update %1 %2 (fnil inc 0))
+                        {}
+                        (neighbors alive))
+        lives? (fn [p] (<= 2 (or (get neighbor-count p) 0) 3)) 
         born (into #{}
                     (comp
                       (filter #(= 3 (second %)))
                       (map first)
                       (remove alive))
-                    neighbors)]
+                    neighbor-count)]
     (set/union (filter lives? alive) born)))
