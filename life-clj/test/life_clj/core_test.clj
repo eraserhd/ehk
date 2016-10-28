@@ -2,6 +2,8 @@
   (:require [midje.sweet :refer :all]
             [life-clj.core :refer :all]))
 
+(def once (comp set->board step board->set))
+
 (facts "about board->set"
   (board->set [" "]) => #{}
   (board->set ["X"]) => #{[0 0]}
@@ -16,8 +18,17 @@
 
 (facts "about simulating life"
   (fact "nothing spontaneously generates"
-    (-> [" "] board->set step set->board) => [" "])
+    (once [" "]) => [" "])
   (fact "lonely cells die"
-    (-> ["X"] board->set step set->board) => [" "]
-    (-> ["XX"] board->set step set->board) => [" "])
+    (once ["X"]) => [" "]
+    (once ["XX"]) => [" "])
+  (fact "overcrowded cells die"
+    (once [" XXX "
+           " XXX "
+           " XXX "]) => ["  X  "
+                         " X X "
+                         "X   X"
+                         " X X "
+                         "  X  "])
+
   (-> ["XX" " X"] board->set step set->board) => ["XX" "XX"])

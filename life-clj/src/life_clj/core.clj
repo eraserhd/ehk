@@ -8,9 +8,18 @@
              :when (not= \space (get row j))]
          [i j])))
 
+(defn- normalize
+  "Chooses a constant amount by which to move all alive cells so that
+  we have no negative coordinates."
+  [alive]
+  (let [di (- (transduce (map first) min Long/MAX_VALUE alive))
+        dj (- (transduce (map second) min Long/MAX_VALUE alive))]
+    (into #{} (map (fn [[i j]] [(+ i di) (+ j dj)])) alive)))
+
 (defn set->board
   [alive]
-  (let [height (inc (transduce (map first) max 0 alive))
+  (let [alive (normalize alive)
+        height (inc (transduce (map first) max 0 alive))
         width (inc (transduce (map second) max 0 alive))
         empty-row (vec (repeat width \space))
         empty-board (vec (repeat height empty-row))]
@@ -28,10 +37,10 @@
                         :when (not= 0 di dj)]
                     [(+ i di) (+ j dj)])
         cell->neighbor-count (reduce
-                               (fn [m [i j]]
-                                 (update m [i j] (fnil inc 0)))
-                               {}
-                               neighbors)]
+                              (fn [m [i j]]
+                                (update m [i j] (fnil inc 0)))
+                              {}
+                              neighbors)]
     (-> #{}
       (into
         (filter #(<= 2 (or (get cell->neighbor-count %) 0) 4))
