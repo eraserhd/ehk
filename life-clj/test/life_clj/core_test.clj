@@ -4,6 +4,15 @@
 
 (def once (comp set->board step board->set))
 
+(defmacro example
+  [title & args]
+  (let [p (->> args
+           (filter string?)
+           (partition 2))
+        left (vec (map first p))
+        right (vec (map second p))]
+    `(fact ~title (once ~left) => ~right)))
+
 (facts "about board->set"
   (board->set [" "]) => #{}
   (board->set ["X"]) => #{[0 0]}
@@ -23,12 +32,10 @@
     (once ["X"]) => [" "]
     (once ["XX"]) => [" "])
   (fact "overcrowded cells die"
-    (once [" XXX "
-           " XXX "
-           " XXX "]) => ["  X  "
-                         " X X "
-                         "X   X"
-                         " X X "
-                         "  X  "])
-
+    (example "overcrowded cells die"
+      "     "     "  X  "
+      " XXX "     " X X "
+      " XXX " ==> "X   X"
+      " XXX "     " X X "
+      "     "     "  X  "))
   (-> ["XX" " X"] board->set step set->board) => ["XX" "XX"])
