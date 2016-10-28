@@ -18,4 +18,8 @@
       (reduce (fn [board [i j]]
                 (assoc-in board [i j] \X))
               empty-board)
-      (mapv (partial apply str))))) 
+      (mapv (partial apply str)))))
+
+(defn step
+  [alive]
+  alive)
