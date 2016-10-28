@@ -38,21 +38,23 @@
         :when (not= 0 delta-i delta-j)]
      [delta-i delta-j]))
 
+(defn- neighbors
+  [alive]
+  (for [[i j] alive
+        [di dj] deltas]
+    [(+ i di) (+ j dj)]))
+
 (defn step
   [alive]
-  (let [neighbor-count (reduce
-                         #(update %1 %2 (fnil inc 0))
-                         {}
-                         (for [[i j] alive
-                               [di dj] deltas]
-                           [(+ i di) (+ j dj)]))]
-    (set/union
-      (filter #(<= 2 (or (get neighbor-count %) 0) 3)
-        alive)
-      (into 
-        #{}
-        (comp
-          (filter #(= 3 (second %)))
-          (map first)
-          (remove alive))
-        neighbor-count))))
+  (let [neighbors (reduce
+                    #(update %1 %2 (fnil inc 0))
+                    {}
+                    (neighbors alive))
+        lives? (fn [p] (<= 2 (or (get neighbors p) 0) 3)) 
+        born (into #{}
+                    (comp
+                      (filter #(= 3 (second %)))
+                      (map first)
+                      (remove alive))
+                    neighbors)]
+    (set/union (filter lives? alive) born)))
