@@ -11,4 +11,5 @@
 
 (facts "about set->board"
   (set->board #{}) => [" "]
-  (set->board #{[0 0]}) => ["X"])
+  (set->board #{[0 0]}) => ["X"]
+  (set->board #{[0 0] [1 1]}) => ["X " " X"])

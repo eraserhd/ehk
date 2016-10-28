@@ -10,9 +10,12 @@
 
 (defn set->board
   [alive]
-  (->> alive
-    (reduce
-       (fn [board [i j]]
-         (assoc-in board [i j] \X))
-       [[\space]])
-    (mapv (partial apply str)))) 
+  (let [height (inc (transduce (map first) max 0 alive))
+        width (inc (transduce (map second) max 0 alive))
+        empty-row (vec (repeat width \space))
+        empty-board (vec (repeat height empty-row))]
+    (->> alive
+      (reduce (fn [board [i j]]
+                (assoc-in board [i j] \X))
+              empty-board)
+      (mapv (partial apply str))))) 
