@@ -29,12 +29,18 @@
               empty-board)
       (mapv (partial apply str)))))
 
+(def deltas
+  "Relative coordinates for each neighbording cell, e.g. [+1 +1]
+  or [-1 0] (but not [0 0])."
+  (for [delta-i [-1 0 +1]
+        delta-j [-1 0 +1]
+        :when (not= 0 delta-i delta-j)]
+     [delta-i delta-j]))
+
 (defn step
   [alive]
   (let [neighbors (for [[i j] alive
-                        di [-1 0 +1]
-                        dj [-1 0 +1]
-                        :when (not= 0 di dj)]
+                        [di dj] deltas]
                     [(+ i di) (+ j dj)])
         cell->neighbor-count (reduce
                               (fn [m [i j]]
