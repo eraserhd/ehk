@@ -4,4 +4,7 @@
 
 (facts "about board->set"
   (board->set [" "]) => #{}
-  (board->set ["X"]) => #{[0 0]})
+  (board->set ["X"]) => #{[0 0]}
+  (board->set ["X X"
+               " XX"
+               "X  "]) => #{[0 0] [0 2] [1 1] [1 2] [2 0]})
