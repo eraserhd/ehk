@@ -58,9 +58,7 @@
         lives? (fn [p]
                  (<= 2 (or (get neighbor-count p) 0) 3)) 
         lives (filter lives? alive)
-        born (into #{}
-                    (comp
-                      (filter #(= 3 (second %)))
-                      (map first))
-                    neighbor-count)]
+        born (keep (fn [[n count]]
+                     (if (= count 3) n))
+                   neighbor-count)]
     (set/union lives born)))
