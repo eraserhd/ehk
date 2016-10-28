@@ -9,5 +9,10 @@
          [i j])))
 
 (defn set->board
-  [s]
-  [" "])
+  [alive]
+  (->> alive
+    (reduce
+       (fn [board [i j]]
+         (assoc-in board [i j] \X))
+       [[\space]])
+    (mapv (partial apply str)))) 
