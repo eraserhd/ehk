@@ -26,16 +26,34 @@
   (set->board #{[0 0] [1 1]}) => ["X " " X"])
 
 (facts "about simulating life"
-  (fact "nothing spontaneously generates"
-    (once [" "]) => [" "])
-  (fact "lonely cells die"
-    (once ["X"]) => [" "]
-    (once ["XX"]) => [" "])
-  (fact "overcrowded cells die"
-    (example "overcrowded cells die"
+  (example "nothing spontaneously generates"
+    " "  ==> " ")
+  (example "cell with no neighbors dies"
+    "X"  ==> " ")
+  (example "cell with single neighbor dies"
+    "XX" ==> " ")
+  (facts "about overcrowding cells dying"
+    (example "4 neighbors"
+      " X "     "XXX"
+      "XXX" ==> "X X"
+      " X "     "XXX")
+    (example "5 and 8 neighbors"
       "     "     "  X  "
       " XXX "     " X X "
       " XXX " ==> "X   X"
       " XXX "     " X X "
-      "     "     "  X  "))
-  (-> ["XX" " X"] board->set step set->board) => ["XX" "XX"])
+      "     "     "  X  ")
+    (example "6 neighbors"
+      "    "     " X  "
+      "XXX " ==> "X X "
+      " XX "     "   X"
+      " XX "     " XX ")
+    (example "7 neighbors"
+      "    "     " X  "
+      "XXX "     "X X "
+      " XX " ==> "   X"
+      "XXX "     "X X "
+      "    "     " X  "))
+  (example "empty cell with three neighbors births"
+    "XX" ==> "XX"
+    " X"     "XX"))

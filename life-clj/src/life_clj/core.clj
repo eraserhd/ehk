@@ -43,7 +43,7 @@
                               neighbors)]
     (-> #{}
       (into
-        (filter #(<= 2 (or (get cell->neighbor-count %) 0) 4))
+        (filter #(<= 2 (or (get cell->neighbor-count %) 0) 3))
         alive)
       (into 
         (comp
