@@ -28,10 +28,11 @@
 (facts "about simulating life"
   (example "nothing spontaneously generates"
     " "  ==> " ")
-  (example "cell with no neighbors dies"
-    "X"  ==> " ")
-  (example "cell with single neighbor dies"
-    "XX" ==> " ")
+  (facts "about lonely cells"
+    (example "cell with no neighbors dies"
+      "X"  ==> " ")
+    (example "cell with single neighbor dies"
+      "XX" ==> " "))
   (facts "about overcrowding cells dying"
     (example "4 neighbors"
       " X "     "XXX"
