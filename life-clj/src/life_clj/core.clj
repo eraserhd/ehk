@@ -44,17 +44,23 @@
         [di dj] deltas]
     [(+ i di) (+ j dj)]))
 
+(defn- cell->neighbor-count
+  "Compute a map of cell address -> neighbor count"
+  [alive]
+  (reduce
+    #(update %1 %2 (fnil inc 0))
+    {}
+    (neighbors alive)))
+
 (defn step
   [alive]
-  (let [neighbor-count (reduce
-                        #(update %1 %2 (fnil inc 0))
-                        {}
-                        (neighbors alive))
-        lives? (fn [p] (<= 2 (or (get neighbor-count p) 0) 3)) 
+  (let [neighbor-count (cell->neighbor-count alive)
+        lives? (fn [p]
+                 (<= 2 (or (get neighbor-count p) 0) 3)) 
+        lives (filter lives? alive)
         born (into #{}
                     (comp
                       (filter #(= 3 (second %)))
-                      (map first)
-                      (remove alive))
+                      (map first))
                     neighbor-count)]
-    (set/union (filter lives? alive) born)))
+    (set/union lives born)))
