@@ -1,4 +1,5 @@
-(ns life-clj.core)
+(ns life-clj.core
+  (:require [clojure.set :as set]))
 
 (defn board->set
   [board]
@@ -39,21 +40,19 @@
 
 (defn step
   [alive]
-  (let [neighbors (for [[i j] alive
-                        [di dj] deltas]
-                    [(+ i di) (+ j dj)])
-        cell->neighbor-count (reduce
-                              (fn [m [i j]]
-                                (update m [i j] (fnil inc 0)))
-                              {}
-                              neighbors)]
-    (-> #{}
-      (into
-        (filter #(<= 2 (or (get cell->neighbor-count %) 0) 3))
+  (let [neighbor-count (reduce
+                         #(update %1 %2 (fnil inc 0))
+                         {}
+                         (for [[i j] alive
+                               [di dj] deltas]
+                           [(+ i di) (+ j dj)]))]
+    (set/union
+      (filter #(<= 2 (or (get neighbor-count %) 0) 3)
         alive)
       (into 
+        #{}
         (comp
           (filter #(= 3 (second %)))
           (map first)
           (remove alive))
-        cell->neighbor-count))))
+        neighbor-count))))
