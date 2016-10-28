@@ -22,4 +22,23 @@
 
 (defn step
   [alive]
-  alive)
+  (let [neighbors (for [[i j] alive
+                        di [-1 0 +1]
+                        dj [-1 0 +1]
+                        :when (not= 0 di dj)]
+                    [(+ i di) (+ j dj)])
+        cell->neighbor-count (reduce
+                               (fn [m [i j]]
+                                 (update m [i j] (fnil inc 0)))
+                               {}
+                               neighbors)]
+    (-> #{}
+      (into
+        (filter #(<= 1 (or (get cell->neighbor-count %) 0) 4))
+        alive)
+      (into 
+        (comp
+          (filter #(= 3 (second %)))
+          (map first)
+          (remove alive))
+        cell->neighbor-count))))
