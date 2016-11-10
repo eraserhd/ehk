@@ -73,8 +73,8 @@
     [((,A ,A-assumptions ...) ((,A => ,B) ,impl-assumptions ...))
      `(,B ,@A-assumptions ,@impl-assumptions)])
 
-  (define (eliminate-contradiction bottom-proof proposition)
-    (assert (eq? '_ (car bottom-proof)))
-    (cons proposition (cdr bottom-proof))))
+  (match-define eliminate-contradiction
+    [((_ ,_-assumptions ...) ,P)
+     `(,P ,@_-assumptions)]))
 
 ;; vi:set sts=2 sw=2 ai et:
