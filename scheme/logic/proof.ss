@@ -47,13 +47,13 @@
   (match-define eliminate-and-right
     [(((,A and ,B) ,assuming ...)) `(,B ,@assuming)])
 
-  (define (introduce-or-left left-proof right-proposition)
-    (cons (list (car left-proof) 'or right-proposition)
-          (cdr left-proof)))
+  (match-define introduce-or-left
+    [((,A ,A-assumptions ...) ,B)
+     `((,A or ,B) ,@A-assumptions)])
 
-  (define (introduce-or-right left-proposition right-proof)
-    (cons (list left-proposition 'or (car right-proof))
-          (cdr right-proof)))
+  (match-define introduce-or-right
+    [(,A (,B ,B-assumptions ...))
+     `((,A or ,B) ,@B-assumptions)])
 
   (match-define eliminate-or
     [(((,A or ,B) ,assuming-or ...)
