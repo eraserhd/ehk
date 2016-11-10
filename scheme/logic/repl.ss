@@ -1,6 +1,7 @@
 (library (logic repl)
-  (export prove)
-  (import (rnrs))
+  (export prove intro)
+  (import (rnrs)
+          (utils match))
 
   (define *goals* #f)
 
@@ -24,4 +25,11 @@
   (define (prove goal)
     (assert (not *goals*))
     (set! *goals* `((,goal)))
+    (display-status))
+
+  (define (intro)
+    (assert *goals*)
+    (set! *goals* (match *goals*
+                    [(((,A => ,B) ,assuming ...) ,rest ...)
+                     `((,B ,A ,@assuming) ,@rest)]))
     (display-status)))
