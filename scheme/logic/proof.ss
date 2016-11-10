@@ -79,8 +79,8 @@
 
   (define (eliminate-contradiction bottom-proof proposition)
     (assert (eq? '_ (car bottom-proof)))
-    (cons proposition (cdr bottom-proof)))
+    (cons proposition (cdr bottom-proof))))
 
-)
+
 
 ;; vi:set sts=2 sw=2 ai et:
