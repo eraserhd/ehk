@@ -30,11 +30,11 @@
          (match args
            exprs ...)))))
 
-  (define (assume proposition)
-    (list proposition proposition))
-
   (define (therefore proof proposition)
     (assert (equal? proof (list proposition))))
+
+  (define (assume P)
+    `(,P ,P))
 
   (match-define introduce-and
     [((,A ,A-assumptions ...) (,B ,B-assumptions ...))
