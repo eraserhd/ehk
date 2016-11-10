@@ -3,6 +3,8 @@
 (import (chezscheme)
         (logic print))
 
+(assert (equal? (parse-infix '(A)) 'A))
+
 ;; Basic statements are formatted
 (assert (equal? (format-proposition 'A) "A"))
 (assert (equal? (format-proposition '_) "⊥"))
