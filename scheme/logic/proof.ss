@@ -69,13 +69,9 @@
     [((,A ,assumptions ...) ,P)
      `((,P => ,A) ,@(remove P assumptions))])
 
-  (define (eliminate-implication left-proof implication-proof)
-    (assert (eq? '=> (cadar implication-proof)))
-    (assert (equal? (car left-proof) (caar implication-proof)))
-    (cons (caddar implication-proof)
-          (append
-            (cdr left-proof)
-            (cdr implication-proof))))
+  (match-define eliminate-implication
+    [((,A ,A-assumptions ...) ((,A => ,B) ,impl-assumptions ...))
+     `(,B ,@A-assumptions ,@impl-assumptions)])
 
   (define (eliminate-contradiction bottom-proof proposition)
     (assert (eq? '_ (car bottom-proof)))
