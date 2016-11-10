@@ -3,9 +3,15 @@
   (import (rnrs)
           (utils match))
 
-  (define (format-proposition P)
+  (define (use-negation P)
     (match P
-      [(,[A] => _) (string-append "¬" A)]
+      [(,[A] => _) `(¬ A)]
+      [(,[A] ,op ,[B]) `(,A ,op ,B)]
+      [,A A]))
+
+  (define (format-proposition P)
+    (match (use-negation P)
+      [(¬ ,[A]) (string-append "¬" A)]
       [(,[A] => ,[B]) (string-append A " ⇒ " B)]
       [(,[A] or ,[B]) (string-append A " ∨ " B)]
       [(,[A] and ,[B]) (string-append A " ∧ " B)]
