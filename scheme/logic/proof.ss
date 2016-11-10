@@ -36,10 +36,9 @@
   (define (therefore proof proposition)
     (assert (equal? proof (list proposition))))
 
-  (define (introduce-and left-proof right-proof)
-    (cons (list (car left-proof) 'and (car right-proof))
-          (append (cdr left-proof)
-                  (cdr right-proof))))
+  (match-define introduce-and
+    [((,A ,A-assumptions ...) (,B ,B-assumptions ...))
+     `((,A and ,B) ,@A-assumptions ,@B-assumptions)])
 
   (match-define eliminate-and-left
     [(((,A and ,B) ,assuming ...)) `(,A ,@assuming)])
