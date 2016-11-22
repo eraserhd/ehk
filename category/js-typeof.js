@@ -11,6 +11,10 @@ function coproduct(a, b) {
   return 'string';
 }
 
+/*
+ * No product.  e.g. 42 and {} are not reachable from some object.
+ */
+
 function reachable(a) {
   var result = [];
   while (true) {
