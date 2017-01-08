@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -O2 -optc-O2 #-}
+
 import Control.Exception.Base (assert)
 
 nextPalindrome input =
