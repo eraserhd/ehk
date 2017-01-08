@@ -31,10 +31,17 @@ test = assert (nextPalindrome "8" == "9") $
        assert (nextPalindrome "123300" == "123321") $
        assert (nextPalindrome "10" == "11") $
        assert (nextPalindrome "9" == "11") $
-       assert (nextPalindrome "555" (nextPalindrome millionOnes == onetwotwooneyadayada ) $
+       assert (nextPalindrome "555" == "565") $
+       assert (nextPalindrome millionOnes == lottaonestwotwolottaones) $
+       assert (nextPalindrome millionNines == onelottazerosone) $
+       assert (nextPalindrome nearlyHundredThousandOnes == lottaonestwolottaones) $
        "Tests passed"
        where
+         nearlyHundredThousandOnes = take 99999 (repeat '1')
+         lottaonestwolottaones = take 49999 (repeat '1') ++ "2" ++ take 49999 (repeat '1')
          millionOnes = take 1000000 (repeat '1')
-         onetwotwooneyadayada = take 499999 (repeat '1') ++ "22" ++ take 499999 (repeat '1')
+         lottaonestwotwolottaones = take 499999 (repeat '1') ++ "22" ++ take 499999 (repeat '1')
+         millionNines = take 1000000 (repeat '9')
+         onelottazerosone = "1" ++ take 999999 (repeat '0') ++ "1"
 
 main = interact (unlines . map nextPalindrome . tail . lines)
