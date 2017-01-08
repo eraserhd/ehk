@@ -1,40 +1,39 @@
 {-# OPTIONS_GHC -O2 -optc-O2 #-}
-
 import Control.Exception.Base (assert)
+import qualified Data.ByteString.Lazy.Char8 as BS
 
 nextPalindrome input =
   let p = palindrome input
-      leftDigits n = let nLength = length n
-                     in take ((div nLength 2) + (rem nLength 2)) n
-      palindrome n = leftDigits n ++ reverse (take (div(length n) 2) n)
-      larger = let left = show ((read (leftDigits p) :: Integer) + 1)
-                   right = take (div (length p) 2) $ repeat '0'
-               in palindrome (left ++ right)
-  in if length p > length input || p > input
+      leftDigits n = let nLength = BS.length n
+                     in BS.take ((div nLength 2) + (rem nLength 2)) n
+      palindrome n = BS.append (leftDigits n) $ BS.reverse (BS.take (div (BS.length n) 2) n)
+      larger = let Just (v, _) = BS.readInteger (leftDigits p)
+                   left = BS.pack $ show (v + 1)
+                   right = BS.take (div (BS.length p) 2) $ BS.repeat '0'
+               in palindrome $ BS.append left right
+  in if BS.length p > BS.length input || p > input
      then p
-     else larger 
+     else larger
 
-test = assert (nextPalindrome "8" == "9") $
-       assert (nextPalindrome "12305" == "12321") $
-       assert (nextPalindrome "12345" == "12421") $
-       assert (nextPalindrome "123456" == "124421") $
-       assert (nextPalindrome "123256" == "123321") $
-       assert (nextPalindrome "99" == "101") $
-       assert (nextPalindrome "999" == "1001") $
-       assert (nextPalindrome "123300" == "123321") $
-       assert (nextPalindrome "10" == "11") $
-       assert (nextPalindrome "9" == "11") $
-       assert (nextPalindrome "555" == "565") $
-       assert (nextPalindrome millionOnes == lottaonestwotwolottaones) $
-       assert (nextPalindrome millionNines == onelottazerosone) $
-       assert (nextPalindrome nearlyHundredThousandOnes == lottaonestwolottaones) $
-       "Tests passed"
-       where
-         nearlyHundredThousandOnes = take 99999 (repeat '1')
-         lottaonestwolottaones = take 49999 (repeat '1') ++ "2" ++ take 49999 (repeat '1')
-         millionOnes = take 1000000 (repeat '1')
-         lottaonestwotwolottaones = take 499999 (repeat '1') ++ "22" ++ take 499999 (repeat '1')
-         millionNines = take 1000000 (repeat '9')
-         onelottazerosone = "1" ++ take 999999 (repeat '0') ++ "1"
+tests = [
+  ("8", "9"),
+  ("12305", "12321"),
+  ("12345" , "12421"),
+  ("123456" , "124421"),
+  ("123256" , "123321"),
+  ("99" , "101"),
+  ("999" , "1001"),
+  ("123300" , "123321"),
+  ("10" , "11"),
+  ("9" , "11"),
+  ("555" , "565"),
+  ( take 1000000 (repeat '1'),
+    take 499999 (repeat '1') ++ "22" ++ take 499999 (repeat '1') ),
+  ( take 1000000 (repeat '9'),
+    "1" ++ take 999999 (repeat '0') ++ "1" ),
+  ( take 99999 (repeat '1'),
+    take 49999 (repeat '1') ++ "2" ++ take 49999 (repeat '1') ) ]
 
-main = interact (unlines . map nextPalindrome . tail . lines)
+test = foldr (\(i, o) r -> assert (nextPalindrome (BS.pack i) == BS.pack o) r) "All tests pass" tests
+
+main = BS.interact (BS.unlines . map nextPalindrome . tail . BS.lines)
