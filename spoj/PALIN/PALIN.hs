@@ -1,25 +1,16 @@
 import Control.Exception.Base (assert)
- 
-half n = div (length n) 2
 
-extra n = rem (length n) 2
-
-leftDigits n = take ((half n) + (extra n)) n
-
-rightDigits n = reverse $ take (half n) n
-
-nearest n = leftDigits n ++ rightDigits n
-
-larger palindrome = let oldLeft = leftDigits palindrome
-                        left = show ((read oldLeft :: Integer) + 1)
-                        right = take (half palindrome) $ repeat '0'
-                    in nearest (left ++ right)
-
-nextPalindrome input = if (read palindrome :: Integer) > (read input :: Integer)
-                       then palindrome
-                       else larger palindrome
-                       where
-                         palindrome = nearest input
+nextPalindrome input =
+  let p = palindrome input
+      leftDigits n = let nLength = length n
+                     in take ((div nLength 2) + (rem nLength 2)) n
+      palindrome n = leftDigits n ++ reverse (take (div(length n) 2) n)
+      larger = let left = show ((read (leftDigits p) :: Integer) + 1)
+                   right = take (div (length p) 2) $ repeat '0'
+               in palindrome (left ++ right)
+  in if length p > length input || p > input
+     then p
+     else larger 
 
 test = assert (nextPalindrome "8" == "9") $
        assert (nextPalindrome "12305" == "12321") $
