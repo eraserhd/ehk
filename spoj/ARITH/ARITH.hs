@@ -1,4 +1,7 @@
+import GHC.Int ( Int64 )
 import qualified Data.ByteString.Lazy.Char8 as BS
+
+data Line = Line Int64 BS.ByteString
 
 parse s = do
   (a, s) <- BS.readInteger s
@@ -8,8 +11,9 @@ parse s = do
 
 alignRight ls = BS.concat $ map pad ls
            where
-             w = maximum $ map (\( n, bs ) -> n + BS.length bs) ls
-             pad ( n, bs ) =
+             lineWidth (Line n bs) = n + BS.length bs
+             w = maximum $ map lineWidth ls
+             pad (Line n bs) =
                BS.concat [
                  BS.replicate (w - (BS.length bs) - n) ' ',
                  bs,
@@ -18,10 +22,10 @@ alignRight ls = BS.concat $ map pad ls
 
 format a op b | op == '-' || op == '+' =
   alignRight [
-    ( 0, as ),
-    ( 0, BS.cons op bs ),
-    ( 0, BS.replicate dashes '-' ),
-    ( 0, cs )
+    Line 0 as,
+    Line 0 (BS.cons op bs),
+    Line 0 (BS.replicate dashes '-'),
+    Line 0 cs
   ]
   where
     as = BS.pack $ show a
@@ -30,26 +34,26 @@ format a op b | op == '-' || op == '+' =
                           then a + b
                           else a - b
     dashes = maximum [1 + BS.length bs, BS.length cs]
-format a '*' b =
+format a op@'*' b =
   alignRight ([
-    ( 0, as ),
-    ( 0, BS.cons '*' bs ),
-    ( 0, BS.replicate dashes1 '-' )
+    Line 0 as,
+    Line 0 (BS.cons op bs),
+    Line 0 (BS.replicate dashes1 '-')
   ] ++ subTotals ++ finalTotal)
   where
     as = BS.pack $ show a
     bs = BS.pack $ show b
-    bDigits = reverse $ map (\c -> read [c] :: Integer) $ show b
-    subTotals = zip [0..] $ map (BS.pack . show . (* a)) bDigits
-    bLastDigit = head bDigits
+    bLine = reverse $ map (\c -> read [c] :: Integer) $ show b
+    subTotals = map (\(n, s) -> Line n s) $ zip [0..] $ map (BS.pack . show . (* a)) bLine
+    bLastDigit = head bLine
     cs = BS.pack $ show (bLastDigit * a)
     dashes1 = maximum [1 + BS.length bs, BS.length cs]
-    finalTotal = if length bDigits == 1
+    finalTotal = if length bLine == 1
                  then []
                  else let result = BS.pack $ show $ a * b
                       in [
-                        ( 0, BS.replicate (BS.length result) '-' ),
-                        ( 0, result )
+                        Line 0 (BS.replicate (BS.length result) '-'),
+                        Line 0 result
                       ]
 
 solve s =
