@@ -16,7 +16,7 @@ parseExpr s = do
 
 showbs = BS.pack . show
 
-alignRight ls = BS.concat $ pad ls
+formatLines ls = BS.concat $ pad ls
            where
              lineWidth (Line n bs) = n + BS.length bs
              lineWidth Dashes = 0
@@ -53,7 +53,7 @@ subTotalLines _ = []
 
 resultLines expr = [ Line 0 (showbs $ result expr) ]
 
-format expr = alignRight (topLines expr ++ subTotalLines expr ++ resultLines expr)
+format expr = formatLines $ topLines expr ++ subTotalLines expr ++ resultLines expr
 
 solve s =
   case parseExpr s of
