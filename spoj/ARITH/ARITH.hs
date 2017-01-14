@@ -34,26 +34,22 @@ alignRight ls = BS.concat $ pad ls
                in padLine l1 : padLine (Line 0 (BS.replicate width '-')) : pad (l2 : ls)
              pad (l : ls) = padLine l : pad ls
 
-format expr@(Expr a op b) | op == '-' || op == '+' =
-  alignRight [
+topLines (Expr a op b) = [
     Line 0 as,
     Line 0 (BS.cons op bs),
-    Dashes,
-    Line 0 cs
+    Dashes
   ]
   where
     as = BS.pack $ show a
     bs = BS.pack $ show b
+
+format expr@(Expr a op b) | op == '-' || op == '+' =
+  alignRight (topLines expr ++ [Line 0 cs])
+  where
     cs = BS.pack $ show $ result expr
 format expr@(Expr a op@'*' b) =
-  alignRight ([
-    Line 0 as,
-    Line 0 (BS.cons op bs),
-    Dashes
-  ] ++ subTotals ++ finalTotal)
+  alignRight (topLines expr ++ subTotals ++ finalTotal)
   where
-    as = BS.pack $ show a
-    bs = BS.pack $ show b
     bLine = reverse $ map (\c -> read [c] :: Integer) $ show b
     subTotals = map (\(n, s) -> Line n s) $ zip [0..] $ map (BS.pack . show . (* a)) bLine
     bLastDigit = head bLine
