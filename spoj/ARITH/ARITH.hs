@@ -42,18 +42,18 @@ topLines (Expr a op b) = [
     Dashes
   ]
 
-resultLines expr = [ Line 0 (showbs $ result expr) ]
-
-format expr@(Expr a op b) | op == '-' || op == '+' =
-  alignRight (topLines expr ++ resultLines expr)
-format expr@(Expr a op@'*' b) =
-  alignRight (topLines expr ++ subTotals ++ finalTotal)
+subTotalLines expr@(Expr a '*' b) =
+  if length subTotals == 2
+  then []
+  else subTotals
   where
     bLine = reverse $ map (\c -> read [c] :: Integer) $ show b
-    subTotals = map (\(n, s) -> Line n s) $ zip [0..] $ map (showbs . (* a)) bLine
-    finalTotal = if length bLine == 1
-                 then []
-                 else [ Dashes ] ++ resultLines expr
+    subTotals = (map (\(n, s) -> Line n s) $ zip [0..] $ map (showbs . (* a)) bLine) ++ [ Dashes ]
+subTotalLines _ = []
+
+resultLines expr = [ Line 0 (showbs $ result expr) ]
+
+format expr = alignRight (topLines expr ++ subTotalLines expr ++ resultLines expr)
 
 solve s =
   case parseExpr s of
