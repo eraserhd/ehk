@@ -2,12 +2,17 @@ import GHC.Int ( Int64 )
 import qualified Data.ByteString.Lazy.Char8 as BS
 
 data Line = Line Int64 BS.ByteString
+data Expr = Expr Integer Char Integer
 
-parse s = do
+result (Expr a '+' b) = a + b
+result (Expr a '-' b) = a - b
+result (Expr a '*' b) = a * b
+
+parseExpr s = do
   (a, s) <- BS.readInteger s
   (op, s) <- BS.uncons s
   (b, _) <- BS.readInteger s
-  return (a, op, b)
+  return $ Expr a op b
 
 alignRight ls = BS.concat $ map pad ls
            where
@@ -20,7 +25,7 @@ alignRight ls = BS.concat $ map pad ls
                  BS.singleton '\n'
                ]
 
-format a op b | op == '-' || op == '+' =
+format expr@(Expr a op b) | op == '-' || op == '+' =
   alignRight [
     Line 0 as,
     Line 0 (BS.cons op bs),
@@ -30,11 +35,9 @@ format a op b | op == '-' || op == '+' =
   where
     as = BS.pack $ show a
     bs = BS.pack $ show b
-    cs = BS.pack $ show $ if op == '+'
-                          then a + b
-                          else a - b
+    cs = BS.pack $ show $ result expr
     dashes = maximum [1 + BS.length bs, BS.length cs]
-format a op@'*' b =
+format expr@(Expr a op@'*' b) =
   alignRight ([
     Line 0 as,
     Line 0 (BS.cons op bs),
@@ -50,14 +53,14 @@ format a op@'*' b =
     dashes1 = maximum [1 + BS.length bs, BS.length cs]
     finalTotal = if length bLine == 1
                  then []
-                 else let result = BS.pack $ show $ a * b
+                 else let resultText = BS.pack $ show $ result expr
                       in [
-                        Line 0 (BS.replicate (BS.length result) '-'),
-                        Line 0 result
+                        Line 0 (BS.replicate (BS.length resultText) '-'),
+                        Line 0 resultText
                       ]
 
 solve s =
-  case parse s of
-    Just (a, op, b) -> format a op b
+  case parseExpr s of
+    Just expr -> format expr
 
 main = BS.interact (BS.unlines . map solve . tail . BS.lines)
