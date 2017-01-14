@@ -14,6 +14,8 @@ parseExpr s = do
   (b, _) <- BS.readInteger s
   return $ Expr a op b
 
+showbs = BS.pack . show
+
 alignRight ls = BS.concat $ pad ls
            where
              lineWidth (Line n bs) = n + BS.length bs
@@ -35,32 +37,23 @@ alignRight ls = BS.concat $ pad ls
              pad (l : ls) = padLine l : pad ls
 
 topLines (Expr a op b) = [
-    Line 0 as,
-    Line 0 (BS.cons op bs),
+    Line 0 (showbs a),
+    Line 0 (BS.cons op (showbs b)),
     Dashes
   ]
-  where
-    as = BS.pack $ show a
-    bs = BS.pack $ show b
+
+resultLines expr = [ Line 0 (showbs $ result expr) ]
 
 format expr@(Expr a op b) | op == '-' || op == '+' =
-  alignRight (topLines expr ++ [Line 0 cs])
-  where
-    cs = BS.pack $ show $ result expr
+  alignRight (topLines expr ++ resultLines expr)
 format expr@(Expr a op@'*' b) =
   alignRight (topLines expr ++ subTotals ++ finalTotal)
   where
     bLine = reverse $ map (\c -> read [c] :: Integer) $ show b
-    subTotals = map (\(n, s) -> Line n s) $ zip [0..] $ map (BS.pack . show . (* a)) bLine
-    bLastDigit = head bLine
-    cs = BS.pack $ show (bLastDigit * a)
+    subTotals = map (\(n, s) -> Line n s) $ zip [0..] $ map (showbs . (* a)) bLine
     finalTotal = if length bLine == 1
                  then []
-                 else let resultText = BS.pack $ show $ result expr
-                      in [
-                        Line 0 (BS.replicate (BS.length resultText) '-'),
-                        Line 0 resultText
-                      ]
+                 else [ Dashes ] ++ resultLines expr
 
 solve s =
   case parseExpr s of
