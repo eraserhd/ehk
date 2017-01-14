@@ -8,14 +8,17 @@ result (Expr a '+' b) = a + b
 result (Expr a '-' b) = a - b
 result (Expr a '*' b) = a * b
 
-parseExpr s = do
+readExpr :: BS.ByteString -> Maybe Expr
+readExpr s = do
   (a, s) <- BS.readInteger s
   (op, s) <- BS.uncons s
   (b, _) <- BS.readInteger s
   return $ Expr a op b
 
+showbs :: Show a => a -> BS.ByteString
 showbs = BS.pack . show
 
+formatLines :: [Line] -> BS.ByteString
 formatLines ls = BS.concat $ pad ls
            where
              lineWidth (Line n bs) = n + BS.length bs
@@ -36,27 +39,36 @@ formatLines ls = BS.concat $ pad ls
                in padLine l1 : padLine (Line 0 (BS.replicate width '-')) : pad (l2 : ls)
              pad (l : ls) = padLine l : pad ls
 
+topLines :: Expr -> [Line]
 topLines (Expr a op b) = [
     Line 0 (showbs a),
     Line 0 (BS.cons op (showbs b)),
     Dashes
   ]
 
-subTotalLines expr@(Expr a '*' b) =
-  if length subTotals == 2
-  then []
-  else subTotals
-  where
-    bLine = reverse $ map (\c -> read [c] :: Integer) $ show b
-    subTotals = (map (\(n, s) -> Line n s) $ zip [0..] $ map (showbs . (* a)) bLine) ++ [ Dashes ]
-subTotalLines _ = []
+middleLines :: Expr -> [Line]
+middleLines expr@(Expr a op b)
+  | op /= '*' = []
+  | b < 10    = []
+  | otherwise = subTotals ++ [ Dashes ]
+    where
+      bDigits :: [Integer]
+      bDigits = reverse $ map (read . return) $ show b
 
-resultLines expr = [ Line 0 (showbs $ result expr) ]
+      intermediateProducts = map (* a) bDigits
 
-format expr = formatLines $ topLines expr ++ subTotalLines expr ++ resultLines expr
+      subTotals :: [Line]
+      subTotals = map (\(indent, n) -> Line indent $ showbs n) $ zip [0..] $ intermediateProducts
 
-solve s =
-  case parseExpr s of
-    Just expr -> format expr
+resultLines :: Expr -> [Line]
+resultLines expr = [ Line 0 $ showbs $ result expr ]
 
-main = BS.interact (BS.unlines . map solve . tail . BS.lines)
+format :: Expr -> BS.ByteString
+format expr = formatLines $ topLines expr ++ middleLines expr ++ resultLines expr
+
+solve :: BS.ByteString -> BS.ByteString
+solve s = let Just expr = readExpr s
+          in format expr
+
+main :: IO ()
+main = BS.interact $ BS.unlines . map solve . tail . BS.lines
