@@ -18,26 +18,25 @@ readExpr s = do
 showbs :: Show a => a -> BS.ByteString
 showbs = BS.pack . show
 
+nl :: BS.ByteString
+nl = BS.singleton '\n'
+
 formatLines :: [Line] -> BS.ByteString
-formatLines ls = BS.concat $ pad ls
+formatLines ls = BS.concat $ fmt ls
            where
              lineWidth (Line n bs) = n + BS.length bs
-             lineWidth Dashes = 0
+             lineWidth Dashes      = 0
 
              w = maximum $ map lineWidth ls
+             padWidth line@(Line n bs) = w - (BS.length bs) - n
+             padding line = BS.replicate (padWidth line) ' '
+             padded line@(Line _ bs) = BS.concat [ padding line, bs, nl ]
 
-             padLine (Line n bs) =
-               BS.concat [
-                 BS.replicate (w - (BS.length bs) - n) ' ',
-                 bs,
-                 BS.singleton '\n'
-               ]
-
-             pad [] = []
-             pad (l1@(Line _ _) : Dashes : l2@(Line _ _) : ls) =
+             fmt [] = []
+             fmt (l1@(Line _ _) : Dashes : l2@(Line _ _) : ls) =
                let width = max (lineWidth l1) (lineWidth l2)
-               in padLine l1 : padLine (Line 0 (BS.replicate width '-')) : pad (l2 : ls)
-             pad (l : ls) = padLine l : pad ls
+               in padded l1 : padded (Line 0 (BS.replicate width '-')) : fmt (l2 : ls)
+             fmt (l : ls) = padded l : fmt ls
 
 topLines :: Expr -> [Line]
 topLines (Expr a op b) = [
