@@ -55,10 +55,11 @@ middleLines expr@(Expr a op b)
       bDigits :: [Integer]
       bDigits = reverse $ map (read . return) $ show b
 
+      intermediateProducts :: [Integer]
       intermediateProducts = map (* a) bDigits
 
       subTotals :: [Line]
-      subTotals = map (\(indent, n) -> Line indent $ showbs n) $ zip [0..] $ intermediateProducts
+      subTotals = map (\(indent, n) -> Line indent $ showbs n) $ zip [0..] intermediateProducts
 
 resultLines :: Expr -> [Line]
 resultLines expr = [ Line 0 $ showbs $ result expr ]
