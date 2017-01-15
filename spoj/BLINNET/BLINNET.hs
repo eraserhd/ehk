@@ -11,11 +11,14 @@ unionInit :: Int -> UnionFind
 unionInit n = array (0, n - 1) [(i, i) | i <- [0..n-1]]
 
 unionFind :: UnionFind -> Int -> (UnionFind, Int)
-unionFind uf i = let j = uf ! i in
-                 if i == j
-                 then (uf, i)
-                 else let (uf2, k) = unionFind uf j
-                      in ((uf2 // [(i, k)]), k)
+unionFind uf i = let j = uf ! i
+                 in if i == j
+                    then (uf, i)
+                    else let (uf2, k) = unionFind uf j
+                             uf3 = if k /= j
+                                   then uf2 // [(i, k)]
+                                   else uf2
+                         in (uf3, k)
 
 unionMerge :: UnionFind -> Int -> Int -> (UnionFind, Bool)
 unionMerge uf1 a b = let (uf2, a') = unionFind uf1 a
