@@ -65,7 +65,7 @@ parseCase = parseN parseCity
 parseCity = parseN parseEdge
 parseEdge (neigh : cost : ints) = (ints, (neigh - 1, cost))
 
-edges cities = nub $ sort $ concat $ zipWith (\n city -> map (\(neigh, cost) -> (cost, min n neigh, max n neigh)) city) [0..] cities
+edges = nub . sort . concat . zipWith (\n city -> map (\(neigh, cost) -> (cost, n, neigh)) $ filter (\(neigh, _) -> neigh > n) city) [0..]
 
 type State = (Int, UnionFind, Bool)
 
