@@ -27,29 +27,28 @@ unionFind uf i = let j = unionLinks uf ! i
                          in (uf3, k)
 
 unionMerge :: UnionFind -> Int -> Int -> (UnionFind, Maybe Int)
-unionMerge uf1 a b = let (uf2, a') = unionFind uf1 a
-                         (uf3, b') = unionFind uf2 b
-                     in if a' == b'
-                        then (uf3, Nothing)
-                        else let rankA = unionRanks uf3 ! a'
-                                 rankB = unionRanks uf3 ! b'
-                                 newSize = (unionSize uf3 ! a') + (unionSize uf3 ! b')
-                             in case compare rankA rankB of
-                                  LT -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')]
-                                             , unionSize  = let sz = unionSize uf3 in sz // [(b', newSize)]
-                                             }
-                                        , Just newSize
-                                        )
-                                  GT -> (uf3 { unionLinks = (unionLinks uf3) // [(b', a')]
-                                             , unionSize  = let sz = unionSize uf3 in sz // [(a', newSize)]
-                                             }
-                                        , Just newSize
-                                        )
-                                  EQ -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')]
-                                             , unionSize  = let sz = unionSize uf3 in sz // [(b', newSize)]
-                                             , unionRanks = (unionRanks uf3) // [(b', 1 + (unionRanks uf3 ! b') )]}
-                                        , Just newSize
-                                        )
+unionMerge uf1 a b = if a' == b'
+                     then (uf3, Nothing)
+                     else case compare rankA rankB of
+                            LT -> linkDifferentRanks a' b'
+                            GT -> linkDifferentRanks b' a'
+                            EQ -> linkEqualRanks
+                     where
+                       (uf2, a') = unionFind uf1 a
+                       (uf3, b') = unionFind uf2 b
+                       rankA = unionRanks uf3 ! a'
+                       rankB = unionRanks uf3 ! b'
+                       newSize = (unionSize uf3 ! a') + (unionSize uf3 ! b')
+
+                       linkDifferentRanks lower higher =
+                         (uf3 { unionLinks = (unionLinks uf3) // [(lower, higher)]
+                              , unionSize  = (unionSize uf3)  // [(higher, newSize)] }, Just newSize )
+
+                       linkEqualRanks =
+                         (uf3 { unionLinks = (unionLinks uf3) // [(a', b')]
+                              , unionSize  = (unionSize uf3)  // [(b', newSize)]
+                              , unionRanks = (unionRanks uf3) // [(b', 1 + (unionRanks uf3 ! b') )] }, Just newSize )
+
 
 numbers :: BS.ByteString -> [Int]
 numbers = map (read . BS.unpack) . filter (isDigit . BS.head) . BS.words
