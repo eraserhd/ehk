@@ -26,23 +26,30 @@ unionFind uf i = let j = unionLinks uf ! i
                                    else uf2
                          in (uf3, k)
 
-unionMerge :: UnionFind -> Int -> Int -> (UnionFind, Bool)
+unionMerge :: UnionFind -> Int -> Int -> (UnionFind, Maybe Int)
 unionMerge uf1 a b = let (uf2, a') = unionFind uf1 a
                          (uf3, b') = unionFind uf2 b
                      in if a' == b'
-                        then (uf3, False)
+                        then (uf3, Nothing)
                         else let rankA = unionRanks uf3 ! a'
                                  rankB = unionRanks uf3 ! b'
+                                 newSize = (unionSize uf3 ! a') + (unionSize uf3 ! b')
                              in case compare rankA rankB of
                                   LT -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')]
-                                             , unionSize  = let sz = unionSize uf3 in sz // [(b', (sz ! a') + (sz ! b'))]
-                                             }, True)
+                                             , unionSize  = let sz = unionSize uf3 in sz // [(b', newSize)]
+                                             }
+                                        , Just newSize
+                                        )
                                   GT -> (uf3 { unionLinks = (unionLinks uf3) // [(b', a')]
-                                             , unionSize  = let sz = unionSize uf3 in sz // [(a', (sz ! a') + (sz ! b'))]
-                                             }, True)
+                                             , unionSize  = let sz = unionSize uf3 in sz // [(a', newSize)]
+                                             }
+                                        , Just newSize
+                                        )
                                   EQ -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')]
-                                             , unionSize  = let sz = unionSize uf3 in sz // [(b', (sz ! a') + (sz ! b'))]
-                                             , unionRanks = (unionRanks uf3) // [(b', 1 + (unionRanks uf3 ! b') )]}, True)
+                                             , unionSize  = let sz = unionSize uf3 in sz // [(b', newSize)]
+                                             , unionRanks = (unionRanks uf3) // [(b', 1 + (unionRanks uf3 ! b') )]}
+                                        , Just newSize
+                                        )
 
 numbers :: BS.ByteString -> [Int]
 numbers = map (read . BS.unpack) . filter (isDigit . BS.head) . BS.words
@@ -57,20 +64,26 @@ parseEdge (neigh : cost : ints) = (ints, (neigh - 1, cost))
 
 edges cities = nub $ sort $ concat $ zipWith (\n city -> map (\(neigh, cost) -> (cost, min n neigh, max n neigh)) city) [0..] cities
 
-type State = (Int, UnionFind)
+type State = (Int, UnionFind, Bool)
 
-solve cities = fst $ foldl takeEdge start (edges cities)
+solve cities = totalCost
                where
+                 (totalCost, _, _) = build start $ edges cities
+
+                 build st              []             = st
+                 build st@(_, _, True) _              = st
+                 build st              (edge : edges) = build (takeEdge st edge) edges
+
                  n = length cities
 
                  start :: State
-                 start = (0, unionInit n)
+                 start = (0, unionInit n, False)
 
                  takeEdge :: State -> (Int, Int, Int) -> State
-                 takeEdge (totalCost, uf) (cost, from, to) =
+                 takeEdge (totalCost, uf, _) (cost, from, to) =
                    case unionMerge uf from to of
-                     (uf', True)  -> (totalCost + cost, uf')
-                     (uf', False) -> (totalCost, uf')
+                     (uf', Just newSize) -> (totalCost + cost, uf', newSize == n)
+                     (uf', Nothing)      -> (totalCost, uf', False)
 
 main = do
   ints <- numbers `fmap` BS.getContents
