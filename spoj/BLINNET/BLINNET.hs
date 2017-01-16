@@ -14,7 +14,7 @@ unionInit n = UnionFind { unionLinks = array (0, n - 1) [(i, i) | i <- [0..n-1]]
                         }
 
 unionFind :: UnionFind -> Int -> (UnionFind, Int)
-unionFind uf i = let j = (unionLinks uf) ! i
+unionFind uf i = let j = unionLinks uf ! i
                  in if i == j
                     then (uf, i)
                     else let (uf2, k) = unionFind uf j
@@ -26,9 +26,15 @@ unionFind uf i = let j = (unionLinks uf) ! i
 unionMerge :: UnionFind -> Int -> Int -> (UnionFind, Bool)
 unionMerge uf1 a b = let (uf2, a') = unionFind uf1 a
                          (uf3, b') = unionFind uf2 b
-                     in if a' /= b'
-                        then (uf3 { unionLinks = (unionLinks uf3) // [(a', b')] }, True)
-                        else (uf3, False)
+                     in if a' == b'
+                        then (uf3, False)
+                        else let rankA = unionRanks uf3 ! a'
+                                 rankB = unionRanks uf3 ! b'
+                             in case compare rankA rankB of
+                                  LT -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')] }, True)
+                                  GT -> (uf3 { unionLinks = (unionLinks uf3) // [(b', a')] }, True)
+                                  EQ -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')]
+                                             , unionRanks = (unionRanks uf3) // [(b', 1 + (unionRanks uf3 ! b') )]}, True)
 
 numbers :: BS.ByteString -> [Int]
 numbers = map (read . BS.unpack) . filter (isDigit . BS.head) . BS.words
