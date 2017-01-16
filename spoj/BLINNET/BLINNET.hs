@@ -6,11 +6,14 @@ import Data.List
 import qualified Data.ByteString.Lazy.Char8 as BS
 
 data UnionFind = UnionFind { unionLinks :: Array Int Int
-                           , unionRanks :: Array Int Int }
+                           , unionRanks :: Array Int Int
+                           , unionSize  :: Array Int Int
+                           }
 
 unionInit :: Int -> UnionFind
 unionInit n = UnionFind { unionLinks = array (0, n - 1) [(i, i) | i <- [0..n-1]]
                         , unionRanks = array (0, n - 1) [(i, 0) | i <- [0..n-1]]
+                        , unionSize  = array (0, n - 1) [(i, 1) | i <- [0..n-1]]
                         }
 
 unionFind :: UnionFind -> Int -> (UnionFind, Int)
@@ -31,9 +34,14 @@ unionMerge uf1 a b = let (uf2, a') = unionFind uf1 a
                         else let rankA = unionRanks uf3 ! a'
                                  rankB = unionRanks uf3 ! b'
                              in case compare rankA rankB of
-                                  LT -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')] }, True)
-                                  GT -> (uf3 { unionLinks = (unionLinks uf3) // [(b', a')] }, True)
+                                  LT -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')]
+                                             , unionSize  = let sz = unionSize uf3 in sz // [(b', (sz ! a') + (sz ! b'))]
+                                             }, True)
+                                  GT -> (uf3 { unionLinks = (unionLinks uf3) // [(b', a')]
+                                             , unionSize  = let sz = unionSize uf3 in sz // [(a', (sz ! a') + (sz ! b'))]
+                                             }, True)
                                   EQ -> (uf3 { unionLinks = (unionLinks uf3) // [(a', b')]
+                                             , unionSize  = let sz = unionSize uf3 in sz // [(b', (sz ! a') + (sz ! b'))]
                                              , unionRanks = (unionRanks uf3) // [(b', 1 + (unionRanks uf3 ! b') )]}, True)
 
 numbers :: BS.ByteString -> [Int]
