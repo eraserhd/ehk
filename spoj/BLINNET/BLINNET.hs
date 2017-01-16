@@ -5,18 +5,21 @@ import Data.Array
 import Data.List
 import qualified Data.ByteString.Lazy.Char8 as BS
 
-type UnionFind = Array Int Int
+data UnionFind = UnionFind { unionLinks :: Array Int Int
+                           , unionRanks :: Array Int Int }
 
 unionInit :: Int -> UnionFind
-unionInit n = array (0, n - 1) [(i, i) | i <- [0..n-1]]
+unionInit n = UnionFind { unionLinks = array (0, n - 1) [(i, i) | i <- [0..n-1]]
+                        , unionRanks = array (0, n - 1) [(i, 0) | i <- [0..n-1]]
+                        }
 
 unionFind :: UnionFind -> Int -> (UnionFind, Int)
-unionFind uf i = let j = uf ! i
+unionFind uf i = let j = (unionLinks uf) ! i
                  in if i == j
                     then (uf, i)
                     else let (uf2, k) = unionFind uf j
                              uf3 = if k /= j
-                                   then uf2 // [(i, k)]
+                                   then uf2 { unionLinks = (unionLinks uf2) // [(i, k)] }
                                    else uf2
                          in (uf3, k)
 
@@ -24,7 +27,7 @@ unionMerge :: UnionFind -> Int -> Int -> (UnionFind, Bool)
 unionMerge uf1 a b = let (uf2, a') = unionFind uf1 a
                          (uf3, b') = unionFind uf2 b
                      in if a' /= b'
-                        then (uf3 // [(a', b')], True)
+                        then (uf3 { unionLinks = (unionLinks uf3) // [(a', b')] }, True)
                         else (uf3, False)
 
 numbers :: BS.ByteString -> [Int]
