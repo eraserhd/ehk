@@ -49,9 +49,13 @@ unionMerge uf1 a b = if a' == b'
                               , unionSize  = (unionSize uf3)  // [(b', newSize)]
                               , unionRanks = (unionRanks uf3) // [(b', 1 + (unionRanks uf3 ! b') )] }, Just newSize )
 
-
 numbers :: BS.ByteString -> [Int]
-numbers = map (read . BS.unpack) . filter (isDigit . BS.head) . BS.words
+numbers = f . BS.dropWhile (not . isDigit)
+          where
+            f bs | BS.null bs = []
+                 | otherwise  = let (num, rest) = BS.span isDigit bs
+                                in (read $ BS.unpack num) : f (BS.dropWhile (not . isDigit) rest)
+
 
 parseN :: ([Int] -> ([Int], a)) -> [Int] -> ([Int], [a])
 parseN f (n : ints) = mapAccumL (\a _ -> f a) ints [1..n]
