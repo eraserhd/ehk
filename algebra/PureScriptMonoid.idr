@@ -17,7 +17,8 @@ data StrictMonoid : (M : Type) -> (op : M -> M -> M) -> Type where
 --
 -- Note: Prelude.Nat.- is not Nat -> Nat -> Nat because it requires a LTE proof.
 -- This is probably sufficient to show this isn't a monoid, but in the interest of
--- proving things, lets make a similar operator that has the right type:
+-- proving things, lets make a similar operator that has the right type.  In this
+-- version, (smallerNum - biggerNum) = 0.
 
 zMinus : Nat -> Nat -> Nat
 zMinus k Z         = k
@@ -70,8 +71,8 @@ qPlusIdentity = Evidence (Ratio 0 1) (\x => (rident x, lident x))
                          rewrite (multOneRightNeutral d) in
                          Refl
 
-qPlusIsMonoid : StrictMonoid Q (Main.qPlus)
-qPlusIsMonoid = SM Q Main.qPlus qPlusAssociative qPlusIdentity
+qPlusMonoid : StrictMonoid Q (Main.qPlus)
+qPlusMonoid = SM Q Main.qPlus qPlusAssociative qPlusIdentity
 
 -- Exercise 2.3 - Uniqueness of identity elements
 
