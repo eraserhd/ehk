@@ -14,8 +14,22 @@ data StrictMonoid : (M : Type) -> (op : M -> M -> M) -> Type where
        StrictMonoid M op
 
 -- Exercise 2.1 - Show why (ℤ, -) is not a monoid
+--
+-- Note: Prelude.Nat.- is not Nat -> Nat -> Nat because it requires a LTE proof.
+-- This is probably sufficient to show this isn't a monoid, but in the interest of
+-- proving things, lets make a similar operator that has the right type:
 
--- zMinusNotAMonoid : StrictMonoid Nat (Prelude.Nat.-) -> Void
+zMinus : Nat -> Nat -> Nat
+zMinus k Z         = k
+zMinus Z (S j)     = Z
+zMinus (S k) (S j) = zMinus k j
+
+zMinusNotAMonoid : StrictMonoid Nat Main.zMinus -> Void
+zMinusNotAMonoid (SM _ _ assoc ident) = SIsNotZ (sym zeroIsOne)
+  where
+    zeroIsOne : ((1 `zMinus` 1) `zMinus` 1) = (1 `zMinus` (1 `zMinus` 1))
+    zeroIsOne = assoc 1 1 1
+
 
 -- Exercise 2.2 - Prove that (ℚ, +) is a monoid
 
@@ -55,6 +69,9 @@ qPlusIdentity = Evidence (Ratio 0 1) (\x => (rident x, lident x))
     lident (Ratio n d) = rewrite (multOneRightNeutral n) in
                          rewrite (multOneRightNeutral d) in
                          Refl
+
+qPlusIsMonoid : StrictMonoid Q (Main.qPlus)
+qPlusIsMonoid = SM Q Main.qPlus qPlusAssociative qPlusIdentity
 
 -- Exercise 2.3 - Uniqueness of identity elements
 
