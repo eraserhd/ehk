@@ -5,7 +5,17 @@
 
 %default total
 
+data StrictMonoid : (M : Type) -> (op : M -> M -> M) -> Type where
+  SM : (M : Type) ->
+       (op : M -> M -> M) ->
+       (assoc : ((a : M) -> (b : M) -> (c : M) ->
+                 ((a `op` b) `op` c) = (a `op` (b `op` c)))) ->
+       (ident : Exists (\e : M => (x : M) -> ((x `op` e) = x, (e `op` x) = x))) ->
+       StrictMonoid M op
+
 -- Exercise 2.1 - Show why (ℤ, -) is not a monoid
+
+-- zMinusNotAMonoid : StrictMonoid Nat (Prelude.Nat.-) -> Void
 
 -- Exercise 2.2 - Prove that (ℚ, +) is a monoid
 
