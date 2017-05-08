@@ -2,6 +2,7 @@
 -- Exercises from Harry Garrood's "A guide to the PureScript numeric
 -- hierarchy"
 --
+import Data.ZZ
 
 %default total
 
@@ -35,7 +36,7 @@ zMinusNotAMonoid (SM _ _ assoc ident) = SIsNotZ (sym zeroIsOne)
 -- Exercise 2.2 - Prove that (ℚ, +) is a monoid
 
 data Q : Type where
-  Ratio : Nat -> Nat -> Q
+  Ratio : ZZ -> ZZ -> Q
 
 qPlus : Q -> Q -> Q
 qPlus (Ratio ln ld) (Ratio rn rd) = Ratio (ln * rd + rn * ld) (rd * ld)
@@ -44,16 +45,16 @@ qPlusAssociative :
   (a : Q) -> (b : Q) -> (c : Q) ->
   ((a `qPlus` b) `qPlus` c) = (a `qPlus` (b `qPlus` c))
 qPlusAssociative (Ratio an ad) (Ratio bn bd) (Ratio cn cd) =
-  rewrite (multAssociative cd bd ad) in
-  rewrite (multDistributesOverPlusLeft (an * bd) (bn * ad) cd) in
-  rewrite (multDistributesOverPlusLeft (bn * cd) (cn * bd) ad) in
-  rewrite (plusAssociative (an * (cd * bd)) ((bn * cd) * ad) ((cn * bd) * ad)) in
-  rewrite (multAssociative cn bd ad) in
-  rewrite (sym $ multAssociative an bd cd) in
-  rewrite (sym $ multAssociative bn ad cd) in
-  rewrite (sym $ multAssociative bn cd ad) in
-  rewrite (multCommutative ad cd) in
-  rewrite (multCommutative bd cd) in
+  rewrite (multAssociativeZ cd bd ad) in
+  rewrite (multDistributesOverPlusLeftZ (an * bd) (bn * ad) cd) in
+  rewrite (multDistributesOverPlusLeftZ (bn * cd) (cn * bd) ad) in
+  rewrite (plusAssociativeZ (an * (cd * bd)) ((bn * cd) * ad) ((cn * bd) * ad)) in
+  rewrite (multAssociativeZ cn bd ad) in
+  rewrite (sym $ multAssociativeZ an bd cd) in
+  rewrite (sym $ multAssociativeZ bn ad cd) in
+  rewrite (sym $ multAssociativeZ bn cd ad) in
+  rewrite (multCommutativeZ ad cd) in
+  rewrite (multCommutativeZ bd cd) in
   Refl
 
 qPlusIdentity :
@@ -61,14 +62,17 @@ qPlusIdentity :
 qPlusIdentity = Evidence (Ratio 0 1) (\x => (rident x, lident x))
   where
     rident : (x : Q) -> (x `qPlus` (Ratio 0 1)) = x
-    rident (Ratio n d) = rewrite (plusZeroRightNeutral d) in
-                         rewrite (multOneRightNeutral n) in
-                         rewrite (plusZeroRightNeutral n) in
+    rident (Ratio n d) = rewrite (multOneRightNeutralZ n) in
+                         rewrite (multOneLeftNeutralZ d) in
+                         rewrite (multZeroLeftZeroZ d) in
+                         rewrite (plusZeroRightNeutralZ n) in
                          Refl
 
     lident : (x : Q) -> ((Ratio 0 1) `qPlus` x) = x
-    lident (Ratio n d) = rewrite (multOneRightNeutral n) in
-                         rewrite (multOneRightNeutral d) in
+    lident (Ratio n d) = rewrite (multOneRightNeutralZ n) in
+                         rewrite (multOneRightNeutralZ d) in
+                         rewrite (multZeroLeftZeroZ d) in
+                         rewrite (plusZeroLeftNeutralZ n) in
                          Refl
 
 qPlusMonoid : StrictMonoid Q (Main.qPlus)
