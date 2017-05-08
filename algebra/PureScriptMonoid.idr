@@ -15,25 +15,17 @@ data StrictMonoid : (M : Type) -> (op : M -> M -> M) -> Type where
        StrictMonoid M op
 
 -- Exercise 2.1 - Show why (ℤ, -) is not a monoid
---
--- Note: Prelude.Nat.- is not Nat -> Nat -> Nat because it requires a LTE proof.
--- This is probably sufficient to show this isn't a monoid, but in the interest of
--- proving things, lets make a similar operator that has the right type.  In this
--- version, (smallerNum - biggerNum) = 0.
 
-zMinus : Nat -> Nat -> Nat
-zMinus k Z         = k
-zMinus Z (S j)     = Z
-zMinus (S k) (S j) = zMinus k j
-
-zMinusNotAMonoid : StrictMonoid Nat Main.zMinus -> Void
-zMinusNotAMonoid (SM _ _ assoc ident) = SIsNotZ (sym zeroIsOne)
+zMinusNotAMonoid : StrictMonoid ZZ (-) -> Void
+zMinusNotAMonoid (SM _ _ assoc ident) = posNotNeg $ sym contradiction
   where
-    zeroIsOne : ((1 `zMinus` 1) `zMinus` 1) = (1 `zMinus` (1 `zMinus` 1))
-    zeroIsOne = assoc 1 1 1
-
+    contradiction : (((the ZZ 1) - 1) - 1) = (1 - (1 - 1))
+    contradiction = assoc 1 1 1
 
 -- Exercise 2.2 - Prove that (ℚ, +) is a monoid
+
+-- FIXME: Denominator could be zero
+-- FIXME: Numerator should always be positive
 
 data Q : Type where
   Ratio : ZZ -> ZZ -> Q
