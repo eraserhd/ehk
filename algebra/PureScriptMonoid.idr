@@ -19,7 +19,7 @@ data StrictMonoid : (M : Type) -> (op : M -> M -> M) -> Type where
 zMinusNotAMonoid : StrictMonoid ZZ (-) -> Void
 zMinusNotAMonoid (SM _ _ assoc ident) = posNotNeg $ sym contradiction
   where
-    contradiction : (((the ZZ 1) - 1) - 1) = (1 - (1 - 1))
+    contradiction : (the ZZ (-1)) = 1
     contradiction = assoc 1 1 1
 
 -- Exercise 2.2 - Prove that (ℚ, +) is a monoid
