@@ -24,8 +24,8 @@ zMinusNotAMonoid (SM _ _ assoc ident) = posNotNeg $ sym contradiction
 
 -- Exercise 2.2 - Prove that (ℚ, +) is a monoid
 
--- FIXME: Denominator could be zero
--- FIXME: Numerator should always be positive
+-- FIXME: Prevent the possibility of the denominator being zero
+-- FIXME: Numerator should always be positive (Nat)
 
 data Q : Type where
   Ratio : ZZ -> ZZ -> Q
