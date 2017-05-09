@@ -14,6 +14,10 @@ data StrictMonoid : (M : Type) -> (op : M -> M -> M) -> Type where
        (ident : Exists (\e : M => (x : M) -> ((x `op` e) = x, (e `op` x) = x))) ->
        StrictMonoid M op
 
+mIdent : StrictMonoid m op -> Exists (\e : m => (x : m) -> ((x `op` e) = x, (e `op` x) = x))
+mIdent (SM _ _ _ ident) = ident
+
+
 -- Exercise 2.1 - Show why (ℤ, -) is not a monoid
 
 zMinusNotAMonoid : StrictMonoid ZZ (-) -> Void
@@ -73,12 +77,10 @@ qPlusMonoid = SM Q Main.qPlus qPlusAssociative qPlusIdentity
 -- Exercise 2.3 - Uniqueness of identity elements
 
 identityElementsAreUnique :
-  (G : Type) ->
-  (op : G -> G -> G) ->
-  (p1 : Exists (\e : G => (x : G) -> ((x `op` e) = x, (e `op` x) = x))) ->
-  (p2 : Exists (\e : G => (x : G) -> ((x `op` e) = x, (e `op` x) = x))) ->
-  getWitness p1 = getWitness p2
-identityElementsAreUnique _ op (Evidence e1 pf1) (Evidence e2 pf2) = trans b a
+  (m : StrictMonoid g op) ->
+  (p2 : Exists (\e : g => (x : g) -> ((x `op` e) = x, (e `op` x) = x))) ->
+  getWitness (mIdent m) = getWitness p2
+identityElementsAreUnique (SM g op _ (Evidence e1 pf1)) (Evidence e2 pf2) = trans b a
   where
     a : (e2 `op` e1) = e2
     a = fst $ pf1 e2
