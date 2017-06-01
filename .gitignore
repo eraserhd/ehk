@@ -11,3 +11,5 @@ work/*
 *.hi
 *~
 *.ibc
+*.agda.vim
+*.agdai
