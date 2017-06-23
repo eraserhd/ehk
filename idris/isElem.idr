@@ -1,7 +1,9 @@
+-- From the mIdris mailing list
 import Data.Vect
 
 %default total
 
+-- Example from the mailing list.  How do you implement ?isElem_rhs
 isElem' : DecEq ty => (value : ty) -> (xs : Vect n ty) -> Dec (Elem value xs)
 isElem' value []      = (No absurd)
 isElem' value (x::xs) = case (decEq value x) of
@@ -10,6 +12,7 @@ isElem' value (x::xs) = case (decEq value x) of
                                        Yes prf     => Yes (There prf)
                                        No notThere => No ?isElem_rhs
 
+-- My solution
 aux : DecEq ty => {value, x : ty} -> {xs : Vect n ty} -> ((value = x) -> Void) -> (Elem value xs -> Void) -> (Elem value (x :: xs) -> Void)
 aux {value = x} {x = x} {xs = xs} notHead notTail Here = notHead Refl
 aux {value = value} {x = x} {xs = xs} notHead notTail (There later) = notTail later
