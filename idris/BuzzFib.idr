@@ -100,6 +100,15 @@ outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) with (fibIsFunct
 
 outputIsFunctional (OutputFizzBuzz z w) y = ?outputIsFunctional_rhs_3
 outputIsFunctional (OutputBuzzFizz z w) y = ?outputIsFunctional_rhs_4
-outputIsFunctional (OutputLiterally z f g w) y = ?outputIsFunctional_rhs_5
+
+outputIsFunctional (OutputLiterally z f g w) (OutputBuzz y s t) with (fibIsFunctional z y)
+  outputIsFunctional (OutputLiterally z f g w) (OutputBuzz y s t) | Refl = absurd (f s)
+outputIsFunctional (OutputLiterally z f g w) (OutputFizz y s t) with (fibIsFunctional z y)
+  outputIsFunctional (OutputLiterally z f g w) (OutputFizz y s t) | Refl = absurd (g s)
+outputIsFunctional (OutputLiterally z f g w) (OutputFizzBuzz y s) = ?outputIsFunctional_rhs_6
+outputIsFunctional (OutputLiterally z f g w) (OutputBuzzFizz y s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputLiterally z f g w) (OutputBuzzFizz y s) | Refl = absurd (w s)
+outputIsFunctional (OutputLiterally z f g w) (OutputLiterally y s t u) with (fibIsFunctional z y)
+  outputIsFunctional (OutputLiterally z f g w) (OutputLiterally y s t u) | Refl = Refl
 
 
