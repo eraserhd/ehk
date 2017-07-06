@@ -21,6 +21,9 @@ data Fib : Nat -> Nat -> Type where
   Fib1 : Fib 1 1
   FibN : Fib n x -> Fib (S n) y -> Fib (S (S n)) (x + y)
 
+||| Proof: There is only one nth Fibonacci number
+fibIsFunctional : Fib n x -> Fib n y -> x = y
+
 ||| Types of output.
 |||
 ||| This only adds a small bit of certainty in the accuracy of the program --
@@ -64,5 +67,17 @@ data OutputSemantics : Nat -> Output -> Type where
 
 ||| Proof: There is only one possible output for any n.
 outputIsFunctional : OutputSemantics n output1 -> OutputSemantics n output2 -> output1 = output2
+outputIsFunctional (OutputBuzz _ _ _) (OutputBuzz _ _ _) = Refl
+outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) with (fibIsFunctional z y)
+  outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) | Refl = absurd (f s)
+outputIsFunctional (OutputBuzz z w f) (OutputFizzBuzz y s) = ?outputIsFunctional_rhs_8
+outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y s) | Refl = ?outputIsFunctional_rhs_1
+outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
+  outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) | Refl = absurd (g w)
+outputIsFunctional (OutputFizz z w f) y = ?outputIsFunctional_rhs_2
+outputIsFunctional (OutputFizzBuzz z w) y = ?outputIsFunctional_rhs_3
+outputIsFunctional (OutputBuzzFizz z w) y = ?outputIsFunctional_rhs_4
+outputIsFunctional (OutputLiterally z f g w) y = ?outputIsFunctional_rhs_5
 
 
