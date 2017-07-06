@@ -40,7 +40,7 @@ implementation Show Output where
 ||| Only valid congurences (x = y (mod z)) are constructible.
 |||
 data ModularCongruence : (x, y, z : Nat) -> Type where
-  ModularBase : x' `LTE` z' -> ModularCongruence x' x' (S z')
+  ModularBase : (x', z' : Nat) -> x' `LTE` z' -> ModularCongruence x' x' (S z')
   ModularStep : ModularCongruence x' y' z' -> ModularCongruence (x' + z') y' z'
 
 infixl 6 .<.
@@ -52,6 +52,9 @@ infixl 9 .|.
 ||| periods.
 (.|.) : (z, x : Nat) -> Type
 z .|. x = ModularCongruence x 0 z
+
+||| (.|.) is transitive
+dividesTransitive : (x, y, z : Nat) -> x .|. y -> y .|. z -> x .|. z
 
 ||| A type only inhabited by primes.
 data Prime : Nat -> Type where
@@ -66,12 +69,20 @@ data OutputSemantics : Nat -> Output -> Type where
   OutputBuzzFizz  : Fib n x -> Prime x -> OutputSemantics n BuzzFizz
   OutputLiterally : Fib n x -> Not (3 .|. x) -> Not (5 .|. x) -> Not (Prime x) -> OutputSemantics n (Literally x)
 
+-- Some helpers
+fiveDividesFifteen : ModularCongruence 15 0 5
+fiveDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularBase 0 4 LTEZero
+
+threeDividesFifteen : ModularCongruence 15 0 3
+threeDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularBase 0 2 LTEZero
+
 ||| Proof: There is only one possible output for any n.
 outputIsFunctional : OutputSemantics n output1 -> OutputSemantics n output2 -> output1 = output2
 outputIsFunctional (OutputBuzz _ _ _) (OutputBuzz _ _ _) = Refl
 outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) with (fibIsFunctional z y)
   outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) | Refl = absurd (f s)
-outputIsFunctional (OutputBuzz z w f) (OutputFizzBuzz y s) = ?outputIsFunctional_rhs_8
+outputIsFunctional (OutputBuzz {x} z w f) (OutputFizzBuzz y s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputBuzz {x} z w f) (OutputFizzBuzz y s) | Refl = absurd (f $ dividesTransitive 5 15 x fiveDividesFifteen s)
 outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y s) with (fibIsFunctional z y)
   outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y (MkPrime x g)) | Refl = absurd (g 3 (LTESucc (LTESucc LTEZero)) w)
 outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
@@ -80,10 +91,13 @@ outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) with (fibIsFunct
 outputIsFunctional (OutputFizz z w f) (OutputBuzz y s g) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizz z w f) (OutputBuzz y s g) | Refl = absurd (f s)
 outputIsFunctional (OutputFizz _ _ _) (OutputFizz _ _ _) = Refl
-outputIsFunctional (OutputFizz z w f) (OutputFizzBuzz y s) = ?outputIsFunctional_rhs_7
+outputIsFunctional (OutputFizz z w f) (OutputFizzBuzz y s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputFizz z w f) (OutputFizzBuzz y s) | Refl = ?outputIsFunctional_rhs_1
 outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y s) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y (MkPrime x g)) | Refl = absurd (g 5 (LTESucc (LTESucc LTEZero)) w)
-outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) = ?outputIsFunctional_rhs_10
+outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
+  outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) | Refl = absurd (s w)
+
 outputIsFunctional (OutputFizzBuzz z w) y = ?outputIsFunctional_rhs_3
 outputIsFunctional (OutputBuzzFizz z w) y = ?outputIsFunctional_rhs_4
 outputIsFunctional (OutputLiterally z f g w) y = ?outputIsFunctional_rhs_5
