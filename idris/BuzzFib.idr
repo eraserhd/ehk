@@ -11,7 +11,6 @@
 --
 -- TODO:
 -- * Fix MkPrime
--- * Implement fibIsFunctional
 -- * Implement dividesTransitive
 
 %default total -- Make sure our proofs are good
@@ -27,6 +26,11 @@ data Fib : Nat -> Nat -> Type where
 
 ||| Proof: There is only one nth Fibonacci number
 fibIsFunctional : Fib n x -> Fib n y -> x = y
+fibIsFunctional Fib0 Fib0 = Refl
+fibIsFunctional Fib1 Fib1 = Refl
+fibIsFunctional (FibN a1 b1) (FibN a2 b2) with (fibIsFunctional a1 a2)
+  fibIsFunctional (FibN a1 b1) (FibN a2 b2) | Refl with (fibIsFunctional b1 b2)
+    fibIsFunctional (FibN a1 b1) (FibN a2 b2) | Refl | Refl = Refl
 
 ||| Types of output.
 |||
@@ -47,7 +51,6 @@ data ModularCongruence : (x, y, z : Nat) -> Type where
   ModularBase : (x', z' : Nat) -> x' `LTE` z' -> ModularCongruence x' x' (S z')
   ModularStep : ModularCongruence x' y' z' -> ModularCongruence (x' + z') y' z'
 
-infixl 6 .<.
 infixl 9 .|.
 
 ||| x = 0 (mod z) means z|x (z divides x).
