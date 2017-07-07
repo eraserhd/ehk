@@ -9,6 +9,10 @@
 -- * "BuzzFizz" when F(n) is prime.
 -- * the value F(n) otherwise.
 --
+-- TODO:
+-- * Fix MkPrime
+-- * Implement fibIsFunctional
+-- * Implement dividesTransitive
 
 %default total -- Make sure our proofs are good
 
