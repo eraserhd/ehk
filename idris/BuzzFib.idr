@@ -77,6 +77,10 @@ threeDividesFifteen : ModularCongruence 15 0 3
 threeDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularBase 0 2 LTEZero
 
 ||| Proof: There is only one possible output for any n.
+|||
+||| There are 25 cases here (5 x 5), which is kind of yucky.  It could be cleaned
+||| up by refactoring OutputSemantics; but I'd rather have the verbose proof with
+||| the direct statement of requirements.
 outputIsFunctional : OutputSemantics n output1 -> OutputSemantics n output2 -> output1 = output2
 outputIsFunctional (OutputBuzz _ _ _) (OutputBuzz _ _ _) = Refl
 outputIsFunctional (OutputFizz _ _ _) (OutputFizz _ _ _) = Refl
@@ -114,7 +118,8 @@ outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) with (fibI
 outputIsFunctional (OutputBuzzFizz z w) (OutputBuzz y s f) = ?outputIsFunctional_rhs_3
 outputIsFunctional (OutputBuzzFizz z w) (OutputFizz y s f) = ?outputIsFunctional_rhs_5
 outputIsFunctional (OutputBuzzFizz z w) (OutputFizzBuzz y s) = ?outputIsFunctional_rhs_8
-outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) = ?outputIsFunctional_rhs_10
+outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) | Refl = absurd (s w)
 
 outputIsFunctional (OutputLiterally z f g w) (OutputBuzz y s t) with (fibIsFunctional z y)
   outputIsFunctional (OutputLiterally z f g w) (OutputBuzz y s t) | Refl = absurd (f s)
@@ -124,5 +129,4 @@ outputIsFunctional (OutputLiterally {x} z f g w) (OutputFizzBuzz y s) with (fibI
   outputIsFunctional (OutputLiterally {x} z f g w) (OutputFizzBuzz y s) | Refl = absurd (g $ dividesTransitive 5 15 x fiveDividesFifteen s)
 outputIsFunctional (OutputLiterally z f g w) (OutputBuzzFizz y s) with (fibIsFunctional z y)
   outputIsFunctional (OutputLiterally z f g w) (OutputBuzzFizz y s) | Refl = absurd (w s)
-
 
