@@ -115,7 +115,8 @@ outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y s) with (fibIsFunction
 outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) | Refl = absurd (g $ dividesTransitive 5 15 x fiveDividesFifteen w)
 
-outputIsFunctional (OutputBuzzFizz z w) (OutputBuzz y s f) = ?outputIsFunctional_rhs_3
+outputIsFunctional (OutputBuzzFizz z w) (OutputBuzz y s f) with (fibIsFunctional z y)
+  outputIsFunctional (OutputBuzzFizz z (MkPrime x g)) (OutputBuzz y s f) | Refl = absurd (g 3 (LTESucc (LTESucc LTEZero)) s)
 outputIsFunctional (OutputBuzzFizz z w) (OutputFizz y s f) with (fibIsFunctional z y)
   outputIsFunctional (OutputBuzzFizz z (MkPrime x g)) (OutputFizz y s f) | Refl = absurd (g 5 (LTESucc (LTESucc LTEZero)) s)
 outputIsFunctional (OutputBuzzFizz z w) (OutputFizzBuzz y s) with (fibIsFunctional z y)
