@@ -79,6 +79,12 @@ threeDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularStep $ Mo
 ||| Proof: There is only one possible output for any n.
 outputIsFunctional : OutputSemantics n output1 -> OutputSemantics n output2 -> output1 = output2
 outputIsFunctional (OutputBuzz _ _ _) (OutputBuzz _ _ _) = Refl
+outputIsFunctional (OutputFizz _ _ _) (OutputFizz _ _ _) = Refl
+outputIsFunctional (OutputFizzBuzz _ _) (OutputFizzBuzz _ _) = Refl
+outputIsFunctional (OutputBuzzFizz _ _) (OutputBuzzFizz _ _) = Refl
+outputIsFunctional (OutputLiterally z f g w) (OutputLiterally y s t u) with (fibIsFunctional z y)
+  outputIsFunctional (OutputLiterally z f g w) (OutputLiterally y s t u) | Refl = Refl
+
 outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) with (fibIsFunctional z y)
   outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) | Refl = absurd (f s)
 outputIsFunctional (OutputBuzz {x} z w f) (OutputFizzBuzz y s) with (fibIsFunctional z y)
@@ -90,7 +96,6 @@ outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) with (fibIsFunct
 
 outputIsFunctional (OutputFizz z w f) (OutputBuzz y s g) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizz z w f) (OutputBuzz y s g) | Refl = absurd (f s)
-outputIsFunctional (OutputFizz _ _ _) (OutputFizz _ _ _) = Refl
 outputIsFunctional (OutputFizz {x} z w f) (OutputFizzBuzz y s) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizz {x} z w f) (OutputFizzBuzz y s) | Refl = absurd (f $ dividesTransitive 3 15 x threeDividesFifteen s)
 outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y s) with (fibIsFunctional z y)
@@ -98,17 +103,26 @@ outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y s) with (fibIsFunctional
 outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) | Refl = absurd (s w)
 
-outputIsFunctional (OutputFizzBuzz z w) y = ?outputIsFunctional_rhs_3
-outputIsFunctional (OutputBuzzFizz z w) y = ?outputIsFunctional_rhs_4
+outputIsFunctional (OutputFizzBuzz z w) (OutputBuzz y s f) = ?outputIsFunctional_rhs_1
+outputIsFunctional (OutputFizzBuzz {x} z w) (OutputFizz y s f) with (fibIsFunctional z y)
+  outputIsFunctional (OutputFizzBuzz {x} z w) (OutputFizz y s f) | Refl = absurd (f $ dividesTransitive 3 15 x threeDividesFifteen w)
+outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y (MkPrime x f)) | Refl = absurd (f 15 (LTESucc (LTESucc LTEZero)) w)
+outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) | Refl = absurd (g $ dividesTransitive 5 15 x fiveDividesFifteen w)
+
+outputIsFunctional (OutputBuzzFizz z w) (OutputBuzz y s f) = ?outputIsFunctional_rhs_3
+outputIsFunctional (OutputBuzzFizz z w) (OutputFizz y s f) = ?outputIsFunctional_rhs_5
+outputIsFunctional (OutputBuzzFizz z w) (OutputFizzBuzz y s) = ?outputIsFunctional_rhs_8
+outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) = ?outputIsFunctional_rhs_10
 
 outputIsFunctional (OutputLiterally z f g w) (OutputBuzz y s t) with (fibIsFunctional z y)
   outputIsFunctional (OutputLiterally z f g w) (OutputBuzz y s t) | Refl = absurd (f s)
 outputIsFunctional (OutputLiterally z f g w) (OutputFizz y s t) with (fibIsFunctional z y)
   outputIsFunctional (OutputLiterally z f g w) (OutputFizz y s t) | Refl = absurd (g s)
-outputIsFunctional (OutputLiterally z f g w) (OutputFizzBuzz y s) = ?outputIsFunctional_rhs_6
+outputIsFunctional (OutputLiterally {x} z f g w) (OutputFizzBuzz y s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputLiterally {x} z f g w) (OutputFizzBuzz y s) | Refl = absurd (g $ dividesTransitive 5 15 x fiveDividesFifteen s)
 outputIsFunctional (OutputLiterally z f g w) (OutputBuzzFizz y s) with (fibIsFunctional z y)
   outputIsFunctional (OutputLiterally z f g w) (OutputBuzzFizz y s) | Refl = absurd (w s)
-outputIsFunctional (OutputLiterally z f g w) (OutputLiterally y s t u) with (fibIsFunctional z y)
-  outputIsFunctional (OutputLiterally z f g w) (OutputLiterally y s t u) | Refl = Refl
 
 
