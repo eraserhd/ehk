@@ -107,7 +107,8 @@ outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y s) with (fibIsFunctional
 outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) | Refl = absurd (s w)
 
-outputIsFunctional (OutputFizzBuzz z w) (OutputBuzz y s f) = ?outputIsFunctional_rhs_1
+outputIsFunctional (OutputFizzBuzz {x} z w) (OutputBuzz y s f) with (fibIsFunctional z y)
+  outputIsFunctional (OutputFizzBuzz {x} z w) (OutputBuzz y s f) | Refl = absurd (f $ dividesTransitive 5 15 x fiveDividesFifteen w)
 outputIsFunctional (OutputFizzBuzz {x} z w) (OutputFizz y s f) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizzBuzz {x} z w) (OutputFizz y s f) | Refl = absurd (f $ dividesTransitive 3 15 x threeDividesFifteen w)
 outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y s) with (fibIsFunctional z y)
