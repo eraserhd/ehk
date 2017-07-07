@@ -48,7 +48,7 @@ implementation Show Output where
 ||| Only valid congurences (x = y (mod z)) are constructible.
 |||
 data ModularCongruence : (x, y, z : Nat) -> Type where
-  ModularBase : (x', z' : Nat) -> x' `LTE` z' -> ModularCongruence x' x' (S z')
+  ModularBase : (S n) `LTE` z -> ModularCongruence n n z
   ModularStep : ModularCongruence x' y' z' -> ModularCongruence (x' + z') y' z'
 
 infixl 9 .|.
@@ -78,10 +78,10 @@ data OutputSemantics : Nat -> Output -> Type where
 
 -- Some helpers
 fiveDividesFifteen : ModularCongruence 15 0 5
-fiveDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularBase 0 4 LTEZero
+fiveDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularBase (LTESucc LTEZero)
 
 threeDividesFifteen : ModularCongruence 15 0 3
-threeDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularBase 0 2 LTEZero
+threeDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularBase (LTESucc LTEZero)
 
 ||| Proof: There is only one possible output for any n.
 |||
