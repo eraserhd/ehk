@@ -117,7 +117,8 @@ outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) with (fibI
 
 outputIsFunctional (OutputBuzzFizz z w) (OutputBuzz y s f) = ?outputIsFunctional_rhs_3
 outputIsFunctional (OutputBuzzFizz z w) (OutputFizz y s f) = ?outputIsFunctional_rhs_5
-outputIsFunctional (OutputBuzzFizz z w) (OutputFizzBuzz y s) = ?outputIsFunctional_rhs_8
+outputIsFunctional (OutputBuzzFizz z w) (OutputFizzBuzz y s) with (fibIsFunctional z y)
+  outputIsFunctional (OutputBuzzFizz z (MkPrime x f)) (OutputFizzBuzz y s) | Refl = absurd (f 15 (LTESucc (LTESucc LTEZero)) s)
 outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) with (fibIsFunctional z y)
   outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) | Refl = absurd (s w)
 
