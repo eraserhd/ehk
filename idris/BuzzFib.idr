@@ -42,11 +42,16 @@ implementation Show Output where
   show BuzzFizz = "BuzzFizz"
   show (Literally k) = show k
 
+syntax [a] "≡" [b] "⟦" mod [n] "⟧" = ModularCongruence a b n
+
 ||| Only valid congurences (x = y (mod z)) are constructible.
 |||
-data ModularCongruence : (x, y, z : Nat) -> Type where
-  ModularBase : (S n) `LTE` z -> ModularCongruence n n z
-  ModularStep : ModularCongruence x' y' z' -> ModularCongruence (x' + z') y' z'
+data ModularCongruence : (a, b, n : Nat) -> Type where
+  MkModularCongruence : (a, b, k, n : Nat) ->
+                        {auto subtractOk : b `LTE` a} ->
+                        {auto bLTn : (S b) `LTE` n} ->
+                        a - b = k * n ->
+                        a ≡ b ⟦mod n⟧
 
 infixl 9 .|.
 
@@ -55,7 +60,7 @@ infixl 9 .|.
 ||| Idris steals too many operator spellings, though, so we spell the type with
 ||| periods.
 (.|.) : (z, x : Nat) -> Type
-z .|. x = ModularCongruence x 0 z
+z .|. x = x ≡ 0 ⟦mod z⟧
 
 ||| (.|.) is transitive
 dividesTransitive : (x, y, z : Nat) -> x .|. y -> y .|. z -> x .|. z
@@ -75,10 +80,10 @@ data OutputSemantics : Nat -> Output -> Type where
 
 -- Some helpers
 fiveDividesFifteen : ModularCongruence 15 0 5
-fiveDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularBase (LTESucc LTEZero)
+fiveDividesFifteen = MkModularCongruence 15 0 3 5 Refl
 
 threeDividesFifteen : ModularCongruence 15 0 3
-threeDividesFifteen = ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularStep $ ModularBase (LTESucc LTEZero)
+threeDividesFifteen = MkModularCongruence 15 0 5 3 Refl
 
 ||| Proof: There is only one possible output for any n.
 |||
