@@ -83,6 +83,11 @@ data Prime : Nat -> Type where
             Prime p
 
 ||| Our rules for output.
+|||
+||| Not (Prime x) in OutputBuzz and OutputFizz aren't part of the problem
+||| statement, which is ambiguous in exactly the way we are using Idris to
+||| prove we aren't, hence I've decided that 3 and 5 are treated as primes
+||| rather than Buzz and Fizz, respectively.
 data OutputSemantics : Nat -> Output -> Type where
   OutputBuzz      : Fib n x -> Not (Prime x) -> 3 .|. x -> Not (5 .|. x) -> OutputSemantics n Buzz
   OutputFizz      : Fib n x -> Not (Prime x) -> 5 .|. x -> Not (3 .|. x) -> OutputSemantics n Fizz
@@ -98,10 +103,6 @@ threeDividesFifteen : 3 .|. 15
 threeDividesFifteen = MkModularCongruence 5
 
 ||| Proof: There is only one possible output for any n.
-|||
-||| There are 25 cases here (5 x 5), which is kind of yucky.  It could be cleaned
-||| up by refactoring OutputSemantics; but I'd rather have the verbose proof with
-||| the direct statement of requirements.
 outputIsFunctional : OutputSemantics n output1 -> OutputSemantics n output2 -> output1 = output2
 outputIsFunctional x y = ?outputIsFunctional_rhs
 
