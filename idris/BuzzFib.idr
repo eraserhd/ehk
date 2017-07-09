@@ -42,9 +42,10 @@ implementation Show Output where
   show BuzzFizz = "BuzzFizz"
   show (Literally k) = show k
 
+-- Syntax considered harmful.  But this one works for now and makes things clearer.
 syntax [a] "≡" [b] "⟦" mod [n] "⟧" = ModularCongruence a b n
 
-||| Only valid congurences (x = y (mod z)) are constructible.
+||| Only valid congurences (a ≡ b ⟦mod n⟧) are constructible.
 |||
 data ModularCongruence : (a, b, n : Nat) -> Type where
   MkModularCongruence : (a, b, k, n : Nat) ->
