@@ -77,8 +77,10 @@ dividesTransitive : (x, y, z : Nat) -> x .|. y -> y .|. z -> x .|. z
 
 ||| A type only inhabited by primes.
 data Prime : Nat -> Type where
-  ||| We can construct a prime x all z such that z > 1 do not divide x.
-  MkPrime : (x : Nat) -> ((z : Nat) -> 2 `LTE` z -> Not (z .|. x)) -> Prime x
+  ||| This reads, roughly, p is prime if every divisor is either 1 or p itself.
+  MkPrime : {p : Nat} ->
+            ((divisor : Nat) -> (divisor .|. p) -> Either (divisor = 1) (divisor = p)) ->
+            Prime p
 
 ||| Our rules for output.
 data OutputSemantics : Nat -> Output -> Type where
@@ -113,8 +115,9 @@ outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) with (fibIsFunctional z
 outputIsFunctional (OutputBuzz {x} z w f) (OutputFizzBuzz y s) with (fibIsFunctional z y)
   outputIsFunctional (OutputBuzz {x} z w f) (OutputFizzBuzz y s) | Refl = absurd (f $ dividesTransitive 5 15 x fiveDividesFifteen s)
 outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y (MkPrime x g)) | Refl = absurd (g 3 (LTESucc (LTESucc LTEZero)) w)
 outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
+  outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y (MkPrime g)) | Refl with (g w)
+    outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y (MkPrime g)) | Refl | with_pat = ?outputIsFunctional_rhs
   outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) | Refl = absurd (g w)
 
 outputIsFunctional (OutputFizz z w f) (OutputBuzz y s g) with (fibIsFunctional z y)
@@ -122,7 +125,7 @@ outputIsFunctional (OutputFizz z w f) (OutputBuzz y s g) with (fibIsFunctional z
 outputIsFunctional (OutputFizz {x} z w f) (OutputFizzBuzz y s) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizz {x} z w f) (OutputFizzBuzz y s) | Refl = absurd (f $ dividesTransitive 3 15 x threeDividesFifteen s)
 outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y (MkPrime x g)) | Refl = absurd (g 5 (LTESucc (LTESucc LTEZero)) w)
+  outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y (MkPrime g)) | Refl = ?oif_rhs_2
 outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) | Refl = absurd (s w)
 
@@ -131,16 +134,16 @@ outputIsFunctional (OutputFizzBuzz {x} z w) (OutputBuzz y s f) with (fibIsFuncti
 outputIsFunctional (OutputFizzBuzz {x} z w) (OutputFizz y s f) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizzBuzz {x} z w) (OutputFizz y s f) | Refl = absurd (f $ dividesTransitive 3 15 x threeDividesFifteen w)
 outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y (MkPrime x f)) | Refl = absurd (f 15 (LTESucc (LTESucc LTEZero)) w)
+  outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y (MkPrime f)) | Refl = ?oif_rhs_3
 outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) with (fibIsFunctional z y)
   outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) | Refl = absurd (g $ dividesTransitive 5 15 x fiveDividesFifteen w)
 
 outputIsFunctional (OutputBuzzFizz z w) (OutputBuzz y s f) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzzFizz z (MkPrime x g)) (OutputBuzz y s f) | Refl = absurd (g 3 (LTESucc (LTESucc LTEZero)) s)
+  outputIsFunctional (OutputBuzzFizz z (MkPrime g)) (OutputBuzz y s f) | Refl = ?oif_rhs_4
 outputIsFunctional (OutputBuzzFizz z w) (OutputFizz y s f) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzzFizz z (MkPrime x g)) (OutputFizz y s f) | Refl = absurd (g 5 (LTESucc (LTESucc LTEZero)) s)
+  outputIsFunctional (OutputBuzzFizz z (MkPrime g)) (OutputFizz y s f) | Refl = ?oif_rhs_5
 outputIsFunctional (OutputBuzzFizz z w) (OutputFizzBuzz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzzFizz z (MkPrime x f)) (OutputFizzBuzz y s) | Refl = absurd (f 15 (LTESucc (LTESucc LTEZero)) s)
+  outputIsFunctional (OutputBuzzFizz z (MkPrime f)) (OutputFizzBuzz y s) | Refl = ?oif_rhs_6
 outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) with (fibIsFunctional z y)
   outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) | Refl = absurd (s w)
 
