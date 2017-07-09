@@ -84,8 +84,8 @@ data Prime : Nat -> Type where
 
 ||| Our rules for output.
 data OutputSemantics : Nat -> Output -> Type where
-  OutputBuzz      : Fib n x -> 3 .|. x -> Not (5 .|. x) -> OutputSemantics n Buzz
-  OutputFizz      : Fib n x -> 5 .|. x -> Not (3 .|. x) -> OutputSemantics n Fizz
+  OutputBuzz      : Fib n x -> Not (Prime x) -> 3 .|. x -> Not (5 .|. x) -> OutputSemantics n Buzz
+  OutputFizz      : Fib n x -> Not (Prime x) -> 5 .|. x -> Not (3 .|. x) -> OutputSemantics n Fizz
   OutputFizzBuzz  : Fib n x -> 15 .|. x -> OutputSemantics n FizzBuzz
   OutputBuzzFizz  : Fib n x -> Prime x -> OutputSemantics n BuzzFizz
   OutputLiterally : Fib n x -> Not (3 .|. x) -> Not (5 .|. x) -> Not (Prime x) -> OutputSemantics n (Literally x)
@@ -103,56 +103,5 @@ threeDividesFifteen = MkModularCongruence 5
 ||| up by refactoring OutputSemantics; but I'd rather have the verbose proof with
 ||| the direct statement of requirements.
 outputIsFunctional : OutputSemantics n output1 -> OutputSemantics n output2 -> output1 = output2
-outputIsFunctional (OutputBuzz _ _ _) (OutputBuzz _ _ _) = Refl
-outputIsFunctional (OutputFizz _ _ _) (OutputFizz _ _ _) = Refl
-outputIsFunctional (OutputFizzBuzz _ _) (OutputFizzBuzz _ _) = Refl
-outputIsFunctional (OutputBuzzFizz _ _) (OutputBuzzFizz _ _) = Refl
-outputIsFunctional (OutputLiterally z f g w) (OutputLiterally y s t u) with (fibIsFunctional z y)
-  outputIsFunctional (OutputLiterally z f g w) (OutputLiterally y s t u) | Refl = Refl
-
-outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzz z w f) (OutputFizz y s g) | Refl = absurd (f s)
-outputIsFunctional (OutputBuzz {x} z w f) (OutputFizzBuzz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzz {x} z w f) (OutputFizzBuzz y s) | Refl = absurd (f $ dividesTransitive 5 15 x fiveDividesFifteen s)
-outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y s) with (fibIsFunctional z y)
-outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y (MkPrime g)) | Refl with (g w)
-    outputIsFunctional (OutputBuzz z w f) (OutputBuzzFizz y (MkPrime g)) | Refl | with_pat = ?outputIsFunctional_rhs
-  outputIsFunctional (OutputBuzz z w f) (OutputLiterally y g s t) | Refl = absurd (g w)
-
-outputIsFunctional (OutputFizz z w f) (OutputBuzz y s g) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizz z w f) (OutputBuzz y s g) | Refl = absurd (f s)
-outputIsFunctional (OutputFizz {x} z w f) (OutputFizzBuzz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizz {x} z w f) (OutputFizzBuzz y s) | Refl = absurd (f $ dividesTransitive 3 15 x threeDividesFifteen s)
-outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizz z w f) (OutputBuzzFizz y (MkPrime g)) | Refl = ?oif_rhs_2
-outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizz z w f) (OutputLiterally y g s t) | Refl = absurd (s w)
-
-outputIsFunctional (OutputFizzBuzz {x} z w) (OutputBuzz y s f) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizzBuzz {x} z w) (OutputBuzz y s f) | Refl = absurd (f $ dividesTransitive 5 15 x fiveDividesFifteen w)
-outputIsFunctional (OutputFizzBuzz {x} z w) (OutputFizz y s f) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizzBuzz {x} z w) (OutputFizz y s f) | Refl = absurd (f $ dividesTransitive 3 15 x threeDividesFifteen w)
-outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizzBuzz z w) (OutputBuzzFizz y (MkPrime f)) | Refl = ?oif_rhs_3
-outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputFizzBuzz {x} z w) (OutputLiterally y f g s) | Refl = absurd (g $ dividesTransitive 5 15 x fiveDividesFifteen w)
-
-outputIsFunctional (OutputBuzzFizz z w) (OutputBuzz y s f) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzzFizz z (MkPrime g)) (OutputBuzz y s f) | Refl = ?oif_rhs_4
-outputIsFunctional (OutputBuzzFizz z w) (OutputFizz y s f) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzzFizz z (MkPrime g)) (OutputFizz y s f) | Refl = ?oif_rhs_5
-outputIsFunctional (OutputBuzzFizz z w) (OutputFizzBuzz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzzFizz z (MkPrime f)) (OutputFizzBuzz y s) | Refl = ?oif_rhs_6
-outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputBuzzFizz z w) (OutputLiterally y f g s) | Refl = absurd (s w)
-
-outputIsFunctional (OutputLiterally z f g w) (OutputBuzz y s t) with (fibIsFunctional z y)
-  outputIsFunctional (OutputLiterally z f g w) (OutputBuzz y s t) | Refl = absurd (f s)
-outputIsFunctional (OutputLiterally z f g w) (OutputFizz y s t) with (fibIsFunctional z y)
-  outputIsFunctional (OutputLiterally z f g w) (OutputFizz y s t) | Refl = absurd (g s)
-outputIsFunctional (OutputLiterally {x} z f g w) (OutputFizzBuzz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputLiterally {x} z f g w) (OutputFizzBuzz y s) | Refl = absurd (g $ dividesTransitive 5 15 x fiveDividesFifteen s)
-outputIsFunctional (OutputLiterally z f g w) (OutputBuzzFizz y s) with (fibIsFunctional z y)
-  outputIsFunctional (OutputLiterally z f g w) (OutputBuzzFizz y s) | Refl = absurd (w s)
+outputIsFunctional x y = ?outputIsFunctional_rhs
 
