@@ -48,10 +48,19 @@ syntax [a] "≡" [b] "⟦" mod [n] "⟧" = ModularCongruence a b n
 ||| Only valid congurences (a ≡ b ⟦mod n⟧) are constructible.
 |||
 data ModularCongruence : (a, b, n : Nat) -> Type where
-  MkModularCongruence : (a, b, k, n : Nat) ->
+  ||| Construct a congruence, supplying k
+  |||
+  ||| We can usually deduce the other things.
+  |||
+  ||| @ k          The k that solves (a - b = k * n)
+  ||| @ subtractOk Proof that b ≤ a
+  ||| @ bLTn       Proof that b < n
+  ||| @ prf        Proof that a - b = k * n
+  MkModularCongruence : {a, b, n : Nat} ->
+                        (k : Nat) ->
                         {auto subtractOk : b `LTE` a} ->
                         {auto bLTn : (S b) `LTE` n} ->
-                        a - b = k * n ->
+                        {auto prf : a - b = k * n} ->
                         a ≡ b ⟦mod n⟧
 
 infixl 9 .|.
@@ -80,11 +89,11 @@ data OutputSemantics : Nat -> Output -> Type where
   OutputLiterally : Fib n x -> Not (3 .|. x) -> Not (5 .|. x) -> Not (Prime x) -> OutputSemantics n (Literally x)
 
 -- Some helpers
-fiveDividesFifteen : ModularCongruence 15 0 5
-fiveDividesFifteen = MkModularCongruence 15 0 3 5 Refl
+fiveDividesFifteen : 5 .|. 15
+fiveDividesFifteen = MkModularCongruence 3
 
-threeDividesFifteen : ModularCongruence 15 0 3
-threeDividesFifteen = MkModularCongruence 15 0 5 3 Refl
+threeDividesFifteen : 3 .|. 15
+threeDividesFifteen = MkModularCongruence 5
 
 ||| Proof: There is only one possible output for any n.
 |||
