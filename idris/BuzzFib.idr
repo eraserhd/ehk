@@ -10,6 +10,8 @@
 -- * the value F(n) otherwise.
 --
 
+import Syntax.PreorderReasoning
+
 %default total -- Make sure our proofs are good
 
 ||| An inductive structure only constructible for valid Fibonacci numbers.
@@ -73,7 +75,20 @@ infixl 9 .|.
 z .|. x = x ≡ 0 ⟦mod z⟧
 
 ||| (.|.) is transitive
+|||
+||| We create our proof by making some algebraic rewrites of the proofs given us.
 dividesTransitive : (x, y, z : Nat) -> x .|. y -> y .|. z -> x .|. z
+dividesTransitive x y z (MkModularCongruence {prf = prf1} k1) (MkModularCongruence {prf = prf2} k2) =
+  MkModularCongruence {prf = resultProof} (k2 * k1)
+  where
+    yIsK1TimesX : y = k1 * x
+    yIsK1TimesX = rewrite sym $ minusZeroRight y in
+                  prf1
+
+    resultProof : z - 0 = (k2 * k1) * x
+    resultProof = rewrite sym $ multAssociative k2 k1 x in
+                  rewrite sym $ yIsK1TimesX in
+                  prf2
 
 ||| A type only inhabited by primes.
 data Prime : Nat -> Type where
