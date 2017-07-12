@@ -31,6 +31,16 @@ fibIsFunctional (FibN a1 b1) (FibN a2 b2) with (fibIsFunctional a1 a2)
   fibIsFunctional (FibN a1 b1) (FibN a2 b2) | Refl with (fibIsFunctional b1 b2)
     fibIsFunctional (FibN a1 b1) (FibN a2 b2) | Refl | Refl = Refl
 
+||| An infinite stream of fibonacci numbers.
+data FibStream : Nat -> Type where
+  (::) : Fib n x -> Inf (FibStream (S n)) -> FibStream n
+
+fibs : FibStream 0
+fibs = fibsN Fib0 Fib1
+       where
+         fibsN : Fib n x -> Fib (S n) y -> FibStream n
+         fibsN a b = a :: fibsN b (FibN a b)
+
 ||| Types of output.
 |||
 ||| This only adds a small bit of certainty in the accuracy of the program --
