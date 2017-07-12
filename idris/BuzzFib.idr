@@ -75,6 +75,26 @@ data ModularCongruence : (a, b, n : Nat) -> Type where
                         {auto prf : a - b = k * n} ->
                         a ≡ b ⟦mod n⟧
 
+lte1n : {n : Nat} -> LTE 1 n
+lte1n {n} = ?lte1n_rhs
+
+incrementModularCongruence : ModularCongruence a b n ->
+                             (isEq : Dec (S b = n)) ->
+                             ModularCongruence (S a) (case isEq of
+                                                        Yes _ => Z
+                                                        No  _ => S b) n
+incrementModularCongruence (MkModularCongruence {a} {b} {n} k {subtractOk} {bLTn} {prf}) (Yes isEqPrf) =
+  MkModularCongruence {a = S a} {b = Z} {n = n} (S k) {bLTn = lte1n} {prf = newPrf}
+  where
+    newPrf : S a = (S k) * n
+    newPrf = ?newPrf_rhs
+
+
+incrementModularCongruence (MkModularCongruence k) (No contra) = ?incrementModularCongruence_rhs_3
+
+||| Find b such that a ≡ b ⟦mod n⟧.
+findCongruence : (a, n : Nat) -> (b : Nat ** ModularCongruence a b n)
+
 infixl 9 .|.
 
 ||| x = 0 (mod z) means z|x (z divides x).
@@ -83,6 +103,11 @@ infixl 9 .|.
 ||| periods.
 (.|.) : (z, x : Nat) -> Type
 z .|. x = x ≡ 0 ⟦mod z⟧
+
+||| Decide whether z divides x
+decDivides : (z, x : Nat) -> Dec (z .|. x)
+decDivides z x = ?decDivides_rhs
+
 
 ||| (.|.) is transitive
 |||
@@ -106,6 +131,12 @@ data Prime : Nat -> Type where
   MkPrime : {p : Nat} ->
             ((divisor : Nat) -> (divisor .|. p) -> Either (divisor = 1) (divisor = p)) ->
             Prime p
+
+||| Decide whether a number is prime, with proof, in O(√n).
+decPrime : (p : Nat) -> Dec (Prime p)
+
+
+
 
 ||| Our rules for output.
 |||
