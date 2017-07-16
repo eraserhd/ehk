@@ -75,17 +75,17 @@ data ModularCongruence : (a, b, n : Nat) -> Type where
                         {auto prf : a - b = k * n} ->
                         a ≡ b ⟦mod n⟧
 
-lte1n : {n : Nat} -> LTE 1 n
-lte1n {n} = ?lte1n_rhs
-
 incrementModularCongruence : ModularCongruence a b n ->
                              (isEq : Dec (S b = n)) ->
                              ModularCongruence (S a) (case isEq of
                                                         Yes _ => Z
                                                         No  _ => S b) n
 incrementModularCongruence (MkModularCongruence {a} {b} {n} k {subtractOk} {bLTn} {prf}) (Yes isEqPrf) =
-  MkModularCongruence {a = S a} {b = Z} {n = n} (S k) {bLTn = lte1n} {prf = newPrf}
+  MkModularCongruence {a = S a} {b = Z} {n = n} (S k) {bLTn = lte1n bLTn} {prf = newPrf}
   where
+    lte1n : LTE (S _) x -> LTE 1 x
+    lte1n (LTESucc x) = LTESucc LTEZero
+
     newPrf : S a = (S k) * n
     newPrf = ?newPrf_rhs
 
