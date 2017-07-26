@@ -11,6 +11,7 @@
 --
 
 import Syntax.PreorderReasoning
+import Data.So
 
 %default total -- Make sure our proofs are good
 
@@ -80,6 +81,8 @@ minusLemma : (x, y, z : Nat) -> {zxOk : LTE z x} -> {zyOk : LTE z y} -> x - z = 
 foo : (x, y : Nat) -> {mOk : LTE x (plus x y)} -> y = x + y - x
 
 bar : (x, y : Nat) -> LTE x (plus x y)
+bar x Z = rewrite plusZeroRightNeutral x in lteRefl
+bar x (S k) = rewrite sym $ plusSuccRightSucc x k in ?bar_rhs_2
 
 incrementModularCongruence : ModularCongruence a b n ->
                              (isEq : Dec (S b = n)) ->
@@ -144,9 +147,9 @@ data Prime : Nat -> Type where
 
 ||| Decide whether a number is prime, with proof, in O(√n).
 decPrime : (p : Nat) -> Dec (Prime p)
-
-
-
+decPrime p = ?decPrime_rhs
+  where
+    rule : (limit, divisor : Nat) -> divisor `LTE` limit -> (divisor .|. p) -> Either (divisor = 1) (divisor = p)
 
 ||| Our rules for output.
 |||
