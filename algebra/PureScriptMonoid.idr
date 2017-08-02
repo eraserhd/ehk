@@ -9,7 +9,7 @@ import Data.ZZ
 data StrictMonoid : (M : Type) -> (op : M -> M -> M) -> Type where
   SM : (M : Type) ->
        (op : M -> M -> M) ->
-       (assoc : ((a : M) -> (b : M) -> (c : M) ->
+       (assoc : ((a, b, c : M) ->
                  ((a `op` b) `op` c) = (a `op` (b `op` c)))) ->
        (ident : Exists (\e : M => (x : M) -> ((x `op` e) = x, (e `op` x) = x))) ->
        StrictMonoid M op
@@ -20,8 +20,8 @@ mIdent (SM _ _ _ ident) = ident
 
 -- Exercise 2.1 - Show why (ℤ, -) is not a monoid
 
-zMinusNotAMonoid : StrictMonoid ZZ (-) -> Void
-zMinusNotAMonoid (SM _ _ assoc ident) = posNotNeg $ sym contradiction
+zMinusNotAMonoid : Not (StrictMonoid ZZ (-))
+zMinusNotAMonoid (SM _ _ assoc _) = posNotNeg $ sym contradiction
   where
     contradiction : (the ZZ (-1)) = 1
     contradiction = assoc 1 1 1
