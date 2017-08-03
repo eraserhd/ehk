@@ -105,17 +105,13 @@ isPrime x = if 2 .|. x
 data OutputSemantics : Nat -> Output -> Type where
   OutputBuzz      : Fib n x -> So (not $ isPrime x) -> So (3 .|. x) -> So (not $ 5 .|. x) -> OutputSemantics n Buzz
   OutputFizz      : Fib n x -> So (not $ isPrime x) -> So (5 .|. x) -> So (not $ 3 .|. x) -> OutputSemantics n Fizz
-  OutputFizzBuzz  : Fib n x -> So (3 .|. x) -> So (5 .|. x) -> OutputSemantics n FizzBuzz
+  OutputFizzBuzz  : Fib n x -> So (15 .|. x) -> OutputSemantics n FizzBuzz
   OutputBuzzFizz  : Fib n x -> So (isPrime x) -> OutputSemantics n BuzzFizz
   OutputLiterally : Fib n x -> So (not $ 3 .|. x) -> So (not $ 5 .|. x) -> So (not $ isPrime x) -> OutputSemantics n (Literally x)
 
-||| Compute output for a particular fibonacci number.
 output : Fib n x -> (out : Output ** OutputSemantics n out)
-output {x} fib =
-  case (choose (isPrime x), choose (3 .|. x), choose (5 .|. x)) of
-    (Left  isPrimeProof,  _,                 _                ) => (BuzzFizz ** OutputBuzzFizz fib isPrimeProof)
-    (Right notPrimeProof, Left divides3,     Right notDivides5) => (Buzz ** OutputBuzz fib notPrimeProof divides3 notDivides5)
-    (Right notPrimeProof, Right notDivides3, Left divides5    ) => (Fizz ** OutputFizz fib notPrimeProof divides5 notDivides3)
-    (Right notPrimeProof, Right notDivides3, Right notDivides5) => (Literally x ** OutputLiterally fib notDivides3 notDivides5 notPrimeProof)
-    (Right _,             Left divides3,     Left divides5    ) => (FizzBuzz ** OutputFizzBuzz fib divides3 divides5)
+output {x} fib with (choose (isPrime x))
+  output {x = x} fib | (Left isPrimeProof)   = (BuzzFizz ** OutputBuzzFizz fib isPrimeProof)
+  output {x = x} fib | (Right notPrimeProof) with (choose (3 .|. x), choose (5 .|. x))
+    output {x = x} fib | (Right notPrimeProof) | with_val = ?what
 
