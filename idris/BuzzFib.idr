@@ -10,7 +10,7 @@
 -- * the value F(n) otherwise.
 --
 
-import Syntax.PreorderReasoning
+import Data.Nat.DivMod
 import Data.So
 
 %default total -- Make sure our proofs are good
@@ -19,7 +19,7 @@ import Data.So
 |||
 ||| Fib n x represents x, the nth Fibonacci number.
 |||
-data Fib : Nat -> Nat -> Type where
+data Fib : Nat -> Integer -> Type where
   Fib0 : Fib 0 1
   Fib1 : Fib 1 1
   FibN : Fib n x -> Fib (S n) y -> Fib (S (S n)) (x + y)
@@ -55,102 +55,48 @@ implementation Show Output where
   show BuzzFizz = "BuzzFizz"
   show (Literally k) = show k
 
--- Syntax considered harmful.  But this one works for now and makes things clearer.
-syntax [a] "≡" [b] "⟦" mod [n] "⟧" = ModularCongruence a b n
+infixr 9 .|.
 
-||| Only valid congurences (a ≡ b ⟦mod n⟧) are constructible.
+||| Does x divide y?
 |||
-data ModularCongruence : (a, b, n : Nat) -> Type where
-  ||| Construct a congruence, supplying k
-  |||
-  ||| We can usually deduce the other things.
-  |||
-  ||| @ k          The k that solves (a - b = k * n)
-  ||| @ subtractOk Proof that b ≤ a
-  ||| @ bLTn       Proof that b < n
-  ||| @ prf        Proof that a - b = k * n
-  MkModularCongruence : {a, b, n : Nat} ->
-                        (k : Nat) ->
-                        {auto subtractOk : b `LTE` a} ->
-                        {auto bLTn : (S b) `LTE` n} ->
-                        {auto prf : a - b = k * n} ->
-                        a ≡ b ⟦mod n⟧
-
-minusLemma : (x, y, z : Nat) -> {zxOk : LTE z x} -> {zyOk : LTE z y} -> x - z = y - z -> x = y
-
-foo : (x, y : Nat) -> {mOk : LTE x (plus x y)} -> y = x + y - x
-
-bar : (x, y : Nat) -> LTE x (plus x y)
-bar x Z = rewrite plusZeroRightNeutral x in lteRefl
-bar x (S k) = rewrite sym $ plusSuccRightSucc x k in ?bar_rhs_2
-
-incrementModularCongruence : ModularCongruence a b n ->
-                             (isEq : Dec (S b = n)) ->
-                             ModularCongruence (S a) (case isEq of
-                                                        Yes _ => Z
-                                                        No  _ => S b) n
-incrementModularCongruence (MkModularCongruence {a} {b} {n} k {subtractOk} {bLTn} {prf}) (Yes isEqPrf) =
-  MkModularCongruence {a = S a} {b = Z} {n = n} (S k) {bLTn = lte1n bLTn} {prf = newPrf}
-  where
-    lte1n : LTE (S _) x -> LTE 1 x
-    lte1n (LTESucc x) = LTESucc LTEZero
-
-    newPrf : S a = (S k) * n
-    newPrf = replace {P = \x => S a = plus x (mult k n)} isEqPrf $
-             eqSucc a (plus b (mult k n)) $
-             minusLemma a (plus b (mult k n)) b {zxOk = subtractOk} {zyOk = bar b (mult k n)} $
-             replace {P = \z => minus a b = z} (foo {mOk = bar b (mult k n)} b (mult k n)) $
-             prf
-
-
-incrementModularCongruence (MkModularCongruence k) (No contra) = ?incrementModularCongruence_rhs_3
-
-||| Find b such that a ≡ b ⟦mod n⟧.
-findCongruence : (a, n : Nat) -> (b : Nat ** ModularCongruence a b n)
-
-infixl 9 .|.
-
-||| x = 0 (mod z) means z|x (z divides x).
+||| divMod taked the predecessor of the divisor so that we can't represent
+||| division by zero.
 |||
-||| Idris steals too many operator spellings, though, so we spell the type with
-||| periods.
-(.|.) : (z, x : Nat) -> Type
-z .|. x = x ≡ 0 ⟦mod z⟧
-
-||| Decide whether z divides x
-decDivides : (z, x : Nat) -> Dec (z .|. x)
-decDivides z x = ?decDivides_rhs
-
-
-||| (.|.) is transitive
+||| Our divisibility and prime tests are boolean, (computational, runtime)
+||| checks.  This is a bit sub-optimal for purposes of making verified
+||| code due to "boolean blindness" - loosing the information contained in
+||| propositions, so we can't use it elsewhere; however, making a type
+||| inhabited solely by valid divisors and a type inhabited solely by primes
+||| is quite a bit of work for this test.  (I started down that road, but
+||| realized there's a lot to do to make proofs of modular congruences work.)
 |||
-||| We create our proof by making some algebraic rewrites of the proofs given us.
-dividesTransitive : (x, y, z : Nat) -> x .|. y -> y .|. z -> x .|. z
-dividesTransitive x y z (MkModularCongruence {prf = prf1} k1) (MkModularCongruence {prf = prf2} k2) =
-  MkModularCongruence {prf = resultProof} (k2 * k1)
+||| assert_total is to tell Idris that (y `mod` x) always produces an answer
+||| (since we handled the 0 case earlier).
+(.|.) : Integer -> Integer -> Bool
+0 .|. y = False
+x .|. y = assert_total $ (y `mod` x) == 0
+
+||| Pretty standard primality testing.
+isPrime : Integer -> Bool
+isPrime 1 = False
+isPrime 2 = False
+isPrime x = if 2 .|. x
+            then False
+            else assert_total $ noDivisorsOver 3
   where
-    yIsK1TimesX : y = k1 * x
-    yIsK1TimesX = rewrite sym $ minusZeroRight y in
-                  prf1
+    ||| Rather than convince Idris this terminates (which is hard, given
+    ||| that we don't have access to the implementation of `>` and we
+    ||| don't have a lot of theorems about Integer), we just declare this
+    ||| partial.  :(
+    partial
+    noDivisorsOver : Integer -> Bool
+    noDivisorsOver divisor = if divisor * divisor > x
+                             then True
+                             else if divisor .|. x
+                                  then False
+                                  else noDivisorsOver (divisor + 2)
 
-    resultProof : z - 0 = (k2 * k1) * x
-    resultProof = rewrite sym $ multAssociative k2 k1 x in
-                  rewrite sym $ yIsK1TimesX in
-                  prf2
-
-||| A type only inhabited by primes.
-data Prime : Nat -> Type where
-  ||| This reads, roughly, p is prime if every divisor is either 1 or p itself.
-  MkPrime : {p : Nat} ->
-            ((divisor : Nat) -> (divisor .|. p) -> Either (divisor = 1) (divisor = p)) ->
-            Prime p
-
-||| Decide whether a number is prime, with proof, in O(√n).
-decPrime : (p : Nat) -> Dec (Prime p)
-decPrime p = ?decPrime_rhs
-  where
-    rule : (limit, divisor : Nat) -> divisor `LTE` limit -> (divisor .|. p) -> Either (divisor = 1) (divisor = p)
-
+{-
 ||| Our rules for output.
 |||
 ||| Not (Prime x) in OutputBuzz and OutputFizz aren't part of the problem
@@ -164,14 +110,8 @@ data OutputSemantics : Nat -> Output -> Type where
   OutputBuzzFizz  : Fib n x -> Prime x -> OutputSemantics n BuzzFizz
   OutputLiterally : Fib n x -> Not (3 .|. x) -> Not (5 .|. x) -> Not (Prime x) -> OutputSemantics n (Literally x)
 
--- Some helpers
-fiveDividesFifteen : 5 .|. 15
-fiveDividesFifteen = MkModularCongruence 3
-
-threeDividesFifteen : 3 .|. 15
-threeDividesFifteen = MkModularCongruence 5
 
 ||| Proof: There is only one possible output for any n.
 outputIsFunctional : OutputSemantics n output1 -> OutputSemantics n output2 -> output1 = output2
-outputIsFunctional x y = ?outputIsFunctional_rhs
 
+-}
