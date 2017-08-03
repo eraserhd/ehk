@@ -42,6 +42,9 @@ fibs = fibsN Fib0 Fib1
          fibsN a b = a :: fibsN b (FibN a b)
 
 ||| Types of output.
+|||
+||| This only adds a small bit of certainty in the accuracy of the program --
+||| we could just have strings when defining the program semantics.
 data Output = Buzz | Fizz | FizzBuzz | BuzzFizz | Literally Integer
 
 implementation Show Output where
@@ -72,7 +75,7 @@ x .|. y = assert_total $ (y `mod` x) == 0
 ||| Pretty standard primality testing.
 isPrime : Integer -> Bool
 isPrime 1 = False
-isPrime 2 = False
+isPrime 2 = True
 isPrime x = if 2 .|. x
             then False
             else assert_total $ noDivisorsOver 3
@@ -117,7 +120,7 @@ output {x} fib =
 
 partial
 runUntil : Nat -> FibStream n -> IO ()
-runUntil {n} limit fibs = if n > limit
+runUntil {n} limit fibs = if n >= limit
                           then pure ()
                           else do
                             let (fib :: restOfFibs) = fibs
@@ -126,6 +129,6 @@ runUntil {n} limit fibs = if n > limit
 
 partial
 main : IO ()
-main = do (nArg :: _) <- getArgs
-          let n = the Nat (cast 43)
+main = do (_ :: nArg :: _) <- getArgs
+          let n = the Nat (cast nArg)
           runUntil n fibs
