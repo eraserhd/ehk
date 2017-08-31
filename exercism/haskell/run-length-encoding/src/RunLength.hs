@@ -1,6 +1,5 @@
 module RunLength (decode, encode) where
 
-import Control.Arrow ((&&&), (>>>))
 import Data.Char (isDigit)
 import Data.List (group)
 
@@ -12,7 +11,7 @@ decode text@(c : cs)
   | otherwise = c : decode cs
 
 encode :: String -> String
-encode = foldMap (length &&& head >>> encodeGroup) . group
+encode = foldMap encodeGroup . group
   where
-    encodeGroup (1, c) = [c]
-    encodeGroup (n, c) = show n ++ [c]
+    encodeGroup [c]        = [c]
+    encodeGroup cs@(c : _) = show (length cs) ++ [c]
