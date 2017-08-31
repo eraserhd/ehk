@@ -1,7 +1,7 @@
 module DNA (toRNA) where
 
 toRNA :: String -> Maybe String
-toRNA = sequence . map rnaComplement
+toRNA = mapM rnaComplement
 
 rnaComplement 'C' = Just 'G'
 rnaComplement 'G' = Just 'C'
