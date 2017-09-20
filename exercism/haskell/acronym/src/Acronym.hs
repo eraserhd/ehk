@@ -1,14 +1,9 @@
 module Acronym (abbreviate) where
 
-import Data.Char (isAlpha, isLower, isUpper, toUpper)
-import Data.List (tails)
-import Data.Maybe (mapMaybe)
+import Control.Arrow ((&&&), (>>>))
+import Data.Char (isAlpha, isUpper, toUpper)
 
 abbreviate :: String -> String
-abbreviate = mapMaybe foo . tails . (' ' :)
+abbreviate = (' ' :) &&& id >>> uncurry zip >>> filter p >>> map (toUpper . snd)
   where
-    foo (c1:c2:_)
-      | not (isAlpha c1) && isAlpha c2 = Just $ toUpper c2
-      | isLower c1 && isUpper c2       = Just c2
-      | otherwise                      = Nothing
-    foo _                              = Nothing
+    p (c1, c2) = (not (isAlpha c1) && isAlpha c2) || (not (isUpper c1) && isUpper c2)
