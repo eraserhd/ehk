@@ -7,7 +7,7 @@ nucleotides :: [Char]
 nucleotides = "ACGT"
 
 emptyCount :: M.Map Char Int
-emptyCount = foldr (\k m -> M.insert k 0 m) M.empty nucleotides
+emptyCount = M.fromList $ zip nucleotides $ repeat 0
 
 nucleotideCounts :: String -> Either String (M.Map Char Int)
 nucleotideCounts = foldM addChar emptyCount
