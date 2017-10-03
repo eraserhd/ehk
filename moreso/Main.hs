@@ -4,24 +4,23 @@ import Control.Monad (guard)
 import Data.Char (isSpace)
 import Data.List (intercalate)
 
+-- TODO: Escape control characters in symbols
+
 data Form a = Sequence [Form a] | Atom a deriving (Eq)
 newtype Symbol = Symbol String deriving (Eq, Ord)
 
 instance Show Symbol where
-  show (Symbol s) = s -- FIXME: Escape some characters
+  show (Symbol s) = s
 instance Read Symbol where
   readsPrec _ s
     | null name = []
     | otherwise = [(Symbol name, rest)]
     where
-      isSym :: Char -> Bool
-      isSym c = not (c `elem` "()") && not (isSpace c)
+      notSymChar :: Char -> Bool
+      notSymChar c = c `elem` "()" || isSpace c
 
-      name :: String
-      name = takeWhile isSym . dropWhile isSpace $ s
-
-      rest :: String
-      rest = dropWhile isSym . dropWhile isSpace $ s
+      name, rest :: String
+      (name, rest) = break notSymChar . dropWhile isSpace $ s
 
 instance Show a => Show (Form a) where
   show (Atom a)    = show a
