@@ -27,7 +27,7 @@ instance Show a => Show (Form a) where
   show (Atom a)    = show a
   show (Sequence xs) = "(" ++ intercalate " " (map show xs) ++ ")"
 instance Read a => Read (Form a) where
-  readsPrec n s = first Sequence <$> readParen True readSequence s <|>
+  readsPrec _ s = first Sequence <$> readParen True readSequence s <|>
                   first Atom <$> reads s
     where
       readSequence :: Read a => ReadS [a]
@@ -35,8 +35,7 @@ instance Read a => Read (Form a) where
         case reads s of
           []     -> [([], s)]
           parses -> do (x, rest) <- parses
-                       (xs, rest') <- readSequence rest
-                       pure (x : xs, rest')
+                       first (x :) <$> readSequence rest
 
 data Expr a = Reference Symbol
             | Forall Symbol a a
