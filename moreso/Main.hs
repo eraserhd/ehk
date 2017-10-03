@@ -1,8 +1,11 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 import Control.Arrow (first)
 import Control.Applicative ((<|>))
 import Control.Monad (guard)
 import Data.Char (isSpace)
 import Data.List (intercalate)
+import GHC.Generics (Generic(..))
 
 -- TODO: Escape control characters in symbols
 
@@ -39,6 +42,7 @@ instance Read a => Read (Form a) where
 data Expr a = Reference Symbol
             | Forall Symbol a a
             | Apply a [a]
+            deriving (Generic, Eq, Show)
 
 main :: IO ()
 main = putStrLn "Hello, world!"
