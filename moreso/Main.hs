@@ -5,7 +5,7 @@ import Control.Applicative ((<|>))
 import Control.Monad (guard)
 import Data.Char (isSpace)
 import Data.Functor.Classes (Show1(..))
-import Data.Functor.Foldable (Fix(..), unfix, ana)
+import Data.Functor.Foldable (Fix(..), unfix, ana, cata)
 import Data.List (intercalate)
 
 -- TODO:
@@ -58,13 +58,22 @@ instance Show1 Expr where
       showSequence []       = ")"
       showSequence (x : xs) = " " ++ sPrec n x (showSequence xs)
 
-parse'                                                                    :: SExpr -> Expr SExpr
-parse' (Atom sym@(Symbol _))                                              = Reference sym
-parse' (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
-parse' (Sequence (x : xs))                                                = Apply x xs
+unform :: SExpr -> Fix Expr
+unform = ana unform'
+  where
+    unform'                                                                    :: SExpr -> Expr SExpr
+    unform' (Atom sym@(Symbol _))                                              = Reference sym
+    unform' (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
+    unform' (Sequence (x : xs))                                                = Apply x xs
 
-parse :: SExpr -> Fix Expr
-parse = ana parse'
+form :: Fix Expr -> SExpr
+form = cata form'
+  where
+    form'                      :: Expr SExpr -> SExpr
+    form' (Reference var)      = Atom var
+    form' (Forall var ty expr) = Sequence [Atom (Symbol "Forall"), Atom var, ty, expr]
+    form' (Apply x xs)         = Sequence (x : xs)
+
 
 main :: IO ()
 main = putStrLn "Hello, world!"
