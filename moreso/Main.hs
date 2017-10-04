@@ -46,6 +46,19 @@ data Pattern = PName Symbol
 data DefineClause a = DefineClause Symbol [Pattern] a
                       deriving (Functor)
 
+instance SExprRepresentable DefineClause where
+  fromSExpr (Sequence [Sequence (Atom fname : args), expr]) = DefineClause fname (map pattern args) expr
+    where
+      pattern                               :: SExpr -> Pattern
+      pattern (Atom var)                    = PName var
+      pattern (Sequence (Atom head : tail)) = PList head $ map pattern tail
+
+  toSExpr (DefineClause fname args expr) = Sequence [Sequence (Atom fname : map pattern args), expr]
+    where
+      pattern              :: Pattern -> SExpr
+      pattern (PName name) = Atom name
+      pattern (PList p ps) = Sequence $ Atom p : map pattern ps
+
 data Expr a = Reference Symbol
             | Define a [DefineClause a]
             | Forall Symbol a a
@@ -54,26 +67,12 @@ data Expr a = Reference Symbol
 
 instance SExprRepresentable Expr where
     fromSExpr (Atom sym@(Symbol _))                                              = Reference sym
-    fromSExpr (Sequence (Atom (Symbol "define") : ty : clauses))                 = Define ty $ map clause clauses
-      where
-        clause :: SExpr -> DefineClause SExpr
-        clause (Sequence [Sequence (Atom fname : args), expr]) = DefineClause fname (map pattern args) expr
-
-        pattern                               :: SExpr -> Pattern
-        pattern (Atom var)                    = PName var
-        pattern (Sequence (Atom head : tail)) = PList head $ map pattern tail
+    fromSExpr (Sequence (Atom (Symbol "define") : ty : clauses))                 = Define ty $ map fromSExpr clauses
     fromSExpr (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
     fromSExpr (Sequence (x : xs))                                                = Apply x xs
 
     toSExpr (Reference var)      = Atom var
-    toSExpr (Define ty clauses)  = Sequence (Atom (Symbol "define") : ty : map clause clauses)
-      where
-        clause                     :: DefineClause SExpr -> SExpr
-        clause (DefineClause fname args expr) = Sequence [Sequence (Atom fname : map pattern args), expr]
-
-        pattern              :: Pattern -> SExpr
-        pattern (PName name) = Atom name
-        pattern (PList p ps) = Sequence $ Atom p : map pattern ps
+    toSExpr (Define ty clauses)  = Sequence (Atom (Symbol "define") : ty : map toSExpr clauses)
     toSExpr (Forall var ty expr) = Sequence [Atom (Symbol "Forall"), Atom var, ty, expr]
     toSExpr (Apply x xs)         = Sequence (x : xs)
 
