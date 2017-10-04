@@ -12,7 +12,7 @@ type-expr := (type TypeCtor Ty
                (DataCtor_2 Ty_n))
 
 expr := Type
-     |  (forall var Ty expr)
+     |  (Forall var Ty expr)
      |  define-expr
      |  (expr_1 .. expr_n)
 

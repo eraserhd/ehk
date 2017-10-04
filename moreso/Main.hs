@@ -50,7 +50,7 @@ data Expr a = Reference Symbol
 
 parse'                                                                    :: SExpr -> Expr SExpr
 parse' (Atom sym@(Symbol _))                                              = Reference sym
-parse' (Sequence [Atom (Symbol "forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
+parse' (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
 parse' (Sequence (x : xs))                                                = Apply x xs
 
 parse :: SExpr -> Fix Expr
