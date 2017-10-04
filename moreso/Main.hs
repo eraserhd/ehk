@@ -4,6 +4,7 @@ import Control.Arrow (first)
 import Control.Applicative ((<|>))
 import Control.Monad (guard)
 import Data.Char (isSpace)
+import Data.Functor.Classes (Show1(..))
 import Data.Functor.Foldable (Fix(..), unfix, ana)
 import Data.List (intercalate)
 
@@ -47,6 +48,15 @@ data Expr a = Reference Symbol
             | Forall Symbol a a
             | Apply a [a]
             deriving (Functor, Eq)
+instance Show1 Expr where
+  liftShowsPrec sPrec _ n (Reference x)      = shows x
+  liftShowsPrec sPrec _ n (Forall x ty expr) =
+    (++ "(Forall " ++ shows x " " ++ sPrec n ty " " ++ sPrec n expr ")")
+  liftShowsPrec sPrec _ n (Apply x xs)       =
+    (++ "(" ++ sPrec n x (showSequence xs))
+    where
+      showSequence []       = ")"
+      showSequence (x : xs) = " " ++ sPrec n x (showSequence xs)
 
 parse'                                                                    :: SExpr -> Expr SExpr
 parse' (Atom sym@(Symbol _))                                              = Reference sym
