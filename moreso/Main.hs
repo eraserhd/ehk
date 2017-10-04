@@ -38,6 +38,7 @@ type SExpr = Form Symbol
 
 class SExprRepresentable f where
   fromSExpr :: SExpr -> f SExpr
+  toSExpr :: f SExpr -> SExpr
 
 data Pattern = PName Symbol
              | PList Symbol [Pattern]
@@ -61,25 +62,23 @@ instance SExprRepresentable Expr where
     fromSExpr (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
     fromSExpr (Sequence (x : xs))                                                = Apply x xs
 
+    toSExpr (Reference var)      = Atom var
+    toSExpr (Define ty clauses)  = Sequence (Atom (Symbol "define") : ty : map clause clauses)
+      where
+        clause                     :: (Symbol, [Pattern], SExpr) -> SExpr
+        clause (fname, args, expr) = Sequence [Sequence (Atom fname : map pattern args), expr]
+
+        pattern              :: Pattern -> SExpr
+        pattern (PName name) = Atom name
+        pattern (PList p ps) = Sequence $ Atom p : map pattern ps
+    toSExpr (Forall var ty expr) = Sequence [Atom (Symbol "Forall"), Atom var, ty, expr]
+    toSExpr (Apply x xs)         = Sequence (x : xs)
 
 unform :: SExpr -> Fix Expr
 unform = ana fromSExpr
 
 form :: Fix Expr -> SExpr
-form = cata form'
-  where
-    form'                      :: Expr SExpr -> SExpr
-    form' (Reference var)      = Atom var
-    form' (Define ty clauses)  = Sequence (Atom (Symbol "define") : ty : map clause clauses)
-    form' (Forall var ty expr) = Sequence [Atom (Symbol "Forall"), Atom var, ty, expr]
-    form' (Apply x xs)         = Sequence (x : xs)
-
-    clause                     :: (Symbol, [Pattern], SExpr) -> SExpr
-    clause (fname, args, expr) = Sequence [Sequence (Atom fname : map pattern args), expr]
-
-    pattern              :: Pattern -> SExpr
-    pattern (PName name) = Atom name
-    pattern (PList p ps) = Sequence $ Atom p : map pattern ps
+form = cata toSExpr
 
 main :: IO ()
 main = putStrLn "Hello, world!"
