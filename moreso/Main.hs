@@ -7,6 +7,7 @@ import Data.Char (isSpace)
 import Data.Functor.Classes (Show1(..))
 import Data.Functor.Foldable (Fix(..), unfix, ana, cata)
 import Data.List (intercalate)
+import Text.ParserCombinators.ReadP (readP_to_S, skipSpaces, munch1, satisfy)
 
 -- TODO:
 -- * Escape control characters in symbols
@@ -18,15 +19,10 @@ newtype Symbol = Symbol String deriving (Eq, Ord)
 instance Show Symbol where
   show (Symbol s) = s
 instance Read Symbol where
-  readsPrec _ s
-    | null name = []
-    | otherwise = [(Symbol name, rest)]
+  readsPrec _ s = first Symbol <$> readP_to_S (skipSpaces *> munch1 (not . notSymChar)) s
     where
       notSymChar :: Char -> Bool
       notSymChar c = c `elem` "()" || isSpace c
-
-      name, rest :: String
-      (name, rest) = break notSymChar . dropWhile isSpace $ s
 
 instance Show a => Show (Form a) where
   show (Atom a)    = show a
