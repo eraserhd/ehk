@@ -43,8 +43,11 @@ class SExprRepresentable f where
 data Pattern = PName Symbol
              | PList Symbol [Pattern]
 
+data DefineClause a = DefineClause Symbol [Pattern] a
+                      deriving (Functor)
+
 data Expr a = Reference Symbol
-            | Define a [(Symbol, [Pattern], a)]
+            | Define a [DefineClause a]
             | Forall Symbol a a
             | Apply a [a]
             deriving (Functor)
@@ -53,8 +56,8 @@ instance SExprRepresentable Expr where
     fromSExpr (Atom sym@(Symbol _))                                              = Reference sym
     fromSExpr (Sequence (Atom (Symbol "define") : ty : clauses))                 = Define ty $ map clause clauses
       where
-        clause :: SExpr -> (Symbol, [Pattern], SExpr)
-        clause (Sequence [Sequence (Atom fname : args), expr]) = (fname, [], expr)
+        clause :: SExpr -> DefineClause SExpr
+        clause (Sequence [Sequence (Atom fname : args), expr]) = DefineClause fname (map pattern args) expr
 
         pattern                               :: SExpr -> Pattern
         pattern (Atom var)                    = PName var
@@ -65,8 +68,8 @@ instance SExprRepresentable Expr where
     toSExpr (Reference var)      = Atom var
     toSExpr (Define ty clauses)  = Sequence (Atom (Symbol "define") : ty : map clause clauses)
       where
-        clause                     :: (Symbol, [Pattern], SExpr) -> SExpr
-        clause (fname, args, expr) = Sequence [Sequence (Atom fname : map pattern args), expr]
+        clause                     :: DefineClause SExpr -> SExpr
+        clause (DefineClause fname args expr) = Sequence [Sequence (Atom fname : map pattern args), expr]
 
         pattern              :: Pattern -> SExpr
         pattern (PName name) = Atom name
