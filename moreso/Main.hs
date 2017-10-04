@@ -36,6 +36,9 @@ instance Read a => Read (Form a) where
 
 type SExpr = Form Symbol
 
+class SExprRepresentable f where
+  fromSExpr :: SExpr -> f SExpr
+
 data Pattern = PName Symbol
              | PList Symbol [Pattern]
 
@@ -45,22 +48,22 @@ data Expr a = Reference Symbol
             | Apply a [a]
             deriving (Functor)
 
+instance SExprRepresentable Expr where
+    fromSExpr (Atom sym@(Symbol _))                                              = Reference sym
+    fromSExpr (Sequence (Atom (Symbol "define") : ty : clauses))                 = Define ty $ map clause clauses
+      where
+        clause :: SExpr -> (Symbol, [Pattern], SExpr)
+        clause (Sequence [Sequence (Atom fname : args), expr]) = (fname, [], expr)
+
+        pattern                               :: SExpr -> Pattern
+        pattern (Atom var)                    = PName var
+        pattern (Sequence (Atom head : tail)) = PList head $ map pattern tail
+    fromSExpr (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
+    fromSExpr (Sequence (x : xs))                                                = Apply x xs
+
+
 unform :: SExpr -> Fix Expr
-unform = ana unform'
-  where
-    unform'                                                                    :: SExpr -> Expr SExpr
-    unform' (Atom sym@(Symbol _))                                              = Reference sym
-    unform' (Sequence (Atom (Symbol "define") : ty : clauses))                 = Define ty $ map clause clauses
-    unform' (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
-    unform' (Sequence (x : xs))                                                = Apply x xs
-
-    clause :: SExpr -> (Symbol, [Pattern], SExpr)
-    clause (Sequence [Sequence (Atom fname : args), expr]) = (fname, [], expr)
-
-    pattern                               :: SExpr -> Pattern
-    pattern (Atom var)                    = PName var
-    pattern (Sequence (Atom head : tail)) = PList head $ map pattern tail
-
+unform = ana fromSExpr
 
 form :: Fix Expr -> SExpr
 form = cata form'
