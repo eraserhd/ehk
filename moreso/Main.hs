@@ -17,22 +17,22 @@ newtype Symbol = Symbol String deriving (Eq, Ord)
 instance Show Symbol where
   show (Symbol s) = s
 instance Read Symbol where
-  readsPrec _ = readP_to_S $ Symbol <$> (skipSpaces *> munch1 (not . notSymChar))
+  readsPrec _ = readP_to_S $ fmap Symbol $ skipSpaces *> munch1 isSymChar
     where
-      notSymChar :: Char -> Bool
-      notSymChar c = c `elem` "()" || isSpace c
+      isSymChar :: Char -> Bool
+      isSymChar c = not (c `elem` "()" || isSpace c)
 
 instance Show a => Show (Form a) where
   show (Atom a)      = show a
   show (Sequence xs) = "(" ++ intercalate " " (map show xs) ++ ")"
 instance Read a => Read (Form a) where
-  readsPrec _ = readP_to_S $ choice [ Sequence <$> between (skipSpaces *> char '(') (skipSpaces *> char ')') readSequence
+  readsPrec _ = readP_to_S $ choice [ Sequence <$> between lparen rparen (many readpa)
                                     , Atom <$> readS_to_P reads
                                     ]
     where
-      readSequence :: Read a => ReadP [a]
-      readSequence = many (skipSpaces *> readS_to_P reads)
-
+      lparen = skipSpaces *> char '('
+      rparen = skipSpaces *> char ')'
+      readpa = skipSpaces *> readS_to_P reads
 
 type SExpr = Form Symbol
 
