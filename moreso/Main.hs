@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, TypeOperators #-}
 
 import Control.Arrow (first)
 import Data.Char (isSpace)
@@ -6,6 +6,7 @@ import Data.Functor.Foldable (Fix(..), ana, cata)
 import Data.List (intercalate)
 import Text.ParserCombinators.ReadP (ReadP(..), choice, readP_to_S, readS_to_P,
                                      skipSpaces, many, munch1, char, between)
+import GHC.Generics ((:+:)(..))
 
 -- TODO:
 -- * Escape control characters in symbols
@@ -42,7 +43,7 @@ class SExprRepresentable f where
 
 data Pattern a = PName Symbol
                | PList Symbol [Pattern a]
-               deriving (Functor)
+               deriving (Functor, Foldable, Traversable)
 
 instance SExprRepresentable Pattern where
   fromSExpr (Atom var)                    = PName var
@@ -53,7 +54,7 @@ instance SExprRepresentable Pattern where
 
 
 data DefineClause a = DefineClause Symbol [Pattern a] a
-                      deriving (Functor)
+                      deriving (Functor, Foldable, Traversable)
 
 instance SExprRepresentable DefineClause where
   fromSExpr (Sequence [Sequence (Atom fname : args), expr]) = DefineClause fname (map fromSExpr args) expr
@@ -64,23 +65,44 @@ data Expr a = Reference Symbol
             | Define a [DefineClause a]
             | Forall Symbol a a
             | Apply a [a]
-            deriving (Functor)
+            deriving (Functor, Foldable, Traversable)
+
+data DataConstructorDefinition a =
+  DataConstructorDefinition Symbol (Expr a)
+  deriving (Functor, Foldable, Traversable)
+
+instance SExprRepresentable DataConstructorDefinition where
+  fromSExpr (Sequence [Atom sym@(Symbol _), ty]) = DataConstructorDefinition sym $ fromSExpr ty
+  toSExpr (DataConstructorDefinition sym ty)     = Sequence [Atom sym, toSExpr ty]
+
+data TypeDefinition a =
+  TypeDefinition Symbol (Expr a) [DataConstructorDefinition a]
+  deriving (Functor, Foldable, Traversable)
+
+instance SExprRepresentable TypeDefinition where
+  fromSExpr (Sequence (Atom (Symbol "type") : Atom typeCtor@(Symbol _) : ty : dataCtors)) =
+    TypeDefinition typeCtor (fromSExpr ty) $ map fromSExpr dataCtors
+
+  toSExpr (TypeDefinition typeCtor ty dataCtors) =
+    Sequence $ Atom (Symbol "type") : Atom typeCtor : toSExpr ty : map toSExpr dataCtors
+
+data TopLevel a = TypeDefinition a :+: Expr a
 
 instance SExprRepresentable Expr where
-    fromSExpr (Atom sym@(Symbol _))                                              = Reference sym
-    fromSExpr (Sequence (Atom (Symbol "define") : ty : clauses))                 = Define ty $ map fromSExpr clauses
-    fromSExpr (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
-    fromSExpr (Sequence (x : xs))                                                = Apply x xs
+  fromSExpr (Atom sym@(Symbol _))                                              = Reference sym
+  fromSExpr (Sequence (Atom (Symbol "define") : ty : clauses))                 = Define ty $ map fromSExpr clauses
+  fromSExpr (Sequence [Atom (Symbol "Forall"), Atom var@(Symbol _), ty, expr]) = Forall var ty expr
+  fromSExpr (Sequence (x : xs))                                                = Apply x xs
 
-    toSExpr (Reference var)      = Atom var
-    toSExpr (Define ty clauses)  = Sequence (Atom (Symbol "define") : ty : map toSExpr clauses)
-    toSExpr (Forall var ty expr) = Sequence [Atom (Symbol "Forall"), Atom var, ty, expr]
-    toSExpr (Apply x xs)         = Sequence (x : xs)
+  toSExpr (Reference var)      = Atom var
+  toSExpr (Define ty clauses)  = Sequence (Atom (Symbol "define") : ty : map toSExpr clauses)
+  toSExpr (Forall var ty expr) = Sequence [Atom (Symbol "Forall"), Atom var, ty, expr]
+  toSExpr (Apply x xs)         = Sequence (x : xs)
 
-unform :: SExpr -> Fix Expr
+unform :: (SExprRepresentable a, Functor a) => SExpr -> Fix a
 unform = ana fromSExpr
 
-form :: Fix Expr -> SExpr
+form :: (SExprRepresentable a, Functor a) => Fix a -> SExpr
 form = cata toSExpr
 
 main :: IO ()
