@@ -5,14 +5,14 @@
 
 \section{To-do}
 \begin{itemize}
-\item Make {\tt SExpressable} on kind {\tt *}
+\item Rename to SExpression
 \item Escape control characters in symbols
 \item Use gana, MonadFail for errors
 \end{itemize}
 
 \section{Preamble}
 \begin{code}
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable #-}
+{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, FlexibleInstances #-}
 
 import Control.Arrow (first)
 import Data.Char (isSpace)
@@ -41,30 +41,37 @@ instance Read SExpr where
 
       isSymChar :: Char -> Bool
       isSymChar c = not (c `elem` "()" || isSpace c)
-
-class SExpressable f where
-  interpretLayer :: SExpr -> f SExpr
-  expressLayer   :: f SExpr -> SExpr
 \end{code}
 
-\section{...}
+A type {\em a} is {\em S-expressable} if we can convert values to
+S-expressions and back.
+
 \begin{code}
-data Pattern a = PName String
-               | PList String [Pattern a]
-               deriving (Functor, Foldable, Traversable)
+class SExpressable a where
+  interpretLayer :: SExpr -> a
+  expressLayer   :: a -> SExpr
+\end{code}
+
+\section{Patterns}
+\begin{code}
+data Pattern = PName String
+             | PList String [Pattern]
 
 instance SExpressable Pattern where
-  interpretLayer (Symbol var)                  = PName var
+  interpretLayer (Symbol var)                    = PName var
   interpretLayer (Sequence (Symbol head : tail)) = PList head $ map interpretLayer tail
 
   expressLayer (PName name) = Symbol name
   expressLayer (PList p ps) = Sequence $ Symbol p : map expressLayer ps
+\end{code}
 
 
-data DefineClause a = DefineClause String [Pattern a] a
+\section{...}
+\begin{code}
+data DefineClause a = DefineClause String [Pattern] a
                       deriving (Functor, Foldable, Traversable)
 
-instance SExpressable DefineClause where
+instance SExpressable (DefineClause SExpr) where
   interpretLayer (Sequence [Sequence (Symbol fname : args), expr]) = DefineClause fname (map interpretLayer args) expr
 
   expressLayer (DefineClause fname args expr) = Sequence [Sequence (Symbol fname : map expressLayer args), expr]
@@ -79,7 +86,7 @@ data DataConstructorDefinition a =
   DataConstructorDefinition String (Expr a)
   deriving (Functor, Foldable, Traversable)
 
-instance SExpressable DataConstructorDefinition where
+instance SExpressable (DataConstructorDefinition SExpr) where
   interpretLayer (Sequence [(Symbol ctorName), ty])    = DataConstructorDefinition ctorName $ interpretLayer ty
   expressLayer (DataConstructorDefinition ctorName ty) = Sequence [Symbol ctorName, expressLayer ty]
 
@@ -87,16 +94,14 @@ data TypeDefinition a =
   TypeDefinition String (Expr a) [DataConstructorDefinition a]
   deriving (Functor, Foldable, Traversable)
 
-instance SExpressable TypeDefinition where
+instance SExpressable (TypeDefinition SExpr) where
   interpretLayer (Sequence (Symbol "type" : Symbol typeCtor : ty : dataCtors)) =
     TypeDefinition typeCtor (interpretLayer ty) $ map interpretLayer dataCtors
 
   expressLayer (TypeDefinition typeCtor ty dataCtors) =
     Sequence $ Symbol "type" : Symbol typeCtor : expressLayer ty : map expressLayer dataCtors
 
-data TopLevel a = TypeDefinition a :+: Expr a
-
-instance SExpressable Expr where
+instance SExpressable (Expr SExpr) where
   interpretLayer (Symbol var)                                       = Reference var
   interpretLayer (Sequence (Symbol "define" : ty : clauses))        = Define ty $ map interpretLayer clauses
   interpretLayer (Sequence [Symbol "Forall", Symbol var, ty, expr]) = Forall var ty expr
@@ -107,10 +112,10 @@ instance SExpressable Expr where
   expressLayer (Forall var ty expr) = Sequence [Symbol "Forall", Symbol var, ty, expr]
   expressLayer (Apply x xs)         = Sequence (x : xs)
 
-interpret :: (SExpressable a, Functor a) => SExpr -> Fix a
+interpret :: (Functor f, SExpressable (f SExpr)) => SExpr -> Fix f
 interpret = ana interpretLayer
 
-express :: (SExpressable a, Functor a) => Fix a -> SExpr
+express :: (Functor f, SExpressable (f SExpr)) => Fix f -> SExpr
 express = cata expressLayer
 
 main :: IO ()
