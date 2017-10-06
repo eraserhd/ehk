@@ -58,12 +58,25 @@ instance Read SExpression where
 
 \subsection{Value Conversion}
 A type {\em a} is {\em S-expressable} if we can convert values to
-S-expressions and back:
+S-expressions and back.
+
+{\bf FIXME:} I'm not too happy about these type signatures.  Are there other
+recursive data structures we'll want to convert to S-expressions?  Perhaps
+we just want a constrained instance for functors in terms of {\tt ana} and
+{\tt cata}?  I think so.
 
 \begin{code}
 class SExpressable a where
   interpretLayer :: SExpression -> a
   expressLayer   :: a -> SExpression
+
+interpret :: (Functor f, SExpressable (f SExpression)) =>
+             SExpression -> Fix f
+interpret = ana interpretLayer
+
+express :: (Functor f, SExpressable (f SExpression)) =>
+           Fix f -> SExpression
+express = cata expressLayer
 \end{code}
 
 \section{Patterns}
@@ -125,12 +138,6 @@ instance SExpressable (Expr SExpression) where
   expressLayer (Define ty clauses)  = Sequence (Symbol "define" : ty : map expressLayer clauses)
   expressLayer (Forall var ty expr) = Sequence [Symbol "Forall", Symbol var, ty, expr]
   expressLayer (Apply x xs)         = Sequence (x : xs)
-
-interpret :: (Functor f, SExpressable (f SExpression)) => SExpression -> Fix f
-interpret = ana interpretLayer
-
-express :: (Functor f, SExpressable (f SExpression)) => Fix f -> SExpression
-express = cata expressLayer
 
 main :: IO ()
 main = putStrLn "Hello, world!"
