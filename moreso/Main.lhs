@@ -1,4 +1,20 @@
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, TypeOperators #-}
+\documentclass{article}
+\usepackage{listings}
+\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small}}{}
+\begin{document}
+
+\section{To-do}
+\begin{itemize}
+\item Convert to literate Haskell
+\item Make {\tt SExpressable} on kind {\tt *}
+\item Escape control characters in symbols
+\item Use gana, MonadFail for errors
+\item Rename define to value
+\end{itemize}
+
+\section{Preamble}
+\begin{code}
+{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable #-}
 
 import Control.Arrow (first)
 import Data.Char (isSpace)
@@ -6,12 +22,10 @@ import Data.Functor.Foldable (Fix(..), ana, cata)
 import Data.List (intercalate)
 import Text.ParserCombinators.ReadP (ReadP(..), (<++), readP_to_S, readS_to_P,
                                      skipSpaces, many, munch1, char, between)
-import GHC.Generics ((:+:)(..))
+\end{code}
 
--- TODO:
--- * Escape control characters in symbols
--- * `unform` should use gana, MonadFail for errors
--- * Rename `define` to `value`?
+\section{S-Expressions}
+\begin{code}
 
 data SExpr = Symbol String
            | Sequence [SExpr]
@@ -33,7 +47,10 @@ instance Read SExpr where
 class SExpressable f where
   interpretLayer :: SExpr -> f SExpr
   expressLayer   :: f SExpr -> SExpr
+\end{code}
 
+\section{...}
+\begin{code}
 data Pattern a = PName String
                | PList String [Pattern a]
                deriving (Functor, Foldable, Traversable)
@@ -100,3 +117,5 @@ express = cata expressLayer
 
 main :: IO ()
 main = putStrLn "Hello, world!"
+\end{code}
+\end{document}

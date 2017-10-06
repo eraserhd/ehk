@@ -16,7 +16,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 executable moreso
-  main-is:             Main.hs
+  main-is:             Main.lhs
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.9 && <4.10,
