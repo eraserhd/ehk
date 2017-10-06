@@ -5,7 +5,6 @@
 
 \section{To-do}
 \begin{itemize}
-\item Convert to literate Haskell
 \item Make {\tt SExpressable} on kind {\tt *}
 \item Escape control characters in symbols
 \item Use gana, MonadFail for errors
