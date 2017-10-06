@@ -31,7 +31,7 @@ instance Read SExpr where
       isSymChar c = not (c `elem` "()" || isSpace c)
 
 class SExpressable f where
-  fromSExpr :: SExpr -> f SExpr
+  interpret :: SExpr -> f SExpr
   toSExpr   :: f SExpr -> SExpr
 
 data Pattern a = PName String
@@ -39,8 +39,8 @@ data Pattern a = PName String
                deriving (Functor, Foldable, Traversable)
 
 instance SExpressable Pattern where
-  fromSExpr (Symbol var)                  = PName var
-  fromSExpr (Sequence (Symbol head : tail)) = PList head $ map fromSExpr tail
+  interpret (Symbol var)                  = PName var
+  interpret (Sequence (Symbol head : tail)) = PList head $ map interpret tail
 
   toSExpr (PName name) = Symbol name
   toSExpr (PList p ps) = Sequence $ Symbol p : map toSExpr ps
@@ -50,7 +50,7 @@ data DefineClause a = DefineClause String [Pattern a] a
                       deriving (Functor, Foldable, Traversable)
 
 instance SExpressable DefineClause where
-  fromSExpr (Sequence [Sequence (Symbol fname : args), expr]) = DefineClause fname (map fromSExpr args) expr
+  interpret (Sequence [Sequence (Symbol fname : args), expr]) = DefineClause fname (map interpret args) expr
 
   toSExpr (DefineClause fname args expr) = Sequence [Sequence (Symbol fname : map toSExpr args), expr]
 
@@ -65,7 +65,7 @@ data DataConstructorDefinition a =
   deriving (Functor, Foldable, Traversable)
 
 instance SExpressable DataConstructorDefinition where
-  fromSExpr (Sequence [(Symbol ctorName), ty])    = DataConstructorDefinition ctorName $ fromSExpr ty
+  interpret (Sequence [(Symbol ctorName), ty])    = DataConstructorDefinition ctorName $ interpret ty
   toSExpr (DataConstructorDefinition ctorName ty) = Sequence [Symbol ctorName, toSExpr ty]
 
 data TypeDefinition a =
@@ -73,8 +73,8 @@ data TypeDefinition a =
   deriving (Functor, Foldable, Traversable)
 
 instance SExpressable TypeDefinition where
-  fromSExpr (Sequence (Symbol "type" : Symbol typeCtor : ty : dataCtors)) =
-    TypeDefinition typeCtor (fromSExpr ty) $ map fromSExpr dataCtors
+  interpret (Sequence (Symbol "type" : Symbol typeCtor : ty : dataCtors)) =
+    TypeDefinition typeCtor (interpret ty) $ map interpret dataCtors
 
   toSExpr (TypeDefinition typeCtor ty dataCtors) =
     Sequence $ Symbol "type" : Symbol typeCtor : toSExpr ty : map toSExpr dataCtors
@@ -82,10 +82,10 @@ instance SExpressable TypeDefinition where
 data TopLevel a = TypeDefinition a :+: Expr a
 
 instance SExpressable Expr where
-  fromSExpr (Symbol var)                                       = Reference var
-  fromSExpr (Sequence (Symbol "define" : ty : clauses))        = Define ty $ map fromSExpr clauses
-  fromSExpr (Sequence [Symbol "Forall", Symbol var, ty, expr]) = Forall var ty expr
-  fromSExpr (Sequence (x : xs))                                = Apply x xs
+  interpret (Symbol var)                                       = Reference var
+  interpret (Sequence (Symbol "define" : ty : clauses))        = Define ty $ map interpret clauses
+  interpret (Sequence [Symbol "Forall", Symbol var, ty, expr]) = Forall var ty expr
+  interpret (Sequence (x : xs))                                = Apply x xs
 
   toSExpr (Reference var)      = Symbol var
   toSExpr (Define ty clauses)  = Sequence (Symbol "define" : ty : map toSExpr clauses)
@@ -93,7 +93,7 @@ instance SExpressable Expr where
   toSExpr (Apply x xs)         = Sequence (x : xs)
 
 unform :: (SExpressable a, Functor a) => SExpr -> Fix a
-unform = ana fromSExpr
+unform = ana interpret
 
 form :: (SExpressable a, Functor a) => Fix a -> SExpr
 form = cata toSExpr
