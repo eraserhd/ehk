@@ -10,7 +10,8 @@ import GHC.Generics ((:+:)(..))
 
 -- TODO:
 -- * Escape control characters in symbols
--- * `unform` will do weird things in undefined cases
+-- * `unform` should use gana, MonadFail for errors
+-- * Rename `define` to `value`?
 
 data SExpr = Symbol String
            | Sequence [SExpr]
@@ -29,7 +30,7 @@ instance Read SExpr where
       isSymChar :: Char -> Bool
       isSymChar c = not (c `elem` "()" || isSpace c)
 
-class SExprRepresentable f where
+class SExpressable f where
   fromSExpr :: SExpr -> f SExpr
   toSExpr   :: f SExpr -> SExpr
 
@@ -37,7 +38,7 @@ data Pattern a = PName String
                | PList String [Pattern a]
                deriving (Functor, Foldable, Traversable)
 
-instance SExprRepresentable Pattern where
+instance SExpressable Pattern where
   fromSExpr (Symbol var)                  = PName var
   fromSExpr (Sequence (Symbol head : tail)) = PList head $ map fromSExpr tail
 
@@ -48,7 +49,7 @@ instance SExprRepresentable Pattern where
 data DefineClause a = DefineClause String [Pattern a] a
                       deriving (Functor, Foldable, Traversable)
 
-instance SExprRepresentable DefineClause where
+instance SExpressable DefineClause where
   fromSExpr (Sequence [Sequence (Symbol fname : args), expr]) = DefineClause fname (map fromSExpr args) expr
 
   toSExpr (DefineClause fname args expr) = Sequence [Sequence (Symbol fname : map toSExpr args), expr]
@@ -63,7 +64,7 @@ data DataConstructorDefinition a =
   DataConstructorDefinition String (Expr a)
   deriving (Functor, Foldable, Traversable)
 
-instance SExprRepresentable DataConstructorDefinition where
+instance SExpressable DataConstructorDefinition where
   fromSExpr (Sequence [(Symbol ctorName), ty])    = DataConstructorDefinition ctorName $ fromSExpr ty
   toSExpr (DataConstructorDefinition ctorName ty) = Sequence [Symbol ctorName, toSExpr ty]
 
@@ -71,7 +72,7 @@ data TypeDefinition a =
   TypeDefinition String (Expr a) [DataConstructorDefinition a]
   deriving (Functor, Foldable, Traversable)
 
-instance SExprRepresentable TypeDefinition where
+instance SExpressable TypeDefinition where
   fromSExpr (Sequence (Symbol "type" : Symbol typeCtor : ty : dataCtors)) =
     TypeDefinition typeCtor (fromSExpr ty) $ map fromSExpr dataCtors
 
@@ -80,7 +81,7 @@ instance SExprRepresentable TypeDefinition where
 
 data TopLevel a = TypeDefinition a :+: Expr a
 
-instance SExprRepresentable Expr where
+instance SExpressable Expr where
   fromSExpr (Symbol var)                                       = Reference var
   fromSExpr (Sequence (Symbol "define" : ty : clauses))        = Define ty $ map fromSExpr clauses
   fromSExpr (Sequence [Symbol "Forall", Symbol var, ty, expr]) = Forall var ty expr
@@ -91,10 +92,10 @@ instance SExprRepresentable Expr where
   toSExpr (Forall var ty expr) = Sequence [Symbol "Forall", Symbol var, ty, expr]
   toSExpr (Apply x xs)         = Sequence (x : xs)
 
-unform :: (SExprRepresentable a, Functor a) => SExpr -> Fix a
+unform :: (SExpressable a, Functor a) => SExpr -> Fix a
 unform = ana fromSExpr
 
-form :: (SExprRepresentable a, Functor a) => Fix a -> SExpr
+form :: (SExpressable a, Functor a) => Fix a -> SExpr
 form = cata toSExpr
 
 main :: IO ()
