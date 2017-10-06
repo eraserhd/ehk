@@ -22,27 +22,43 @@ import Text.ParserCombinators.ReadP (ReadP(..), (<++), readP_to_S, readS_to_P,
 \end{code}
 
 \section{S-Expressions}
+
+Our lisp's fundamental data type isn't {\em quite} an S-expression--we borrow
+Haskell's list type instead of making our own pairs.  This allows us to avoid
+implementing dotted pair notation.
+
 \begin{code}
 data SExpression = Symbol String
                  | Sequence [SExpression]
-                 deriving (Eq)
-
-instance Show SExpression where
-  show (Symbol a)    = a
-  show (Sequence xs) = "(" ++ intercalate " " (map show xs) ++ ")"
-instance Read SExpression where
-  readsPrec _ = readP_to_S grammar
-    where
-      grammar  = skipSpaces *> (sequence <++ symbol)
-      sequence = Sequence <$> between (char '(') (skipSpaces *> char ')') (many grammar)
-      symbol   = Symbol <$> munch1 isSymChar
-
-      isSymChar :: Char -> Bool
-      isSymChar c = not (c `elem` "()" || isSpace c)
 \end{code}
 
+\subsection{Textual Representation}
+S-expressions are printed and parsed using lisp's representation, rather than
+Haskell's:
+\begin{code}
+instance Show SExpression where
+  show (Symbol name) = name
+  show (Sequence xs) = "(" ++
+                       intercalate " " (show <$> xs) ++
+                       ")"
+
+instance Read SExpression where
+  readsPrec _ = readP_to_S sExpression
+    where
+      sExpression   = skipSpaces *> (sequence <++ symbol)
+      sequence      = Sequence <$> parenthesized (many sExpression)
+      symbol        = Symbol <$> munch1 isSymbolChar
+      parenthesized = between leftParen rightParen
+      leftParen     = char '('
+      rightParen    = skipSpaces *> char ')'
+
+      isSymbolChar :: Char -> Bool
+      isSymbolChar c = not (c `elem` "()" || isSpace c)
+\end{code}
+
+\subsection{Value Conversion}
 A type {\em a} is {\em S-expressable} if we can convert values to
-S-expressions and back.
+S-expressions and back:
 
 \begin{code}
 class SExpressable a where
