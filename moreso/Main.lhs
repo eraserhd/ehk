@@ -9,7 +9,6 @@
 \item Make {\tt SExpressable} on kind {\tt *}
 \item Escape control characters in symbols
 \item Use gana, MonadFail for errors
-\item Rename define to value
 \end{itemize}
 
 \section{Preamble}
