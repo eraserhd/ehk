@@ -31,28 +31,28 @@ instance Read SExpr where
       isSymChar c = not (c `elem` "()" || isSpace c)
 
 class SExpressable f where
-  interpret :: SExpr -> f SExpr
-  toSExpr   :: f SExpr -> SExpr
+  interpretLayer :: SExpr -> f SExpr
+  expressLayer   :: f SExpr -> SExpr
 
 data Pattern a = PName String
                | PList String [Pattern a]
                deriving (Functor, Foldable, Traversable)
 
 instance SExpressable Pattern where
-  interpret (Symbol var)                  = PName var
-  interpret (Sequence (Symbol head : tail)) = PList head $ map interpret tail
+  interpretLayer (Symbol var)                  = PName var
+  interpretLayer (Sequence (Symbol head : tail)) = PList head $ map interpretLayer tail
 
-  toSExpr (PName name) = Symbol name
-  toSExpr (PList p ps) = Sequence $ Symbol p : map toSExpr ps
+  expressLayer (PName name) = Symbol name
+  expressLayer (PList p ps) = Sequence $ Symbol p : map expressLayer ps
 
 
 data DefineClause a = DefineClause String [Pattern a] a
                       deriving (Functor, Foldable, Traversable)
 
 instance SExpressable DefineClause where
-  interpret (Sequence [Sequence (Symbol fname : args), expr]) = DefineClause fname (map interpret args) expr
+  interpretLayer (Sequence [Sequence (Symbol fname : args), expr]) = DefineClause fname (map interpretLayer args) expr
 
-  toSExpr (DefineClause fname args expr) = Sequence [Sequence (Symbol fname : map toSExpr args), expr]
+  expressLayer (DefineClause fname args expr) = Sequence [Sequence (Symbol fname : map expressLayer args), expr]
 
 data Expr a = Reference String
             | Define a [DefineClause a]
@@ -65,38 +65,38 @@ data DataConstructorDefinition a =
   deriving (Functor, Foldable, Traversable)
 
 instance SExpressable DataConstructorDefinition where
-  interpret (Sequence [(Symbol ctorName), ty])    = DataConstructorDefinition ctorName $ interpret ty
-  toSExpr (DataConstructorDefinition ctorName ty) = Sequence [Symbol ctorName, toSExpr ty]
+  interpretLayer (Sequence [(Symbol ctorName), ty])    = DataConstructorDefinition ctorName $ interpretLayer ty
+  expressLayer (DataConstructorDefinition ctorName ty) = Sequence [Symbol ctorName, expressLayer ty]
 
 data TypeDefinition a =
   TypeDefinition String (Expr a) [DataConstructorDefinition a]
   deriving (Functor, Foldable, Traversable)
 
 instance SExpressable TypeDefinition where
-  interpret (Sequence (Symbol "type" : Symbol typeCtor : ty : dataCtors)) =
-    TypeDefinition typeCtor (interpret ty) $ map interpret dataCtors
+  interpretLayer (Sequence (Symbol "type" : Symbol typeCtor : ty : dataCtors)) =
+    TypeDefinition typeCtor (interpretLayer ty) $ map interpretLayer dataCtors
 
-  toSExpr (TypeDefinition typeCtor ty dataCtors) =
-    Sequence $ Symbol "type" : Symbol typeCtor : toSExpr ty : map toSExpr dataCtors
+  expressLayer (TypeDefinition typeCtor ty dataCtors) =
+    Sequence $ Symbol "type" : Symbol typeCtor : expressLayer ty : map expressLayer dataCtors
 
 data TopLevel a = TypeDefinition a :+: Expr a
 
 instance SExpressable Expr where
-  interpret (Symbol var)                                       = Reference var
-  interpret (Sequence (Symbol "define" : ty : clauses))        = Define ty $ map interpret clauses
-  interpret (Sequence [Symbol "Forall", Symbol var, ty, expr]) = Forall var ty expr
-  interpret (Sequence (x : xs))                                = Apply x xs
+  interpretLayer (Symbol var)                                       = Reference var
+  interpretLayer (Sequence (Symbol "define" : ty : clauses))        = Define ty $ map interpretLayer clauses
+  interpretLayer (Sequence [Symbol "Forall", Symbol var, ty, expr]) = Forall var ty expr
+  interpretLayer (Sequence (x : xs))                                = Apply x xs
 
-  toSExpr (Reference var)      = Symbol var
-  toSExpr (Define ty clauses)  = Sequence (Symbol "define" : ty : map toSExpr clauses)
-  toSExpr (Forall var ty expr) = Sequence [Symbol "Forall", Symbol var, ty, expr]
-  toSExpr (Apply x xs)         = Sequence (x : xs)
+  expressLayer (Reference var)      = Symbol var
+  expressLayer (Define ty clauses)  = Sequence (Symbol "define" : ty : map expressLayer clauses)
+  expressLayer (Forall var ty expr) = Sequence [Symbol "Forall", Symbol var, ty, expr]
+  expressLayer (Apply x xs)         = Sequence (x : xs)
 
-unform :: (SExpressable a, Functor a) => SExpr -> Fix a
-unform = ana interpret
+interpret :: (SExpressable a, Functor a) => SExpr -> Fix a
+interpret = ana interpretLayer
 
-form :: (SExpressable a, Functor a) => Fix a -> SExpr
-form = cata toSExpr
+express :: (SExpressable a, Functor a) => Fix a -> SExpr
+express = cata expressLayer
 
 main :: IO ()
 main = putStrLn "Hello, world!"
