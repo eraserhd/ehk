@@ -19,5 +19,6 @@ data Category : Type where
                ((.)   : {a, b, c : Obj} -> (a -=> b) -> (b -=> c) -> (a -=> c)) ->
                ((:=:) : {a, b, c, d : Obj} -> (f : a -=> b) -> (g : c -=> d) -> Type) ->
                (composeAssociative : {a, b, c, d : Obj} -> (f : a -=> b) -> (g : b -=> c) -> (h : c -=> d) -> (f . g) . h :=: f . (g . h)) ->
-               (identity : (x : Obj) -> Subset (x -=> x) (\id => ((f : x -=> a) -> id . f :=: f, (g : a -=> x) -> g . id :=: g))) ->
+               (identity : (x : Obj) -> Subset (x -=> x) (\id => ((a : Obj) -> (f : x -=> a) -> id . f :=: f,
+                                                                  (a : Obj) -> (g : a -=> x) -> g . id :=: g))) ->
                Category
