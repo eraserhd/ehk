@@ -5,6 +5,7 @@
 
 \section{To-do}
 \begin{itemize}
+\item Fold syntax.scm into Main.lhs
 \item Escape control characters in symbols
 \item Use gana, MonadFail for errors
 \end{itemize}
