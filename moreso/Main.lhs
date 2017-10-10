@@ -3,13 +3,6 @@
 \lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small}}{}
 \begin{document}
 
-\section{To-do}
-\begin{itemize}
-\item Fold syntax.scm into Main.lhs
-\item Escape control characters in symbols
-\item Use gana, MonadFail for errors
-\end{itemize}
-
 \section{Preamble}
 \begin{code}
 {-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, FlexibleInstances #-}
