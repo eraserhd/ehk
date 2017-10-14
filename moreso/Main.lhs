@@ -60,9 +60,7 @@ Haskell's:
 \begin{code}
 instance Show SExpression where
   show (Symbol name) = name
-  show (Sequence xs) = "(" ++
-                       intercalate " " (show <$> xs) ++
-                       ")"
+  show (Sequence xs) = "(" ++ intercalate " " (show <$> xs) ++ ")"
 
 instance Read SExpression where
   readsPrec _ = readP_to_S sExpression
