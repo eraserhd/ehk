@@ -1,7 +1,35 @@
 \documentclass{article}
 \usepackage{minted}
 \newminted[code]{haskell}{}
+\newminted[moreso]{scheme}{}
 \begin{document}
+
+\section{The Language}
+\begin{moreso}
+define-expr := (define Ty
+                 ((fname pat_1,1 ... pat_1,n) expr_1)
+                 ...
+                 ((fname pat_n,1 ... pat_n,n) expr_n))
+
+type-expr := (type TypeCtor Ty
+               (DataCtor_1 Ty_1)
+               ...
+               (DataCtor_2 Ty_n))
+
+expr := Type
+     |  (Forall var Ty expr)
+     |  define-expr
+     |  (expr_1 .. expr_n)
+
+pat := var
+    |  _
+    |  TypeCtor
+    |  (TypeCtor e_1 ... e_n)
+    |  DataCtor
+    |  (DataCtor e_1 ... e_n)
+
+toplevel : (type-expr | define-expr)*
+\end{moreso}
 
 \section{Preamble}
 \begin{code}
