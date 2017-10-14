@@ -1,6 +1,6 @@
 \documentclass{article}
-\usepackage{listings}
-\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small}}{}
+\usepackage{minted}
+\newminted[code]{haskell}{}
 \begin{document}
 
 \section{Preamble}
