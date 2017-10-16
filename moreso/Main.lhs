@@ -6,29 +6,23 @@
 
 \section{The Language}
 \begin{moreso}
-define-expr := (define Ty
-                 ((fname pat_1,1 ... pat_1,n) expr_1)
-                 ...
-                 ((fname pat_n,1 ... pat_n,n) expr_n))
+symbol         := <any non-whitespace, non-parenthesis character>+
+is-expr        := ('is' Ty expr)                         ; a type assertion
+lambda-expr    := ('lambda' symbol expr)
+introduce-sym  := 'introduce_' <digit>+                  ; constructor n for a particular type
+introduce-expr := (introduce-sym expr_0 ... expr_n)      ; construct a value
+eliminate-expr := ('eliminate' expr f_0 ... f_n)         ; destruct a value
+type-expr      := ('inductive' Ty schema_0 ... schema_n) ; introduce a new inductive type
 
-type-expr := (type TypeCtor Ty
-               (DataCtor_1 Ty_1)
-               ...
-               (DataCtor_2 Ty_n))
-
-expr := Type
-     |  (Forall var Ty expr)
-     |  define-expr
-     |  (expr_1 .. expr_n)
-
-pat := var
-    |  _
-    |  TypeCtor
-    |  (TypeCtor e_1 ... e_n)
-    |  DataCtor
-    |  (DataCtor e_1 ... e_n)
-
-toplevel : (type-expr | define-expr)*
+expr           := 'Type'                                 ; Root type
+               |  ('Forall' symbol Ty expr)              ; Dependent types
+               |  is-expr
+               |  lambda-expr
+               |  introduce-expr
+               |  eliminate-expr
+               |  type-expr
+               |  symbol                                 ; variable reference
+               |  (expr_1 ... expr_n)                    ; application
 \end{moreso}
 
 \section{Preamble}
