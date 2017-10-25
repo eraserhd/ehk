@@ -17,8 +17,7 @@ interface Category (Obj : Type) where
   ||| A type constructor for equality on morphisms.  Note that we can't just
   ||| use (=) because intensional equality doesn't work for morphisms in Set
   ||| (f . g = p could never be shown).
-  (:=:) : {a, b, c, d : Obj} -> (a ~> b) -> (c ~> d) -> Type
-
+  (:=:) : {a, b : Obj} -> (a ~> b) -> (a ~> b) -> Type
 
   ||| Proof that composition is associative
   composeAssociative : {a, b, c, d : Obj} ->
