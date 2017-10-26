@@ -3,6 +3,14 @@
 infixr 5 ~>
 infix 5 :=:
 
+||| Categories need to carry our idea of equality with them (for example,
+||| in Set, we can't just use (=) because intensional equality doesn't work
+||| for morphisms (f . g = p could never be shown).
+interface Equality (eq : ty -> ty -> Type) where
+  symmetry : (x, y : ty) -> x `eq` y -> y `eq` x
+  reflexivity :  (x : ty) -> x `eq` x
+  transitivity : (x, y, z : ty) -> x `eq` y -> y `eq` z -> x `eq` z
+
 ||| A fully general, but fully strict implementation of a category.
 |||
 |||   Obj   - the type of objects
@@ -14,10 +22,8 @@ interface Category (Obj : Type) where
   ||| composition on morphisms
   (.) : {a, b, c : Obj} -> (a ~> b) -> (b ~> c) -> (a ~> c)
 
-  ||| A type constructor for equality on morphisms.  Note that we can't just
-  ||| use (=) because intensional equality doesn't work for morphisms in Set
-  ||| (f . g = p could never be shown).
   (:=:) : {a, b : Obj} -> (a ~> b) -> (a ~> b) -> Type
+  morphismEquality : Equality {ty=a ~> b} (:=:)
 
   ||| Proof that composition is associative
   composeAssociative : {a, b, c, d : Obj} ->
