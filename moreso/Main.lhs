@@ -27,7 +27,8 @@ expr           := 'Type'                                 ; Root type
 
 \section{Preamble}
 \begin{code}
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, FlexibleInstances #-}
+{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable,
+             FlexibleInstances #-}
 
 import Control.Arrow (first)
 import Data.Char (isSpace)
