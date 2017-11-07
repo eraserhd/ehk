@@ -5,6 +5,13 @@
 
 > data Flower = Red | Yellow | Blue
 
+Let's first describe how to pick three flowers.
+
+> data Pick3 : Vect n Flower -> Vect 3 Flower -> Type where
+>   MkPick3 : (garden : Vect n Flower) ->
+>             (x, y, z : Fin n) -> Not (x = y) -> Not (x = z) -> Not (y = z) ->
+>             Pick3 garden (index x garden :: index y garden :: index z garden :: [])
+
 First, we have n and a Vect n Flower.  These are givens:
 
 > gardenProof : (n : Nat) -> (garden : Vect n Flower) ->
@@ -15,28 +22,19 @@ because we have claims for Red and Yellow:
 
 >               Elem Blue garden ->
 
-Picking three distinct flowers from a garden is really something like "forall
-3-prefixes of a permutation of n flowers".  It could be done with something like
-https://github.com/eraserhd/ehk/blob/master/euler/43.idr#L7-L13
-
-I'm going to say "given three distinct indices" is easier:
-
->               (x, y, z : Fin n) -> Not (x = y) -> Not (x = z) -> Not (y = z) ->
-
 Now we can model the claim of the first observer:
 
->               let picked = index x garden :: index y garden :: index z garden :: [] in
->               Elem Red picked ->
+>               (Pick3 garden picked -> Elem Red picked) ->
 
 This could alternately be modeled as `Either ((index x garden) = Red) (Either ((index y garden) = Red) ((index z garden) = Red))`, which could make it easier to prove.
 
 And the second:
 
->               Elem Yellow picked ->
+>               (Pick3 garden picked -> Elem Yellow picked) ->
 
 And the conclusion:
 
->               Elem Blue picked
+>               Pick3 garden picked -> Elem Blue picked
 
 How to prove this?  There would probably be a bunch of lemmas (or auxiliary functions).
 Still off the cuff, I would try to first prove there are only three flowers, from which
