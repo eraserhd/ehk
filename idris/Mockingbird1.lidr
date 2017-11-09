@@ -39,3 +39,8 @@ And the conclusion:
 How to prove this?  There would probably be a bunch of lemmas (or auxiliary functions).
 Still off the cuff, I would try to first prove there are only three flowers, from which
 the conclusion looks like it would come easily.
+
+> gardenProof n garden atLeastOneBlue anyPickOneRed anyPickOneYellow anyPick = ?quoi
+>   where
+>     bar : 3 `LTE` n
+>     bar = ?wha
