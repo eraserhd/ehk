@@ -1,7 +1,7 @@
 
 
 infixr 5 ~>
-infix 5 :=:
+infix 5 ~=
 
 ||| Categories need to carry our idea of equality with them (for example,
 ||| in Set, we can't just use (=) because intensional equality doesn't work
@@ -22,14 +22,14 @@ interface Category (Obj : Type) where
   ||| composition on morphisms
   (.) : {a, b, c : Obj} -> (a ~> b) -> (b ~> c) -> (a ~> c)
 
-  (~=~) : {a, b : Obj} -> (a ~> b) -> (a ~> b) -> Type
-  morphismEqualityIsAnEqualityRelation : (a, b : Obj) -> EqualityRelation (a ~> b) (~=~)
+  (~=) : {a, b : Obj} -> (a ~> b) -> (a ~> b) -> Type
+  morphismEqualityIsAnEqualityRelation : (a, b : Obj) -> EqualityRelation (a ~> b) (~=)
 
   compositionIsAssociative : {a, b, c, d : Obj} ->
                              (f : a ~> b) -> (g : b ~> c) -> (h : c ~> d) ->
-                             (f . g) . h ~=~ f . (g . h)
+                             (f . g) . h ~= f . (g . h)
 
   identityMorphism : (x : Obj) ->
                      Subset (x ~> x)
-                            (\id => ((a : Obj) -> (f : x ~> a) -> id . f ~=~ f,
-                                     (a : Obj) -> (g : a ~> x) -> g . id ~=~ g))
+                            (\id => ((a : Obj) -> (f : x ~> a) -> id . f ~= f,
+                                     (a : Obj) -> (g : a ~> x) -> g . id ~= g))
