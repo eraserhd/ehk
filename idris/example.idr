@@ -1,5 +1,7 @@
 module Example
 
+import Data.So
+
 -- Divisible by 3 "Fizz"
 -- Divisible by 5 "Buzz"
 -- Divisible by both, "FizzBuzz"
@@ -27,6 +29,21 @@ fizzBuzz x with (isMod3 x, isMod5 x)
   fizzBuzz x | (False, True) = "Buzz"
   fizzBuzz x | (False, False) = show x
 
+foo : (n : Nat) -> Either (So (isMod3 n)) (So (isMod5 n)) -> Not (fizzBuzz n = "")
+foo n (Left l)  = ?foo_rhs_1
+foo n (Right r) = ?foo_rhs_2
+
+{-
+fizzIfDivisibleBy3 : (n : Nat) ->
+                     So (isMod3 n && isMod5 n) ->
+                     fizzBuzz n = "FizzBuzz"
+fizzIfDivisibleBy3 n x with (choose (isMod3 n && isMod5 n))
+  fizzIfDivisibleBy3 n x | (Left l) = ?fizzIfDivisibleBy3_rhs_1
+  fizzIfDivisibleBy3 n x | (Right r) = ?fizzIfDivisibleBy3_rhs_2
+-}
+
+
+{-
 fizzBuzz3ReturnsFizz : fizzBuzz 3 = "Fizz"
 fizzBuzz3ReturnsFizz = Refl
 
@@ -38,3 +55,4 @@ fizzBuzz2Is2 = Refl
 
 fizzBuzz15ReturnsFizzBuzz : fizzBuzz 15 = "FizzBuzz"
 fizzBuzz15ReturnsFizzBuzz = Refl
+-}
