@@ -1,2 +1,6 @@
+*.idx
+*.tex
+*.toc
+*.scn
 *.pdf
 _minted-*
