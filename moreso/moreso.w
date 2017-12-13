@@ -27,9 +27,7 @@ introduce-expr := (introduce-sym expr_0 ... expr_n)      ; construct a value
 eliminate-expr := ('eliminate' expr f_0 ... f_n)         ; destruct a value
 type-expr      := ('inductive' Ty schema_0 ... schema_n) ; introduce a new inductive type
 
-expr           := 'Type'                                 ; Root type
-               |  ('Forall' symbol Ty expr)              ; Dependent types
-               |  is-expr
+expr           := is-expr
                |  lambda-expr
                |  introduce-expr
                |  eliminate-expr
@@ -38,8 +36,37 @@ expr           := 'Type'                                 ; Root type
                |  (expr_1 ... expr_n)                    ; application
 \end{verbatim}
 
+\def\istype{\mbox{ is a type}}
+
 \begin{displaymath}
-\frac{Hello}{World}(IS)
+\frac{}{\Gamma\vdash\mbox{{\tt Type}}\istype}
+\end{displaymath}
+
+\begin{displaymath}
+\frac{
+\Gamma\vdash A\istype
+\quad
+\Gamma,x:A\vdash B\istype
+}{
+\Gamma\vdash\mbox{\tt (Forall } x\ A\ B\mbox{\tt)}\istype}
+\end{displaymath}
+
+\begin{displaymath}
+\frac{
+  ??
+}{
+\Gamma\vdash\mbox{\tt (Inductive} \mbox{\tt)}\istype
+}
+\end{displaymath}
+
+\begin{displaymath}
+\frac{
+\Gamma\vdash A\istype\quad
+\Gamma,x:A\vdash B\istype\quad
+\Gamma,x:A\vdash e : B
+}{
+\Gamma\vdash\mbox{\tt (lambda } x\ e\mbox{\tt)} : \mbox{\tt (Forall } x\ A\ B\mbox{\tt)}
+}
 \end{displaymath}
 
 @
