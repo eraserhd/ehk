@@ -8,4 +8,4 @@ moreso.tex: moreso.w
 	chezweave moreso.w
 
 moreso.pdf: moreso.tex
-	pdflatex -shell-escape moreso.tex
+	pdftex -shell-escape moreso.tex

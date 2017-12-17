@@ -9,16 +9,9 @@
 %...
 }
 
-\def\N#1#2#3.{% beginning of starred section
-\section{#3}
-}
-
-\documentclass{article}
-\begin{document}
-
 @* The Language.
 
-\begin{verbatim}
+\verbatim
 symbol         := <any non-whitespace, non-parenthesis character>+
 is-expr        := ('is' Ty expr)                         ; a type assertion
 lambda-expr    := ('lambda' symbol expr)
@@ -34,41 +27,27 @@ expr           := is-expr
                |  type-expr
                |  symbol                                 ; variable reference
                |  (expr_1 ... expr_n)                    ; application
-\end{verbatim}
+!endverbatim
 
-\def\istype{\mbox{ is a type}}
+\def\Type{\tt Type}
+\def\isatype{\rm\ is\ a\ type}
 
-\begin{displaymath}
-\frac{}{\Gamma\vdash\mbox{{\tt Type}}\istype}
-\end{displaymath}
+$$\over\Gamma\vdash\Type\isatype$$
 
-\begin{displaymath}
-\frac{
-\Gamma\vdash A\istype
-\quad
-\Gamma,x:A\vdash B\istype
-}{
-\Gamma\vdash\mbox{\tt (Forall } x\ A\ B\mbox{\tt)}\istype}
-\end{displaymath}
+$$
+  \Gamma\vdash A\isatype
+  \quad
+  \Gamma,x:A\vdash B\isatype
+\over
+\Gamma\vdash{\tt (Forall\ } x\ A\ B{\tt)}\isatype
+$$
 
-\begin{displaymath}
-\frac{
-  ??
-}{
-\Gamma\vdash\mbox{\tt (Inductive} \mbox{\tt)}\istype
-}
-\end{displaymath}
+$$ ?? \over \Gamma\vdash{\tt (Inductive\ }{\tt)}\isatype $$
 
-\begin{displaymath}
-\frac{
-\Gamma\vdash A\istype\quad
-\Gamma,x:A\vdash B\istype\quad
+$$\Gamma\vdash A\isatype\quad
+\Gamma,x:A\vdash B\isatype\quad
 \Gamma,x:A\vdash e : B
-}{
-\Gamma\vdash\mbox{\tt (lambda } x\ e\mbox{\tt)} : \mbox{\tt (Forall } x\ A\ B\mbox{\tt)}
-}
-\end{displaymath}
+\over
+\Gamma\vdash{\tt (lambda\ } x\ e{\tt)} : {\tt (Forall\ } x\ A\ B{\tt)}
+$$
 
-@
-
-\end{document}
