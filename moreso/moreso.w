@@ -36,7 +36,7 @@ expr           := is-expr
 \def\Inductive{\keyword{Inductive}}
 \def\Type{\keyword{Type}}
 
-\def\isatype{\rm\ is\ a\ type}
+\def\isatype{{\rm\ is\ a\ type}}
 
 $$\over\Gamma\vdash\Type\isatype$$
 
@@ -55,6 +55,6 @@ $$
  \Gamma,x:A\vdash B\isatype\quad
  \Gamma,x:A\vdash e : B
 \over
- \Gamma\vdash \app{lambda\ x\ e} : \app{\Forall\ x\ A\ B}
+ \Gamma\vdash \app{\keyword{lambda}\ x\ e} : \app{\Forall\ x\ A\ B}
 $$
 
