@@ -12,20 +12,13 @@
 @* The Language.
 
 \verbatim
-symbol         := <any non-whitespace, non-parenthesis character>+
-is-expr        := ('is' Ty expr)                         ; a type assertion
-lambda-expr    := ('lambda' symbol expr)
 introduce-sym  := 'introduce_' <digit>+                  ; constructor n for a particular type
 introduce-expr := (introduce-sym expr_0 ... expr_n)      ; construct a value
 eliminate-expr := ('eliminate' expr f_0 ... f_n)         ; destruct a value
 type-expr      := ('inductive' Ty schema_0 ... schema_n) ; introduce a new inductive type
 
-expr           := is-expr
-               |  lambda-expr
-               |  introduce-expr
+expr           := introduce-expr
                |  eliminate-expr
-               |  type-expr
-               |  symbol                                 ; variable reference
                |  (expr_1 ... expr_n)                    ; application
 !endverbatim
 
@@ -58,3 +51,9 @@ $$
  \Gamma\vdash \app{\keyword{lambda}\ x\ e} : \app{\Forall\ x\ A\ B}
 $$
 
+$$
+ \Gamma\vdash A\isatype\quad
+ \Gamma\vdash x:A
+\over
+ \Gamma\vdash \app{\keyword{is}\ A\ x} : A
+$$
