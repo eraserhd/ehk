@@ -29,7 +29,13 @@ expr           := is-expr
                |  (expr_1 ... expr_n)                    ; application
 !endverbatim
 
-\def\Type{\tt Type}
+\def\keyword#1{{\tt #1}}
+\def\app#1{{\tt(}#1{\tt)}}
+
+\def\Forall{\keyword{Forall}}
+\def\Inductive{\keyword{Inductive}}
+\def\Type{\keyword{Type}}
+
 \def\isatype{\rm\ is\ a\ type}
 
 $$\over\Gamma\vdash\Type\isatype$$
@@ -39,15 +45,16 @@ $$
   \quad
   \Gamma,x:A\vdash B\isatype
 \over
-\Gamma\vdash{\tt (Forall\ } x\ A\ B{\tt)}\isatype
+\Gamma\vdash{\app{\Forall\ x\ A\ B}}\isatype
 $$
 
-$$ ?? \over \Gamma\vdash{\tt (Inductive\ }{\tt)}\isatype $$
+$$ ?? \over \Gamma\vdash \app{\Inductive\ }\isatype $$
 
-$$\Gamma\vdash A\isatype\quad
-\Gamma,x:A\vdash B\isatype\quad
-\Gamma,x:A\vdash e : B
+$$
+ \Gamma\vdash A\isatype\quad
+ \Gamma,x:A\vdash B\isatype\quad
+ \Gamma,x:A\vdash e : B
 \over
-\Gamma\vdash{\tt (lambda\ } x\ e{\tt)} : {\tt (Forall\ } x\ A\ B{\tt)}
+ \Gamma\vdash \app{lambda\ x\ e} : \app{\Forall\ x\ A\ B}
 $$
 
