@@ -93,6 +93,7 @@ parameter is the type for which a value is being introduced.
     (Forall x e0 e1)
     (is e0 e1)
     (ctor e)
+    (eliminate e)
     (lambda x e)
     (e0 e1)))
 
