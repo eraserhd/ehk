@@ -85,20 +85,20 @@ other terminals.
 (define (name? x)
   (and (symbol? x)
        (not (constructor? x))
-       (not (eq? x 'eliminate))
-       (not (eq? x 'Type))))
+       (not (memq x '(Type Forall Inductive is eliminate lambda)))))
 
 @ The Kernel Definition.
 @p
 (define-language Kernel
   (terminals
     (constructor (ctor))
-    (name (x))
+    (name (x name))
     (Type (Type)))
   (Expr (e)
     x
     Type
     (Forall x e0 e1)
+    (Inductive name e e* ...)
     (is e0 e1)
     (ctor e)
     (eliminate e)
