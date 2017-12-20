@@ -28,9 +28,6 @@ for typing, two for working with values, function abstraction and application.
 \medskip
 $\bullet$ {\tt Inductive}\par
 \medskip
-$\bullet$ ${\tt introduce}_i$\par
-$\bullet$ {\tt eliminate}\par
-\medskip
 
 @ |Type|.  The symbol ``|Type|'' is a terminal in our core language, so we
 need a predicate for our nanopass library.
@@ -44,7 +41,7 @@ need a predicate for our nanopass library.
 (assert (Type? 'Type))
 (assert (not (Type? 'random)))
 
-@ Contructors.  Our core language can introduce and eliminate algebraic
+@ Contsructors.  Our core language can introduce and eliminate algebraic
 types.  The constructors are not named, instead we introduce values of a
 particular type with {\tt introduce\_}$n$, where $n >= 0$.  The first
 parameter is the type for which a value is being introduced.
@@ -81,14 +78,25 @@ parameter is the type for which a value is being introduced.
 (assert (not (constructor? 'introduce_foo)))
 (assert (not (constructor? 'introduce_-1)))
 
+@ Names.  To avoid ambiguity, we make names disjoint from constructors and
+other terminals.
+
+@p
+(define (name? x)
+  (and (symbol? x)
+       (not (constructor? x))
+       (not (eq? x 'eliminate))
+       (not (eq? x 'Type))))
+
 @ The Kernel Definition.
 @p
 (define-language Kernel
   (terminals
     (constructor (ctor))
-    (symbol (x))
+    (name (x))
     (Type (Type)))
   (Expr (e)
+    x
     Type
     (Forall x e0 e1)
     (is e0 e1)
