@@ -1,4 +1,6 @@
 
+LIBDIRS	= .:./nanopass
+
 all: moreso.pdf test
 
 tests.ss moreso.ss: moreso.w
@@ -11,6 +13,6 @@ moreso.pdf: moreso.tex
 	pdftex -shell-escape moreso.tex
 
 test: tests.ss
-	scheme --program ./tests.ss
+	scheme --libdirs $(LIBDIRS) --program ./tests.ss
 
 .PHONY: all test

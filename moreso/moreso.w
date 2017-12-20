@@ -34,7 +34,7 @@ converts them.
 @(moreso.ss@>=
 (library (moreso)
   (export desugar)
-  (import (rnrs))
+  (import (rnrs) (nanopass))
 
   (define (desugar form)
     #f)

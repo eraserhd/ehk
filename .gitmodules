@@ -1,0 +1,3 @@
+[submodule "moreso/nanopass"]
+	path = moreso/nanopass
+	url = git@github.com:nanopass/nanopass-framework-scheme.git
