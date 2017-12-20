@@ -92,13 +92,13 @@ other terminals.
 (define-language Kernel
   (terminals
     (constructor (ctor))
-    (name (x name))
+    (name (x))
     (Type (Type)))
   (Expr (e)
     x
     Type
     (Forall x e0 e1)
-    (Inductive name e e* ...)
+    (Inductive e e* ...)
     (is e0 e1)
     (ctor e)
     (eliminate e)
