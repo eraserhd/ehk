@@ -13,7 +13,7 @@
 
 @p
 (library (moreso)
-  (export Type?)
+  (export constructor? Type?)
   (import (rnrs) (nanopass))
 
 @ Testing.  As we go, we make assertions to spot check that things are
@@ -44,16 +44,55 @@ need a predicate for our nanopass library.
 (assert (Type? 'Type))
 (assert (not (Type? 'random)))
 
+@ Contructors.  Our core language can introduce and eliminate algebraic
+types.  The constructors are not named, instead we introduce values of a
+particular type with {\tt introduce\_}$n$, where $n >= 0$.  The first
+parameter is the type for which a value is being introduced.
+
+@p
+(define (constructor? x)
+  (define prefix "introduce_")
+  (define prefix-len (string-length prefix))
+  (define (all-digits? s)
+    (call/cc (lambda (cont)
+               (string-for-each
+                 (lambda (ch)
+                   (if (char<? ch #\0)
+                     (cont #f))
+                   (if (char<? #\9 ch)
+                     (cont #f)))
+                 s)
+               #t)))
+  (and (symbol? x)
+       (let* ((s (symbol->string x))
+              (len (string-length s)))
+         (and (< prefix-len (string-length s))
+              (string=? (substring s 0 prefix-len) prefix)
+              (all-digits? (substring s prefix-len (string-length s)))))))
+
+@ |constructor?| works.
+@(tests.ss@>=
+(assert (constructor? 'introduce_0))
+(assert (constructor? 'introduce_1))
+(assert (constructor? 'introduce_21))
+(assert (not (constructor? 'foo)))
+(assert (not (constructor? 'verylongname)))
+(assert (not (constructor? 'introduce_)))
+(assert (not (constructor? 'introduce_foo)))
+(assert (not (constructor? 'introduce_-1)))
+
 @ The Kernel Definition.
 @p
 (define-language Kernel
   (terminals
+    (constructor (ctor))
     (symbol (x))
     (Type (Type)))
   (Expr (e)
     Type
     (Forall x e0 e1)
     (is e0 e1)
+    (ctor e)
     (lambda x e)
     (e0 e1)))
 
