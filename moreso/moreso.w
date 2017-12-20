@@ -9,6 +9,19 @@
 %...
 }
 
+@* Preamble.  Moreso is written as an R6RS Scheme library.
+
+@p
+(library (moreso)
+  (export Type?)
+  (import (rnrs) (nanopass))
+
+@ Testing.  As we go, we make assertions to spot check that things are
+working the way we intend.  Here is the preamble for our test file:
+
+@(tests.ss@>=
+(import (rnrs) (moreso))
+
 @* The Kernel Language.  The kernel of Moreso consists of seven forms: four
 for typing, two for working with values, function abstraction and application.
 
@@ -25,28 +38,23 @@ $\bullet$ {\tt lambda}\par
 $\bullet$ function application\par
 \medskip
 
-In the kernel language, lambdas have a single parameter and applications
-apply a single accepts them and
-converts them.argument.  This is convenient for writing a complier, but
-inconvenient for writing programs, so non-kernel Moreso accepts them and
-converts them.
+@p
 
-@(moreso.ss@>=
-(library (moreso)
-  (export desugar)
-  (import (rnrs) (nanopass))
+(define-language Kernel
+  (terminals
+    (Type (Type))))
 
-  (define (desugar form)
-    #f)
-)
-@* Tests.  Our tests are simple assertions---spot checks, really---that
-our code does what we claim it does so far.
+@ |Type|.  |Type| is a terminal in our core language, so we need a predicate
+for our nanopass library.
 
+@p
+(define (Type? x)
+  (equal? 'Type x))
+
+@ |Type?| works.
 @(tests.ss@>=
-(import (rnrs) (moreso))
-@ Sample Check.  We do this.
-@(tests.ss@>=
-(assert #t)
+(assert (Type? 'Type))
+(assert (not (Type? 'random)))
 @* Rules. Are here.
 
 %introduce-sym  := 'introduce_' <digit>
@@ -100,13 +108,5 @@ $$
 \eqno (app)
 $$
 
-@* Inductive Types.  Moreso uses a general mechanism for inductive types
-based on Luo's implementation of UTT.
-
-@ Strict Positivity of Operators.  Operators are functional types which
-produce a value of some type.
-
-@c () => (schema-positive?)
-@<Definition of schema-positive?@>=
-(define (schema-positive? type-name schema)
-  ...)
+@p
+)
