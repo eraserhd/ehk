@@ -25,10 +25,6 @@ working the way we intend.  Here is the preamble for our test file:
 @* The Kernel Language.  The kernel of Moreso consists of seven forms: four
 for typing, two for working with values, function abstraction and application.
 
-\medskip
-$\bullet$ {\tt Inductive}\par
-\medskip
-
 @ |Type|.  The symbol ``|Type|'' is a terminal in our core language, so we
 need a predicate for our nanopass library.
 
