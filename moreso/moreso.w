@@ -26,26 +26,14 @@ working the way we intend.  Here is the preamble for our test file:
 for typing, two for working with values, function abstraction and application.
 
 \medskip
-$\bullet$ {\tt Type}\par
-$\bullet$ {\tt Forall}\par
 $\bullet$ {\tt Inductive}\par
-$\bullet$ {\tt is}\par
 \medskip
 $\bullet$ ${\tt introduce}_i$\par
 $\bullet$ {\tt eliminate}\par
 \medskip
-$\bullet$ {\tt lambda}\par
-$\bullet$ function application\par
-\medskip
 
-@p
-
-(define-language Kernel
-  (terminals
-    (Type (Type))))
-
-@ |Type|.  |Type| is a terminal in our core language, so we need a predicate
-for our nanopass library.
+@ |Type|.  The symbol ``|Type|'' is a terminal in our core language, so we
+need a predicate for our nanopass library.
 
 @p
 (define (Type? x)
@@ -55,6 +43,20 @@ for our nanopass library.
 @(tests.ss@>=
 (assert (Type? 'Type))
 (assert (not (Type? 'random)))
+
+@ The Kernel Definition.
+@p
+(define-language Kernel
+  (terminals
+    (symbol (x))
+    (Type (Type)))
+  (Expr (e)
+    Type
+    (Forall x e0 e1)
+    (is e0 e1)
+    (lambda x e)
+    (e0 e1)))
+
 @* Rules. Are here.
 
 %introduce-sym  := 'introduce_' <digit>
