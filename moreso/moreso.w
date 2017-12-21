@@ -39,7 +39,7 @@ need a predicate for our nanopass library.
 
 @ Contsructors.  Our core language can introduce and eliminate algebraic
 types.  The constructors are not named, instead we introduce values of a
-particular type with {\tt introduce\_}$n$, where $n >= 0$.  The first
+particular type with {\tt introduce\_}$n$, where $n\geq 0$.  The first
 parameter is the type for which a value is being introduced.
 
 @p
@@ -74,8 +74,8 @@ parameter is the type for which a value is being introduced.
 (assert (not (constructor? 'introduce_foo)))
 (assert (not (constructor? 'introduce_-1)))
 
-@ Names.  To avoid ambiguity, we make names disjoint from constructors and
-other terminals.
+@ Names.  To avoid ambiguity, we cannot use reserved words or constructors
+as names.
 
 @p
 (define (name? x)
