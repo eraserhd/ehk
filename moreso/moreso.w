@@ -13,14 +13,14 @@
 
 @p
 (library (moreso)
-  (export constructor? Type?)
+  (export constructor? Type? Lmulti-apply simplify-applications unparse-Kernel)
   (import (rnrs) (nanopass))
 
 @ Testing.  As we go, we make assertions to spot check that things are
 working the way we intend.  Here is the preamble for our test file:
 
 @(tests.ss@>=
-(import (rnrs) (moreso))
+(import (rnrs) (moreso) (nanopass))
 
 @* The Kernel Language.  The kernel of Moreso consists of seven forms: four
 for typing, two for working with values, function abstraction and application.
@@ -92,16 +92,53 @@ as names.
     (Type (Type)))
   (Expr (e)
     x
+    ctor
     Type
     (Forall x e0 e1)
     (Inductive e e* ...)
     (is e0 e1)
-    (ctor e)
     (eliminate e)
     (lambda x e)
     (e0 e1)))
 
-@* Rules. Are here.
+@* Multiple Parameters.  The kernel language is easy for us to compile and
+analyze since applications all apply a single parameter and |lambda| always
+abstracts over a single parameter.  Since this is ergonomically awkward, we
+allow entered programs to have multiple-parameter applications and
+abstractions, and we boil these down to our kernel language with some compiler
+passes.
+
+@ Simplifying Applications.  Note that we don't allow {\tt ()} (empty parens).
+Some lisps allow this as a convenient way to specify a literal empty list,
+since it cannot be interpreted as a function call; however we don't have a
+useful empty list value at this point.
+
+@p
+(define-language Lmulti-apply
+  (extends Kernel)
+  (Expr (e)
+    (- (e0 e1))
+    (+ (e0 e* ...))))
+
+(define-pass simplify-applications : Lmulti-apply (e) -> Kernel ()
+  (Expr : Expr (e) -> Expr ()
+    [(,[e0] ,[e*] ...) (let loop ((e0 e0)
+                                  (e* e*))
+                         (if (null? e*)
+                           e0
+                           (loop `(,e0 ,(car e*)) (cdr e*))))])
+  (Expr e))
+
+@ Simplifying Applications Works.
+@(tests.ss@>=
+(define-parser test-Lmulti-apply Lmulti-apply)
+(let ((f (lambda (e) (unparse-Kernel (simplify-applications (test-Lmulti-apply e))))))
+  (assert (equal? '((Type Type) Type) (f '(Type Type Type))))
+  (assert (equal? '(Type Type) (f '(Type Type))))
+  (assert (equal? 'Type (f '(Type)))))
+
+
+@* Rules.
 
 %introduce-sym  := 'introduce_' <digit>
 %introduce-expr := (introduce-sym expr_0 ... expr_n)
