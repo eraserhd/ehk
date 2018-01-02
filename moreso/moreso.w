@@ -13,7 +13,7 @@
 
 @p
 (library (moreso)
-  (export constructor? Type? Lmulti-apply simplify-applications unparse-Kernel)
+  (export constructor? hole? Type? Lmulti-apply simplify-applications unparse-Kernel)
   (import (rnrs) (nanopass))
 
 @ Testing.  As we go, we make assertions to spot check that things are
@@ -74,6 +74,25 @@ parameter is the type for which a value is being introduced.
 (assert (not (constructor? 'introduce_foo)))
 (assert (not (constructor? 'introduce_-1)))
 
+@ Holes.  Holes have the form ``{\tt ?foo}'' and signify missing terms.  They
+are used internally during type-checking, but can be entered manually by the
+developer to indicate that a piece of code is not finished.
+
+@p
+(define (hole? x)
+  (and (symbol? x)
+       (let ((spelling (symbol->string x)))
+         (and (<= 2 (string-length spelling))
+              (char=? #\? (string-ref spelling 0))))))
+
+@ |hole?| Works.
+@(tests.ss@>=
+(assert (hole? '?foo))
+(assert (hole? '?b))
+(assert (not (hole? 'foo)))
+(assert (not (hole? '?)))
+(assert (not (hole? 42)))
+
 @ Names.  To avoid ambiguity, we cannot use reserved words or constructors
 as names.
 
@@ -81,6 +100,7 @@ as names.
 (define (name? x)
   (and (symbol? x)
        (not (constructor? x))
+       (not (hole? x))
        (not (memq x '(Type Forall Inductive is eliminate lambda)))))
 
 @ The Kernel Definition.
@@ -89,9 +109,11 @@ as names.
   (terminals
     (constructor (ctor))
     (name (x))
+    (hole (h))
     (Type (Type)))
   (Expr (e)
     x
+    h
     ctor
     Type
     (Forall x e0 e1)
