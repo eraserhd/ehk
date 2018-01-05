@@ -160,11 +160,17 @@ useful empty list value at this point.
   (equal? to (unparse-Kernel (Input->Kernel (parse-Input from)))))
 (define-syntax parses
   (syntax-rules (=>)
-    ((_ from => to) (assert (parses? (quote from) (quote to))))))
+    ((parses from => to)
+     (assert (parses? (quote from) (quote to))))
+    ((parses from => to more ...)
+     (begin
+       (assert (parses? (quote from) (quote to)))
+       (parses more ...)))))
 
-(parses (Type Type Type) => ((Type Type) Type))
-(parses (Type Type)      => (Type Type))
-(parses (Type)           => Type)
+(parses
+  (Type Type Type) => ((Type Type) Type)
+  (Type Type)      => (Type Type)
+  (Type)           => Type)
 
 @ Lambdas.  Multi-parameter lambdas can have any number of parameters,
 including zero.  Zero parameter lambdas are removed, since our language is
@@ -188,9 +194,10 @@ fully lazy.
 
 @ Simplifying Lambdas Works.
 @(tests.ss@>=
-(parses (lambda () Type)    => Type)
-(parses (lambda (x) Type)   => (lambda x Type))
-(parses (lambda (x y) Type) => (lambda x (lambda y Type)))
+(parses
+  (lambda () Type)    => Type
+  (lambda (x) Type)   => (lambda x Type)
+  (lambda (x y) Type) => (lambda x (lambda y Type)))
 
 @* The Input Language.  The language |Input| changes nothing, but we define it
 here so that we don't have to expose the name of the first compiler stage.
