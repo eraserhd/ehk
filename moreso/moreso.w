@@ -156,10 +156,15 @@ useful empty list value at this point.
 
 @ Simplifying Applications Works.
 @(tests.ss@>=
-(let ((f (lambda (e) (unparse-Kernel (Input->Kernel (parse-Input e))))))
-  (assert (equal? '((Type Type) Type) (f '(Type Type Type))))
-  (assert (equal? '(Type Type) (f '(Type Type))))
-  (assert (equal? 'Type (f '(Type)))))
+(define (parses? from to)
+  (equal? to (unparse-Kernel (Input->Kernel (parse-Input from)))))
+(define-syntax parses
+  (syntax-rules (=>)
+    ((_ from => to) (assert (parses? (quote from) (quote to))))))
+
+(parses (Type Type Type) => ((Type Type) Type))
+(parses (Type Type)      => (Type Type))
+(parses (Type)           => Type)
 
 @ Lambdas.  Multi-parameter lambdas can have any number of parameters,
 including zero.  Zero parameter lambdas are removed, since our language is
@@ -183,10 +188,9 @@ fully lazy.
 
 @ Simplifying Lambdas Works.
 @(tests.ss@>=
-(let ((f (lambda (e) (unparse-Kernel (Input->Kernel (parse-Input e))))))
-  (assert (equal? 'Type (f '(lambda () Type))))
-  (assert (equal? '(lambda x Type) (f '(lambda (x) Type))))
-  (assert (equal? '(lambda x (lambda y Type)) (f '(lambda (x y) Type)))))
+(parses (lambda () Type)    => Type)
+(parses (lambda (x) Type)   => (lambda x Type))
+(parses (lambda (x y) Type) => (lambda x (lambda y Type)))
 
 @* The Input Language.  The language |Input| changes nothing, but we define it
 here so that we don't have to expose the name of the first compiler stage.
