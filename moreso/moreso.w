@@ -14,9 +14,9 @@
 @p
 (library (moreso)
   (export constructor? hole? Type?
+          Input parse-Input
           Kernel unparse-Kernel
-          Lmulti-apply simplify-applications
-          Lmulti-lambda simplify-lambdas)
+          Input->Kernel)
   (import (rnrs) (nanopass))
 
 @ Testing.  As we go, we make assertions to spot check that things are
@@ -135,7 +135,7 @@ passes.
 
 @ Applications.  Note that we don't allow {\tt ()} (empty parens).
 Some lisps allow this as a convenient way to specify a literal empty list,
-since it cannot be interpreted as a function call; however we don't have a
+since it cannot be interpreted as a function call; however, we don't have a
 useful empty list value at this point.
 
 @p
@@ -156,8 +156,7 @@ useful empty list value at this point.
 
 @ Simplifying Applications Works.
 @(tests.ss@>=
-(define-parser test-Lmulti-apply Lmulti-apply)
-(let ((f (lambda (e) (unparse-Kernel (simplify-applications (test-Lmulti-apply e))))))
+(let ((f (lambda (e) (unparse-Kernel (Input->Kernel (parse-Input e))))))
   (assert (equal? '((Type Type) Type) (f '(Type Type Type))))
   (assert (equal? '(Type Type) (f '(Type Type))))
   (assert (equal? 'Type (f '(Type)))))
@@ -184,11 +183,30 @@ fully lazy.
 
 @ Simplifying Lambdas Works.
 @(tests.ss@>=
-(define-parser test-Lmulti-lambda Lmulti-lambda)
-(let ((f (lambda (e) (unparse-Kernel (simplify-applications (simplify-lambdas (test-Lmulti-lambda e)))))))
+(let ((f (lambda (e) (unparse-Kernel (Input->Kernel (parse-Input e))))))
   (assert (equal? 'Type (f '(lambda () Type))))
   (assert (equal? '(lambda x Type) (f '(lambda (x) Type))))
   (assert (equal? '(lambda x (lambda y Type)) (f '(lambda (x y) Type)))))
+
+@* The Input Language.  The language |Input| changes nothing, but we define it
+here so that we don't have to expose the name of the first compiler stage.
+
+@p
+(define-language Input
+  (extends Lmulti-lambda))
+
+(define-pass input : Input (e) -> Lmulti-lambda ()
+  (Expr : Expr (e) -> Expr ())
+  (Expr e))
+
+(define-parser parse-Input Input)
+
+@ The Whole Compiler.  Here we string together all the passes for outside
+consumption.
+
+@p
+(define (Input->Kernel e)
+  (simplify-applications (simplify-lambdas (input e))))
 
 @* Rules.
 
