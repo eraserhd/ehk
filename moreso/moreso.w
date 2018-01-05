@@ -13,7 +13,10 @@
 
 @p
 (library (moreso)
-  (export constructor? hole? Type? Lmulti-apply simplify-applications unparse-Kernel)
+  (export constructor? hole? Type?
+          Kernel unparse-Kernel
+          Lmulti-apply simplify-applications
+          Lmulti-lambda simplify-lambdas)
   (import (rnrs) (nanopass))
 
 @ Testing.  As we go, we make assertions to spot check that things are
@@ -130,7 +133,7 @@ allow entered programs to have multiple-parameter applications and
 abstractions, and we boil these down to our kernel language with some compiler
 passes.
 
-@ Simplifying Applications.  Note that we don't allow {\tt ()} (empty parens).
+@ Applications.  Note that we don't allow {\tt ()} (empty parens).
 Some lisps allow this as a convenient way to specify a literal empty list,
 since it cannot be interpreted as a function call; however we don't have a
 useful empty list value at this point.
@@ -159,6 +162,33 @@ useful empty list value at this point.
   (assert (equal? '(Type Type) (f '(Type Type))))
   (assert (equal? 'Type (f '(Type)))))
 
+@ Lambdas.  Multi-parameter lambdas can have any number of parameters,
+including zero.  Zero parameter lambdas are removed, since our language is
+fully lazy.
+
+@p
+(define-language Lmulti-lambda
+  (extends Lmulti-apply)
+  (Expr (e)
+    (- (lambda x e))
+    (+ (lambda (x* ...) e))))
+
+(define-pass simplify-lambdas : Lmulti-lambda (e) -> Lmulti-apply ()
+  (Expr : Expr (e) -> Expr ()
+    [(lambda (,x* ...) ,[e]) (let loop ((e e)
+                                        (x* x*))
+                               (if (null? x*)
+                                 e
+                                 `(lambda ,(car x*) ,(loop e (cdr x*)))))])
+  (Expr e))
+
+@ Simplifying Lambdas Works.
+@(tests.ss@>=
+(define-parser test-Lmulti-lambda Lmulti-lambda)
+(let ((f (lambda (e) (unparse-Kernel (simplify-applications (simplify-lambdas (test-Lmulti-lambda e)))))))
+  (assert (equal? 'Type (f '(lambda () Type))))
+  (assert (equal? '(lambda x Type) (f '(lambda (x) Type))))
+  (assert (equal? '(lambda x (lambda y Type)) (f '(lambda (x y) Type)))))
 
 @* Rules.
 
