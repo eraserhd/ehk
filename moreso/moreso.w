@@ -62,9 +62,9 @@ parameter is the type for which a value is being introduced.
   (and (symbol? x)
        (let* ((s (symbol->string x))
               (len (string-length s)))
-         (and (< prefix-len (string-length s))
+         (and (< prefix-len len)
               (string=? (substring s 0 prefix-len) prefix)
-              (all-digits? (substring s prefix-len (string-length s)))))))
+              (all-digits? (substring s prefix-len len))))))
 
 @ |constructor?| works.
 @(tests.ss@>=
