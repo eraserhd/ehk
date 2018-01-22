@@ -9,7 +9,7 @@
 %...
 }
 
-@* Preamble.  Moreso is written as an R6RS Scheme library.
+@* Preamble. Moreso is written as an R6RS Scheme library.
 
 @p
 (library (moreso)
@@ -17,6 +17,14 @@
           Input parse-Input
           Kernel unparse-Kernel
           Input->Kernel)
+
+@ Nanopass.  Moreso relies heavily on the Nanopass Compiler Library
+[1, 2, 3, 4] available at
+{\tt https://github.com/nanopass/nanopass-framework-scheme}.  Fitting with
+nanopass's philosophy, Moreso's passes are small, single-purpose, and
+hopefully easily understandable.
+
+@p
   (import (rnrs) (nanopass))
 
 @ Testing.  As we go, we make assertions to spot check that things are
@@ -274,3 +282,13 @@ $$
 
 @p
 )
+
+@* References.
+
+[1] A. Keep and R. K. Dybvig. A Nanopass Compiler for Commercial Compiler Development. In ICFP '13: Proceedings of the 18th ACM SIGPLAN International Conference on Functional Programming, New York, NY, USA, 2013. ACM.
+
+[2] A. Keep. A Nanopass Framework for Commercial Compiler Development. Doctoral dissertation, Indiana University, Bloomington, Indiana, USA, Feb. 2013.
+
+[3] D. Sarkar. Nanopass Compiler Infrastructure. Doctoral dissertation, Indiana University, Bloomington, Indiana, USA, 2008.
+
+[4] D. Sarkar, O. Waddell, and R. K. Dybvig. A nanopass infrastructure for compiler education. In ICFP '04: Proceedings of the ninth ACM SIGPLAN International Conference on Functional Programming, pages 201–212, New York, NY, USA, 2004. ACM.
