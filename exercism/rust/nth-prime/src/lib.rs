@@ -6,11 +6,8 @@ fn is_prime(p : u32) -> bool {
 }
 
 pub fn nth(n : usize) -> Result<u32,&'static str> {
-    if n <= 0 {
+    if n < 1 {
         return Err("Invalid prime index");
     }
-    match (2..).filter(|&x| is_prime(x)).nth(n-1)  {
-        Some(p) => Ok(p),
-        None    => Err("Shouldn't get here")
-    }
+    (2..).filter(|&x| is_prime(x)).nth(n-1).ok_or("what?") 
 }
