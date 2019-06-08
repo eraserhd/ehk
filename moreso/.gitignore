@@ -1,0 +1,8 @@
+*.idx
+*.tex
+*.toc
+*.scn
+*.pdf
+_minted-*
+moreso.ss
+tests.ss

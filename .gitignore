@@ -13,3 +13,4 @@ work/*
 *.ibc
 *.agda.vim
 *.agdai
+.stack-work

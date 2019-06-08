@@ -1,0 +1,8 @@
+[package]
+name = "gigasecond"
+version = "1.1.0"
+
+[dependencies]
+chrono = "0.4"
+time = "0.1"
+

@@ -10,6 +10,7 @@
 -- * the value F(n) otherwise.
 --
 
+import Data.Nat.DivMod
 import Data.So
 
 %default total -- Make sure our proofs are good
@@ -58,6 +59,9 @@ infixr 9 .|.
 
 ||| Does x divide y?
 |||
+||| divMod taked the predecessor of the divisor so that we can't represent
+||| division by zero.
+|||
 ||| Our divisibility and prime tests are boolean, (computational, runtime)
 ||| checks.  This is a bit sub-optimal for purposes of making verified
 ||| code due to "boolean blindness" - loosing the information contained in
@@ -75,7 +79,7 @@ x .|. y = assert_total $ (y `mod` x) == 0
 ||| Pretty standard primality testing.
 isPrime : Integer -> Bool
 isPrime 1 = False
-isPrime 2 = True
+isPrime 2 = False
 isPrime x = if 2 .|. x
             then False
             else assert_total $ noDivisorsOver 3
@@ -94,41 +98,20 @@ isPrime x = if 2 .|. x
 
 ||| Our rules for output.
 |||
-||| So (not $ isPrime x) in OutputBuzz and OutputFizz aren't part of the problem
+||| Not (Prime x) in OutputBuzz and OutputFizz aren't part of the problem
 ||| statement, which is ambiguous in exactly the way we are using Idris to
 ||| prove we aren't, hence I've decided that 3 and 5 are treated as primes
 ||| rather than Buzz and Fizz, respectively.
 data OutputSemantics : Nat -> Output -> Type where
   OutputBuzz      : Fib n x -> So (not $ isPrime x) -> So (3 .|. x) -> So (not $ 5 .|. x) -> OutputSemantics n Buzz
   OutputFizz      : Fib n x -> So (not $ isPrime x) -> So (5 .|. x) -> So (not $ 3 .|. x) -> OutputSemantics n Fizz
-
-  ||| The boolean blindness thing here means we can't deduce that (15 .|. x) -> (3 .|. x) and so forth.
-  OutputFizzBuzz  : Fib n x -> So (3 .|. x) -> So (5 .|. x) -> OutputSemantics n FizzBuzz
+  OutputFizzBuzz  : Fib n x -> So (15 .|. x) -> OutputSemantics n FizzBuzz
   OutputBuzzFizz  : Fib n x -> So (isPrime x) -> OutputSemantics n BuzzFizz
   OutputLiterally : Fib n x -> So (not $ 3 .|. x) -> So (not $ 5 .|. x) -> So (not $ isPrime x) -> OutputSemantics n (Literally x)
 
-||| Compute output for a particular fibonacci number, with a proof that
-||| our result matches the semantics.
 output : Fib n x -> (out : Output ** OutputSemantics n out)
-output {x} fib =
-  case (choose (isPrime x), choose (3 .|. x), choose (5 .|. x)) of
-    (Left  isPrimeProof,  _,                 _                ) => (BuzzFizz ** OutputBuzzFizz fib isPrimeProof)
-    (Right notPrimeProof, Left divides3,     Right notDivides5) => (Buzz ** OutputBuzz fib notPrimeProof divides3 notDivides5)
-    (Right notPrimeProof, Right notDivides3, Left divides5    ) => (Fizz ** OutputFizz fib notPrimeProof divides5 notDivides3)
-    (Right notPrimeProof, Right notDivides3, Right notDivides5) => (Literally x ** OutputLiterally fib notDivides3 notDivides5 notPrimeProof)
-    (Right _,             Left divides3,     Left divides5    ) => (FizzBuzz ** OutputFizzBuzz fib divides3 divides5)
+output {x} fib with (choose (isPrime x))
+  output {x = x} fib | (Left isPrimeProof)   = (BuzzFizz ** OutputBuzzFizz fib isPrimeProof)
+  output {x = x} fib | (Right notPrimeProof) with (choose (3 .|. x), choose (5 .|. x))
+    output {x = x} fib | (Right notPrimeProof) | with_val = ?what
 
-partial
-runUntil : Nat -> FibStream n -> IO ()
-runUntil {n} limit fibs = if n >= limit
-                          then pure ()
-                          else do
-                            let (fib :: restOfFibs) = fibs
-                            putStrLn $ show $ fst $ output fib
-                            runUntil limit restOfFibs
-
-partial
-main : IO ()
-main = do (_ :: nArg :: _) <- getArgs
-          let n = the Nat (cast nArg)
-          runUntil n fibs
