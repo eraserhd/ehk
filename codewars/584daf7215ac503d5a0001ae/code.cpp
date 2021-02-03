@@ -48,6 +48,14 @@ private:
     }
 };
 
+Value reverse(Value l)
+{
+    Value result = Value::NIL;
+    for (; l != Value::NIL; l = l.cdr())
+        result = Value{l.car(), result};
+    return result;
+}
+
 template<typename Iterator>
 int64_t parse_integer(Iterator& begin)
 {
@@ -74,14 +82,10 @@ Value parse_rec(Iterator& begin)
         result = Value{parse_integer(begin)};
         break;
     case '(':
-        {
-            Value backwards = Value::NIL;
-            while (*begin != ')')
-                backwards = Value{parse_rec(begin),backwards};
-            ++begin;
-            for (; backwards != Value::NIL; backwards = backwards.cdr())
-                result = Value{backwards.car(), result};
-        }
+        while (*begin != ')')
+            result = Value{parse_rec(begin),result};
+        ++begin;
+        result = reverse(result);
         break;
     default:
         result = Value{*(begin-1)};
