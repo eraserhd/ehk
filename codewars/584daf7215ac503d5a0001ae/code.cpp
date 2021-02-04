@@ -16,8 +16,8 @@ struct Value
 {
     enum class Type { Pair, Number, Symbol, Ref };
 
-public:
     Type type;
+
     union
     {
         char _symbol;
@@ -28,7 +28,7 @@ public:
 
     Value()                     : type(Type::Pair),   _pair(nullptr)        {}
     Value(int number)           : type(Type::Number), _number(number)       {}
-    Value(int64_t number)       : type(Type::Number), _number(number)       {}
+    Value(Number number)        : type(Type::Number), _number(number)       {}
     Value(char symbol)          : type(Type::Symbol), _symbol(symbol)       {}
     Value(Value car, Value cdr) : type(Type::Pair),   _pair(alloc(car,cdr)) {}
     Value(Value* ref)           : type(Type::Ref),    _ref(ref)             {}
@@ -56,7 +56,7 @@ public:
 
     inline Value car() const { return _pair->first; }
     inline Value cdr() const { return _pair->second; }
-    inline int64_t number() const { return _number; }
+    inline Number number() const { return _number; }
     inline char symbol() const { return _symbol; }
 
     static const Value NIL;
@@ -80,7 +80,7 @@ Value reverse(Value l)
 }
 
 template<typename Iterator>
-int64_t parse_integer(Iterator& begin)
+Number parse_integer(Iterator& begin)
 {
     int64_t result = 0;
     while (isdigit(*begin))
@@ -222,7 +222,7 @@ Value simplify(Value expr)
         a = simplify(a);
         b = simplify(b);
         if (a.type == Value::Type::Number and b.type == Value::Type::Number)
-            return Value{int64_t(pow(a.number(), b.number()))};
+            return Value{Number(pow(a.number(), b.number()))};
         return L('^', a, b);
     }
     return expr;
