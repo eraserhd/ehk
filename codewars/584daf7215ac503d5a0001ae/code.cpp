@@ -9,55 +9,65 @@
 #include <string>
 #include <list>
 
+typedef int64_t Number;
+
 // Greenspuns 10th rule?
 struct Value
 {
-    enum Type { Pair, Number, Symbol, Ref };
+    enum class Type { Pair, Number, Symbol, Ref };
 
 public:
     Type type;
-    int64_t _repr;
+    union
+    {
+        char _symbol;
+        Number _number;
+        std::pair<Value,Value>* _pair;
+        Value* _ref;
+    };
 
-    Value()                     : type(Pair),   _repr(0)                              {}
-    Value(int number)           : type(Number), _repr(number)                         {}
-    Value(int64_t number)       : type(Number), _repr(number)                         {}
-    Value(char symbol)          : type(Symbol), _repr(symbol)                         {}
-    Value(Value car, Value cdr) : type(Pair),   _repr(alloc(car,cdr))                 {}
-    Value(Value* ref)           : type(Ref),    _repr(reinterpret_cast<int64_t>(ref)) {}
+    Value()                     : type(Type::Pair),   _pair(nullptr)        {}
+    Value(int number)           : type(Type::Number), _number(number)       {}
+    Value(int64_t number)       : type(Type::Number), _number(number)       {}
+    Value(char symbol)          : type(Type::Symbol), _symbol(symbol)       {}
+    Value(Value car, Value cdr) : type(Type::Pair),   _pair(alloc(car,cdr)) {}
+    Value(Value* ref)           : type(Type::Ref),    _ref(ref)             {}
 
     inline bool operator == (const Value& rhs) const
     {
-        if (type == Ref)
+        if (type != Type::Ref and type != rhs.type) return false;
+        switch (type)
         {
-            Value* ref = reinterpret_cast<Value*>(_repr&~3);
-            *ref = rhs;
+        case Type::Pair:
+            if (_pair == rhs._pair) return true;
+            if (_pair == nullptr or rhs._pair == nullptr) return false;
+            return _pair->first == rhs._pair->first and _pair->second == rhs._pair->second;
+        case Type::Number:
+            return _number == rhs._number;
+        case Type::Symbol:
+            return _symbol == rhs._symbol;
+        case Type::Ref:
+            *_ref = rhs;
             return true;
         }
-        if (_repr == rhs._repr) return true;
-        if (type != Pair or rhs.type != Pair) return false;
-        if (_repr == 0 or rhs._repr == 0) return false;
-        return car() == rhs.car() and cdr() == rhs.cdr();
     }
 
     inline bool operator != (const Value& rhs) const { return !operator == (rhs); } 
 
-    inline Value car() const { return pair()->first; }
-    inline Value cdr() const { return pair()->second; }
-    inline int64_t number() const { return _repr; }
+    inline Value car() const { return _pair->first; }
+    inline Value cdr() const { return _pair->second; }
+    inline int64_t number() const { return _number; }
+    inline char symbol() const { return _symbol; }
 
     static const Value NIL;
     static void clear_heap() { heap.clear(); }
 
 private:
     static std::list<std::pair<Value,Value>> heap;
-    static int64_t alloc(Value car, Value cdr)
+    static std::pair<Value,Value>* alloc(Value car, Value cdr)
     {
         heap.push_front(std::make_pair(car, cdr));
-        return reinterpret_cast<int64_t>(&heap.front());
-    }
-    std::pair<Value,Value>* pair() const
-    {
-        return reinterpret_cast<std::pair<Value,Value>*>(_repr);
+        return &heap.front();
     }
 };
 
@@ -129,13 +139,13 @@ std::string to_s(Value v)
 {
     switch (v.type)
     {
-    case Value::Number:
+    case Value::Type::Number:
         {
             std::ostringstream o;
             o << v.number();
             return o.str();
         }
-    case Value::Symbol:
+    case Value::Type::Symbol:
         switch (char(v.number()))
         {
         case 's': return "sin";
@@ -145,7 +155,7 @@ std::string to_s(Value v)
         case 'l': return "ln";
         default:  return std::string{char(v.number())};
         }
-    case Value::Pair:
+    case Value::Type::Pair:
         {
             std::string result = "(";
             for (Value i = v; i != Value::NIL; i = i.cdr())
@@ -155,7 +165,7 @@ std::string to_s(Value v)
             }
             return result + ")";
         }
-    case Value::Ref:
+    case Value::Type::Ref:
         return "&";
     }
 }
@@ -171,7 +181,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type == Value::Number and b.type == Value::Number)
+        if (a.type == Value::Type::Number and b.type == Value::Type::Number)
             return Value{a.number() + b.number()};
         return L('+', a, b);
     }
@@ -180,7 +190,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type == Value::Number and b.type == Value::Number)
+        if (a.type == Value::Type::Number and b.type == Value::Type::Number)
             return Value{a.number() - b.number()};
         return L('-', a, b);
     }
@@ -192,7 +202,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type == Value::Number and b.type == Value::Number)
+        if (a.type == Value::Type::Number and b.type == Value::Type::Number)
             return Value{a.number() * b.number()};
         return L('*', a, b);
     }
@@ -201,7 +211,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type == Value::Number and b.type == Value::Number)
+        if (a.type == Value::Type::Number and b.type == Value::Type::Number)
             return Value{a.number() / b.number()};
         return L('/', a, b);
     }
@@ -211,7 +221,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type == Value::Number and b.type == Value::Number)
+        if (a.type == Value::Type::Number and b.type == Value::Type::Number)
             return Value{int64_t(pow(a.number(), b.number()))};
         return L('^', a, b);
     }
@@ -222,7 +232,7 @@ Value differentiate(Value expr)
 {
     Value a, b;
     if (expr == Value{'x'})           return {1};
-    if (expr.type == Value::Number) return {0};
+    if (expr.type == Value::Type::Number) return {0};
     if (L('^', &a, &b) == expr)       return L('^', L('*', a, b), L('-', b, 1));
     if (L('+', &a, &b) == expr)       return L('+', differentiate(a), differentiate(b));
     if (L('-', &a, &b) == expr)       return L('-', differentiate(a), differentiate(b));
