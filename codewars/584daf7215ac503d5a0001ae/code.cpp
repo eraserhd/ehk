@@ -9,7 +9,7 @@
 #include <string>
 #include <list>
 
-typedef int64_t Number;
+typedef double Number;
 
 // Greenspuns 10th rule?
 struct Value
