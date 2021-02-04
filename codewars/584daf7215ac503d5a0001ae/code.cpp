@@ -146,7 +146,7 @@ std::string to_s(Value v)
             return o.str();
         }
     case Value::Type::Symbol:
-        switch (char(v.number()))
+        switch (v.symbol())
         {
         case 's': return "sin";
         case 'c': return "cos";
@@ -170,6 +170,13 @@ std::string to_s(Value v)
     }
 }
 
+template<char symbol> struct Operator;
+template<> struct Operator<'+'> { inline static Number evaluate(Number a, Number b) { return a+b; } };
+template<> struct Operator<'-'> { inline static Number evaluate(Number a, Number b) { return a-b; } };
+template<> struct Operator<'*'> { inline static Number evaluate(Number a, Number b) { return a*b; } };
+template<> struct Operator<'/'> { inline static Number evaluate(Number a, Number b) { return a/b; } };
+template<> struct Operator<'^'> { inline static Number evaluate(Number a, Number b) { return std::pow(a,b); } };
+
 Value simplify(Value expr);
 
 Value simplify(Value expr)
@@ -182,7 +189,7 @@ Value simplify(Value expr)
         a = simplify(a);
         b = simplify(b);
         if (a.type == Value::Type::Number and b.type == Value::Type::Number)
-            return Value{a.number() + b.number()};
+            return Operator<'+'>::evaluate(a.number(), b.number());
         return L('+', a, b);
     }
     if (L('-', &a, 0) == expr) return simplify(a);
@@ -191,7 +198,7 @@ Value simplify(Value expr)
         a = simplify(a);
         b = simplify(b);
         if (a.type == Value::Type::Number and b.type == Value::Type::Number)
-            return Value{a.number() - b.number()};
+            return Operator<'-'>::evaluate(a.number(), b.number());
         return L('-', a, b);
     }
     if (L('*', 0, &a) == expr) return {0};
@@ -203,7 +210,7 @@ Value simplify(Value expr)
         a = simplify(a);
         b = simplify(b);
         if (a.type == Value::Type::Number and b.type == Value::Type::Number)
-            return Value{a.number() * b.number()};
+            return Operator<'*'>::evaluate(a.number(), b.number());
         return L('*', a, b);
     }
     if (L('/', &a, 1) == expr) return simplify(a);
@@ -212,7 +219,7 @@ Value simplify(Value expr)
         a = simplify(a);
         b = simplify(b);
         if (a.type == Value::Type::Number and b.type == Value::Type::Number)
-            return Value{a.number() / b.number()};
+            return Operator<'/'>::evaluate(a.number(), b.number());
         return L('/', a, b);
     }
     if (L('^', &a, 1) == expr) return simplify(a);
@@ -222,7 +229,7 @@ Value simplify(Value expr)
         a = simplify(a);
         b = simplify(b);
         if (a.type == Value::Type::Number and b.type == Value::Type::Number)
-            return Value{Number(pow(a.number(), b.number()))};
+            return Operator<'^'>::evaluate(a.number(), b.number());
         return L('^', a, b);
     }
     return expr;
