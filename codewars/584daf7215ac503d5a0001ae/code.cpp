@@ -12,27 +12,29 @@
 // Greenspuns 10th rule?
 struct Value
 {
-    int64_t _repr;
     enum Type { Pair, Number, Symbol, Ref };
-    inline Type type() const { return (Type)(_repr&3); }
 
-    Value()                     : _repr(0)                                  {}
-    Value(int number)           : _repr((number<<2)|Number)                 {}
-    Value(int64_t number)       : _repr((number<<2)|Number)                 {}
-    Value(char symbol)          : _repr((symbol<<2)|Symbol)                 {}
-    Value(Value car, Value cdr) : _repr(alloc(car,cdr))                     {}
-    Value(Value* ref)           : _repr(reinterpret_cast<int64_t>(ref)|Ref) {}
+public:
+    Type type;
+    int64_t _repr;
+
+    Value()                     : type(Pair),   _repr(0)                              {}
+    Value(int number)           : type(Number), _repr(number)                         {}
+    Value(int64_t number)       : type(Number), _repr(number)                         {}
+    Value(char symbol)          : type(Symbol), _repr(symbol)                         {}
+    Value(Value car, Value cdr) : type(Pair),   _repr(alloc(car,cdr))                 {}
+    Value(Value* ref)           : type(Ref),    _repr(reinterpret_cast<int64_t>(ref)) {}
 
     inline bool operator == (const Value& rhs) const
     {
-        if (type() == Ref)
+        if (type == Ref)
         {
             Value* ref = reinterpret_cast<Value*>(_repr&~3);
             *ref = rhs;
             return true;
         }
         if (_repr == rhs._repr) return true;
-        if (type() != Pair or rhs.type() != Pair) return false;
+        if (type != Pair or rhs.type != Pair) return false;
         if (_repr == 0 or rhs._repr == 0) return false;
         return car() == rhs.car() and cdr() == rhs.cdr();
     }
@@ -41,7 +43,7 @@ struct Value
 
     inline Value car() const { return pair()->first; }
     inline Value cdr() const { return pair()->second; }
-    inline int64_t number() const { return _repr >> 2; }
+    inline int64_t number() const { return _repr; }
 
     static const Value NIL;
     static void clear_heap() { heap.clear(); }
@@ -125,7 +127,7 @@ inline Value L(Arg1 arg1, Args... args) { return Value{arg1, L(args...)}; }
 
 std::string to_s(Value v)
 {
-    switch (v.type())
+    switch (v.type)
     {
     case Value::Number:
         {
@@ -158,6 +160,8 @@ std::string to_s(Value v)
     }
 }
 
+Value simplify(Value expr);
+
 Value simplify(Value expr)
 {
     Value a, b;
@@ -167,7 +171,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type() == Value::Number and b.type() == Value::Number)
+        if (a.type == Value::Number and b.type == Value::Number)
             return Value{a.number() + b.number()};
         return L('+', a, b);
     }
@@ -176,7 +180,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type() == Value::Number and b.type() == Value::Number)
+        if (a.type == Value::Number and b.type == Value::Number)
             return Value{a.number() - b.number()};
         return L('-', a, b);
     }
@@ -188,7 +192,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type() == Value::Number and b.type() == Value::Number)
+        if (a.type == Value::Number and b.type == Value::Number)
             return Value{a.number() * b.number()};
         return L('*', a, b);
     }
@@ -197,7 +201,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type() == Value::Number and b.type() == Value::Number)
+        if (a.type == Value::Number and b.type == Value::Number)
             return Value{a.number() / b.number()};
         return L('/', a, b);
     }
@@ -207,7 +211,7 @@ Value simplify(Value expr)
     {
         a = simplify(a);
         b = simplify(b);
-        if (a.type() == Value::Number and b.type() == Value::Number)
+        if (a.type == Value::Number and b.type == Value::Number)
             return Value{int64_t(pow(a.number(), b.number()))};
         return L('^', a, b);
     }
@@ -218,14 +222,19 @@ Value differentiate(Value expr)
 {
     Value a, b;
     if (expr == Value{'x'})           return {1};
-    if (expr.type() == Value::Number) return {0};
+    if (expr.type == Value::Number) return {0};
     if (L('^', &a, &b) == expr)       return L('^', L('*', a, b), L('-', b, 1));
     if (L('+', &a, &b) == expr)       return L('+', differentiate(a), differentiate(b));
     if (L('-', &a, &b) == expr)       return L('-', differentiate(a), differentiate(b));
     if (L('*', &a, &b) == expr)       return L('+', L('*', differentiate(a), b), L('*', a, differentiate(b)));
     if (L('/', &a, &b) == expr)       return L('/', L('-', L('*', differentiate(a), b), L('*', a, differentiate(b))),
                                                     L('^', b, 2));
-    //assert(false);
+    // need chain rule
+    if (L('s', 'x') == expr) return L('c', 'x');
+    if (L('c', 'x') == expr) return L('-', 0, L('s', 'x'));
+    if (L('t', 'x') == expr) return L('/', 1, L('^', L('c', 'x'), 2));
+    if (L('e', 'x') == expr) return L('e', 'x');
+    if (L('l', 'x') == expr) return L('/', 1, 'x');
     return expr;
 }
 
