@@ -58,6 +58,7 @@ struct Value
     inline Value cdr() const { return _pair->second; }
     inline Number number() const { return _number; }
     inline char symbol() const { return _symbol; }
+    inline bool number_p() const { return type == Type::Number; }
 
     static const Value NIL;
     static void clear_heap() { heap.clear(); }
@@ -153,7 +154,7 @@ std::string to_s(Value v)
         case 't': return "tan";
         case 'e': return "exp";
         case 'l': return "ln";
-        default:  return std::string{char(v.number())};
+        default:  return std::string{v.symbol()};
         }
     case Value::Type::Pair:
         {
@@ -180,58 +181,52 @@ template<> struct Operator<'^'> { inline static Number evaluate(Number a, Number
 Value simplify(Value expr);
 
 template<char symbol>
-Value evaluate_if_possible(Value a, Value b)
+Value evaluate(Value a, Value b)
 {
-    a = simplify(a);
-    b = simplify(b);
-    if (a.type == Value::Type::Number and b.type == Value::Type::Number)
-        return Operator<symbol>::evaluate(a.number(), b.number());
-    return L(symbol, a, b);
+    return Operator<symbol>::evaluate(a.number(), b.number());
 }
 
 Value simplify(Value expr)
 {
-    Value a, b;
-    if (L('+', 0, &a) == expr)  return simplify(a);
-    if (L('+', &a, 0) == expr)  return simplify(a);
-    if (L('+', &a, &b) == expr) return evaluate_if_possible<'+'>(a, b);
-    if (L('-', &a, 0) == expr)  return simplify(a);
-    if (L('-', &a, &b) == expr) return evaluate_if_possible<'-'>(a, b);
-    if (L('*', 0, &a) == expr)  return {0};
-    if (L('*', &a, 0) == expr)  return {0};
-    if (L('*', 1, &a) == expr)  return simplify(a);
-    if (L('*', &a, 1) == expr)  return simplify(a);
-    if (L('*', &a, &b) == expr) return evaluate_if_possible<'*'>(a, b);
-    if (L('/', &a, 1) == expr)  return simplify(a);
-    if (L('/', &a, &b) == expr) return evaluate_if_possible<'/'>(a, b);
-    if (L('^', &a, 1) == expr)  return simplify(a);
-    if (L('^', &a, 0) == expr)  return {1};
-    if (L('^', &a, &b) == expr) return evaluate_if_possible<'^'>(a, b);
-    if (L('s', &a) == expr)     return L('s', simplify(a));
-    if (L('c', &a) == expr)     return L('c', simplify(a));
-    if (L('t', &a) == expr)     return L('t', simplify(a));
-    if (L('e', &a) == expr)     return L('e', simplify(a));
-    if (L('l', &a) == expr)     return L('l', simplify(a));
+    Value a, b, c, op;
+    if (L(&op, &a) == expr) expr = L(op, simplify(a));
+    if (L(&op, &a, &b) == expr) expr = L(op, simplify(a), simplify(b));
+    if (L('+', 0, &a) == expr) return a;
+    if (L('+', &a, 0) == expr) return a;
+    if (L('+', &a, &b) == expr and a.number_p() and b.number_p()) return evaluate<'+'>(a, b);
+    if (L('-', &a, 0) == expr) return a;
+    if (L('-', &a, &b) == expr and a.number_p() and b.number_p()) return evaluate<'-'>(a, b);
+    if (L('*', 0, &a) == expr) return {0};
+    if (L('*', &a, 0) == expr) return {0};
+    if (L('*', 1, &a) == expr) return a;
+    if (L('*', &a, 1) == expr) return a;
+    if (L('*', &a, &b) == expr and a.number_p() and b.number_p()) return evaluate<'*'>(a, b);
+    if (L('/', &a, 1) == expr) return a;
+    if (L('/', &a, &b) == expr and a.number_p() and b.number_p()) return evaluate<'/'>(a, b);
+    if (L('^', &a, 1) == expr) return a;
+    if (L('^', &a, 0) == expr) return {1};
+    if (L('^', &a, &b) == expr and a.number_p() and b.number_p()) return evaluate<'^'>(a, b);
     return expr;
 }
 
 Value differentiate(Value expr)
 {
     Value a, b;
-    if (expr == Value{'x'})           return {1};
+    if (Value{'x'} == expr)           return {1};
     if (expr.type == Value::Type::Number) return {0};
-    if (L('^', &a, &b) == expr)       return L('^', L('*', a, b), L('-', b, 1));
+    if (L('^', &a, &b) == expr)       return L('*', b, L('^', a, L('-', b, 1)));
     if (L('+', &a, &b) == expr)       return L('+', differentiate(a), differentiate(b));
     if (L('-', &a, &b) == expr)       return L('-', differentiate(a), differentiate(b));
     if (L('*', &a, &b) == expr)       return L('+', L('*', differentiate(a), b), L('*', a, differentiate(b)));
     if (L('/', &a, &b) == expr)       return L('/', L('-', L('*', differentiate(a), b), L('*', a, differentiate(b))),
                                                     L('^', b, 2));
-    // need chain rule
-    if (L('s', 'x') == expr) return L('c', 'x');
-    if (L('c', 'x') == expr) return L('-', 0, L('s', 'x'));
-    if (L('t', 'x') == expr) return L('/', 1, L('^', L('c', 'x'), 2));
-    if (L('e', 'x') == expr) return L('e', 'x');
-    if (L('l', 'x') == expr) return L('/', 1, 'x');
+    // Functions with chain rule.  The chain rule usually has g'(x) second, but the tests
+    // seem to want this
+    if (L('s', &a) == expr) return L('*', differentiate(a), L('c', a));
+    if (L('c', &a) == expr) return L('*', differentiate(a), L('*', -1, L('s', a)));
+    if (L('t', &a) == expr) return L('/', differentiate(a), L('^', L('c', a), 2));
+    if (L('e', &a) == expr) return L('*', differentiate(a), L('e', a));
+    if (L('l', &a) == expr) return L('/', differentiate(a), a);
     return expr;
 }
 
@@ -241,6 +236,8 @@ std::string diff(const std::string& s)
 }
 
 #ifdef TEST
+// 1.  Wanted (* -1 (sin x)) instead of (- 0 (sin x)).
+// 2.  Order of parameters is important, e.g. for tan, (* 2 ...) not (* ... 2)
 int main(int argc, const char *argv[])
 {
     // parse
@@ -258,5 +255,13 @@ int main(int argc, const char *argv[])
     // simplification
     assert(parse("42") == simplify(parse("42")));
     assert(parse("42") == simplify(parse("(+ 11 31)")));
+
+    std::cerr << to_s(differentiate(parse("(^ x 2)"))) << std::endl;
+    std::cerr << to_s(simplify(differentiate(parse("(^ x 2)")))) << std::endl;
+    std::cerr << to_s(simplify(simplify(differentiate(parse("(^ x 2)"))))) << std::endl;
+    assert(parse("(* 2 x)") == simplify(differentiate(parse("(^ x 2)"))));
+
+    std::cerr << diff("(^ x 3)") << std::endl;
+    std::cerr << diff(diff("(^ x 3)")) << std::endl;
 }
 #endif
