@@ -180,7 +180,7 @@ template<> struct Operator<'^'> { inline static Number evaluate(Number a, Number
 Value simplify(Value expr);
 
 template<char symbol>
-Value recur_and_evaluate(Value a, Value b)
+Value evaluate_if_possible(Value a, Value b)
 {
     a = simplify(a);
     b = simplify(b);
@@ -194,19 +194,19 @@ Value simplify(Value expr)
     Value a, b;
     if (L('+', 0, &a) == expr)  return simplify(a);
     if (L('+', &a, 0) == expr)  return simplify(a);
-    if (L('+', &a, &b) == expr) return recur_and_evaluate<'+'>(a, b);
+    if (L('+', &a, &b) == expr) return evaluate_if_possible<'+'>(a, b);
     if (L('-', &a, 0) == expr)  return simplify(a);
-    if (L('-', &a, &b) == expr) return recur_and_evaluate<'-'>(a, b);
+    if (L('-', &a, &b) == expr) return evaluate_if_possible<'-'>(a, b);
     if (L('*', 0, &a) == expr)  return {0};
     if (L('*', &a, 0) == expr)  return {0};
     if (L('*', 1, &a) == expr)  return simplify(a);
     if (L('*', &a, 1) == expr)  return simplify(a);
-    if (L('*', &a, &b) == expr) return recur_and_evaluate<'*'>(a, b);
+    if (L('*', &a, &b) == expr) return evaluate_if_possible<'*'>(a, b);
     if (L('/', &a, 1) == expr)  return simplify(a);
-    if (L('/', &a, &b) == expr) return recur_and_evaluate<'/'>(a, b);
+    if (L('/', &a, &b) == expr) return evaluate_if_possible<'/'>(a, b);
     if (L('^', &a, 1) == expr)  return simplify(a);
     if (L('^', &a, 0) == expr)  return {1};
-    if (L('^', &a, &b) == expr) return recur_and_evaluate<'^'>(a, b);
+    if (L('^', &a, &b) == expr) return evaluate_if_possible<'^'>(a, b);
     if (L('s', &a) == expr)     return L('s', simplify(a));
     if (L('c', &a) == expr)     return L('c', simplify(a));
     if (L('t', &a) == expr)     return L('t', simplify(a));
