@@ -5,12 +5,12 @@ import (
 	"sort"
 )
 
-type Coin struct {
+type coin struct {
 	weight int
 	value  int
 }
 
-type Memo struct {
+type memoCell struct {
         possible bool
         value int64
 }
@@ -18,13 +18,13 @@ type Memo struct {
 type PigBank struct {
 	emptyWeight int
 	weight      int
-	coins       []Coin
-	memo        [10001]Memo
+	coins       []coin
+	memo        [10001]memoCell
 }
 
 func (bank *PigBank) ReadCase() {
 	var N int
-	var coins [500]Coin
+	var coins [500]coin
 	fmt.Scanf("%d %d\n%d\n", &bank.emptyWeight, &bank.weight, &N)
 	for n := 0; n < N; n++ {
 		fmt.Scanf("%d %d\n", &coins[n].value, &coins[n].weight)
@@ -36,7 +36,7 @@ func (bank *PigBank) CoinWeight() int {
 	return bank.weight - bank.emptyWeight
 }
 
-type ByWeightThenValue []Coin
+type ByWeightThenValue []coin
 
 func (coins ByWeightThenValue) Len() int {
 	return len(coins)
@@ -67,7 +67,7 @@ func (bank *PigBank) SortCoins() {
 }
 
 func (bank *PigBank) MinimumMoney() (minimum int64, possible bool) {
-        bank.memo[0] = Memo{possible: true, value: 0}
+        bank.memo[0] = memoCell{possible: true, value: 0}
 	for i := 0; i <= bank.CoinWeight(); i++ {
 		for j := range bank.coins {
 			if i+bank.coins[j].weight >= 10001 {
@@ -79,7 +79,7 @@ func (bank *PigBank) MinimumMoney() (minimum int64, possible bool) {
 			newValue := bank.memo[i].value + int64(bank.coins[j].value)
 			memop := &bank.memo[i+bank.coins[j].weight]
 			if !memop.possible || memop.value > newValue {
-        			*memop = Memo{possible: true, value: newValue}
+        			*memop = memoCell{possible: true, value: newValue}
 			}
 		}
 	}
@@ -87,7 +87,7 @@ func (bank *PigBank) MinimumMoney() (minimum int64, possible bool) {
 	return result.value, result.possible
 }
 
-func solveCase() {
+func SolveCase() {
 	var bank PigBank
 	bank.ReadCase()
 	bank.SortCoins()
@@ -103,6 +103,6 @@ func main() {
 	var T int
 	fmt.Scanf("%d", &T)
 	for t := 0; t < T; t++ {
-        	solveCase()
+        	SolveCase()
 	}
 }
