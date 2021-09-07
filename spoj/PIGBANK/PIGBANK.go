@@ -5,6 +5,11 @@ import (
 	"sort"
 )
 
+const (
+        MaximumWeight = 10000
+        MaximumCoins = 500
+)
+
 type coin struct {
 	weight int
 	value  int
@@ -19,12 +24,12 @@ type PigBank struct {
 	emptyWeight int
 	weight      int
 	coins       []coin
-	memo        [10001]memoCell
+	memo        [MaximumWeight + 1]memoCell
 }
 
 func (bank *PigBank) ReadCase() {
 	var N int
-	var coins [500]coin
+	var coins [MaximumCoins]coin
 	fmt.Scanf("%d %d\n%d\n", &bank.emptyWeight, &bank.weight, &N)
 	for n := 0; n < N; n++ {
 		fmt.Scanf("%d %d\n", &coins[n].value, &coins[n].weight)
