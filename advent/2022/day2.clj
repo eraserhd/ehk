@@ -18,15 +18,17 @@
              [:scissors :paper]
              [:paper :rock]})
 
-(defn outcome-score [me them]
+(defn outcome [me them]
   (cond
-   (= me them)       3   ; draw
-   (beats [me them]) 6   ; win
-   :else             0)) ; lose
+   (= me them)       :draw
+   (beats [me them]) :win
+   :else             :lose))
+
+(def outcome-score {:win 6, :draw 3, :lose 0})
 
 (defn round-score [[them me]]
   (+ (shape-score me)
-     (outcome-score me them)))
+     (outcome-score (outcome me them))))
 
 (defn compute [input]
   (->> input
@@ -35,8 +37,29 @@
        (reduce +)))
 
 (comment
-  (= 15 ())
+  (= 15 (compute '[[A Y] [B X] [C Z]]))
 
   result)
-  
+
+(def intended-outcome '{X :lose
+                        Y :draw
+                        Z :win})
+
+(defn play [them intended-outcome]
+  (->> [:rock :paper :scissors]
+       (filter #(= intended-outcome (outcome % them)))
+       first))
+
+(defn compute2 [input]
+  (->> input
+       (map (fn [[them outcome]]
+              [(shapes them) (intended-outcome outcome)]))
+       (map (fn [[them outcome]]
+              [them (play them outcome)]))
+       (map round-score)
+       (reduce +)))
+
+(comment
+  (play :rock :lose)
  
+  (= 12 (compute2 '[[A Y] [B X] [C Z]])))
