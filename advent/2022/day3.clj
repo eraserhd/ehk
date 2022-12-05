@@ -1,6 +1,7 @@
 (ns day3
   (:require
    [clojure.java.io :as io]
+   [clojure.set]
    [clojure.string :as s]))
 
 (defn read-all [path]
@@ -19,29 +20,34 @@
 
 (assert (= [#{\A \B \C} #{\D \E \F}] (parse-rucksack "ABCDEF")))
 
-(defn value [ch]
+(defn priority [ch]
   (if (Character/isUpperCase ch)
     (+ (long ch) (- (long \A)) 27)
     (+ (long ch) (- (long \a)) 1)))
 
-(assert (= 1 (value \a)))
-(assert (= 2 (value \b)))
-(assert (= 27 (value \A)))
-(assert (= 28 (value \B)))
+(defn common-item-priority [item-sets]
+  (priority (first (apply clojure.set/intersection item-sets))))
+
+(assert (= 1 (priority \a)))
+(assert (= 2 (priority \b)))
+(assert (= 27 (priority \A)))
+(assert (= 28 (priority \B)))
 
 (defn solve []
   (->> (read-all "day3.txt")
        (map str)
        (map parse-rucksack)
-       (map (fn [[a b]]
-              (first (clojure.set/intersection a b))))
-       (map value)
+       (map common-item-priority)
+       (reduce +)))
+
+(defn solve2 []
+  (->> (read-all "day3.txt")
+       (map (comp set str))
+       (partition 3)
+       (map common-item-priority)
        (reduce +)))
 
 (comment
  
   (= 8252 (solve))
-  
-  input
-  (some? nil))
-
+  (= 2828 (solve2)))
