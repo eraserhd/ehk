@@ -37,9 +37,8 @@
        (reduce +)))
 
 (comment
-  (= 15 (compute '[[A Y] [B X] [C Z]]))
+  (= 15 (compute '[[A Y] [B X] [C Z]])))
 
-  result)
 
 (def intended-outcome '{X :lose
                         Y :draw
@@ -62,4 +61,6 @@
 (comment
   (play :rock :lose)
  
-  (= 12 (compute2 '[[A Y] [B X] [C Z]])))
+  (= 12 (compute2 '[[A Y] [B X] [C Z]]))
+
+  (compute2 input))
