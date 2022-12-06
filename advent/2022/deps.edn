@@ -1,7 +1,1 @@
-{:paths ["."]
- :deps
- {pyons/aoc-util {:git/url "https://github.com/pyons/aoc-util" :git/tag "v0.2.2" :git/sha "6010da5"}}
- :aliases 
- {:nREPL {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}}
-          :main-opts ["-m" "nrepl.cmdline"
-                      "-p" "31234"]}}}
+{:paths ["."]}
