@@ -17,4 +17,5 @@
 (comment
   (= 10 (solve "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg" 4))
   (= 29 (solve "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg" 14))
-  (= 1361 (solve input)))
+  (= 1361 (solve input 4))
+  (= 3263 (solve input 14)))
