@@ -1,1 +1,2 @@
-{:paths ["."]}
+{:paths ["."]
+ :deps {io.github.nextjournal/clerk {:mvn/version "0.12.707"}}}

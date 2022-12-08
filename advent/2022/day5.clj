@@ -1,7 +1,8 @@
 (ns day5
  (:require
   [clojure.string :as s]
-  [clojure.walk :as w]))
+  [clojure.walk :as w]
+  [nextjournal.clerk :as clerk]))
 
 (defn symbols->keywords [x]
   (w/postwalk (fn [x]
@@ -67,7 +68,7 @@
          (map (comp first second))
          (apply str))))
 
-(comment
+(clerk/example
  (= "VWLCWGSDQ" (solve :CrateMover9000 input))
  (= "TCGLQSLPW" (solve :CrateMover9001 input))
  input)

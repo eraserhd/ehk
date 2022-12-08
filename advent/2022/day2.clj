@@ -1,4 +1,6 @@
-(ns day2)
+(ns day2
+ (:require
+  [nextjournal.clerk :as clerk]))
 
 (def input
   (read-string (slurp "day2.txt")))
@@ -49,6 +51,9 @@
        (filter #(= intended-outcome (outcome % them)))
        first))
 
+(clerk/example
+  (play :rock :lose))
+
 (defn compute2 [input]
   (->> input
        (map (fn [[them outcome]]
@@ -58,9 +63,7 @@
        (map round-score)
        (reduce +)))
 
-(comment
-  (play :rock :lose)
- 
+(clerk/example
   (= 12 (compute2 '[[A Y] [B X] [C Z]]))
 
   (compute2 input))
