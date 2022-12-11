@@ -26,13 +26,8 @@ R 2")
             (repeat n (get directions dir)))
           moves))
 
-(def start
-  {:H [0 0]
-   :T [0 0]
-   :T-seen #{[0 0]}})
-
-(def make-adjacent
-  [])
+(defn start [length]
+  (repeat length {:at [0 0], :seen #{[0 0]}}))
 
 (defn step [from to]
   (cond
@@ -40,24 +35,47 @@ R 2")
    (< from to) (inc from)
    :else       (dec from)))
 
-(defn move-once
-  [{[hi hj] :H, [ti tj] :T, :as state} [di dj]]
-  (let [hi (+ hi di)
-        hj (+ hj dj)
-        adjacent? (and (<= -1 (- hi ti) 1) (<= -1 (- hj tj) 1))
-        [ti tj] (if adjacent?
-                  [ti tj]
-                  [(step ti hi) (step tj hj)])]
-    (-> state
-      (assoc :H [hi hj] :T [ti tj])
-      (update :T-seen conj [ti tj]))))
+(defn fix-tail
+  [[hi hj] tail]
+  (if-not (seq tail)
+    ()
+    (let [[{[ti tj] :at, :as next} & more-tail] tail
+          adjacent? (and (<= -1 (- hi ti) 1) (<= -1 (- hj tj) 1))
+          [ti tj]   (if adjacent?
+                      [ti tj]
+                      [(step ti hi) (step tj hj)])
+          next'     (-> next
+                        (assoc :at [ti tj])
+                        (update :seen conj [ti tj]))]
+      (cons next' (fix-tail [ti tj] more-tail)))))
 
-(defn solve [moves]
-  (let [end-state (reduce
-                    move-once
-                    start
-                    (simplify-moves moves))]
-    (count (:T-seen end-state))))
+(defn move-one-step
+  [[{[hi hj] :at, :as head} & tail] [di dj]]
+  (let [hi    (+ hi di)
+        hj    (+ hj dj)
+        head' (assoc head :at [hi hj])]
+    (cons head' (fix-tail [hi hj] tail))))
 
-(= 13 (solve example-moves))
-(= 6642 (solve moves))
+(defn solve [moves length]
+  (let [end-rope (reduce
+                   move-one-step
+                   (start length)
+                   (simplify-moves moves))]
+    (count (:seen (last end-rope)))))
+
+(= 13 (solve example-moves 2))
+(= 6642 (solve moves 2))
+
+(def larger-example
+  "R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20")
+(def larger-moves (parse-moves larger-example))
+
+(= 36 (solve larger-moves 10))
+(= 2765 (solve moves 10))
