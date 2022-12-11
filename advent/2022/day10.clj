@@ -1,4 +1,6 @@
-(ns day10)
+(ns day10
+ (:require
+  [clojure.string :as s]))
 
 (def example-input "noop
 addx 3
@@ -167,3 +169,18 @@ noop")
 
 (= 13140 (solve larger-input))
 (= 17940 (solve input))
+
+(defn solve2 [input]
+  (->> (parse input)
+       (map #(if (number? %) % 0))
+       (reductions + 1)
+       (map (fn [clock x]
+              (if (<= (dec x) (mod clock 40) (inc x))
+                \#
+                \.))
+            (iterate inc 0))
+       (partition 40)
+       (map (partial apply str))
+       (s/join "\n")))
+
+(solve2 larger-input)
