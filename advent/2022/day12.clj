@@ -35,15 +35,20 @@
                                ffirst)
         end               (->> chars-with-coords
                                (filter (comp #{\E} val))
-                               ffirst)]
-    {:heightmap heightmap
-     :start     start
-     :end       end}))
+                               ffirst)
+        all-lowest        (->> heightmap
+                               (filter (comp zero? val))
+                               (map key))]
+    {:heightmap    heightmap
+     :marked-start [start]
+     :all-lowest   all-lowest
+     :end          end}))
 
-(defn solve [input]
-  (let [{:keys [start end heightmap]} (parse-input input)
-        queue (conj (clojure.lang.PersistentQueue/EMPTY) start)
-        seen  {start 0}]
+(defn shortest-path [input how]
+  (let [{:keys [end heightmap], :as parsed} (parse-input input)
+        starts (parsed how)
+        queue  (into (clojure.lang.PersistentQueue/EMPTY) starts)
+        seen   (reduce #(assoc %1 %2 0) {} starts)]
     (loop [queue queue
            seen  seen]
       (cond
@@ -67,5 +72,8 @@
              seen   (into seen (map (fn [n] [n steps']) next))]
          (recur queue seen))))))
 
-(= 31 (solve example-input))
-(= 420 (solve input))
+(= 31 (shortest-path example-input :marked-start))
+(= 420 (shortest-path input :marked-start))
+
+(= 29 (shortest-path example-input :all-lowest))
+(= 414 (shortest-path input :all-lowest))
