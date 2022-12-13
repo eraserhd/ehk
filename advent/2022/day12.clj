@@ -67,4 +67,5 @@
              seen   (into seen (map (fn [n] [n steps']) next))]
          (recur queue seen))))))
 
-(solve example-input)
+(= 31 (solve example-input))
+(= 420 (solve input))
