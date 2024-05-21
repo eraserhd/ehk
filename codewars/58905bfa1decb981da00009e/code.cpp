@@ -4,17 +4,15 @@
 #include <vector>
 using namespace std;
 
-enum Direction {
+enum Direction
+{
     Up = +1,
     Down = -1,
 };
 
-Direction opposite(Direction dir)
+Direction operator !(Direction dir)
 {
-    switch (dir) {
-    case Direction::Up: return Direction::Down;
-    case Direction::Down: return Direction::Up;
-    }
+    return Direction(-1*dir);
 }
 
 struct Floor {
@@ -29,8 +27,8 @@ struct Floor {
     bool button_pushed(Direction direction) const
     {
         for (auto destination : queue)
-            if ((direction == Direction::Up and destination > number) or
-                (direction == Direction::Down and destination < number))
+            if ((direction == Up and destination > number) or
+                (direction == Down and destination < number))
                 return true;
         return false;
     }
@@ -40,12 +38,12 @@ struct Lift {
     vector<Floor> floors;
     int current_floor;
     Direction direction;
-    int capacity;
+    const int capacity;
     multiset<int> occupants;
 
     Lift(const std::vector<std::vector<int>> &queues, int capacity)
       : current_floor(0)
-      , direction(Direction::Up)
+      , direction(Up)
       , capacity(capacity)
       , occupants{}
     {
@@ -58,8 +56,8 @@ struct Lift {
         auto& q = floors[current_floor].queue;
         for (auto it = q.begin(); occupants.size() < capacity && it != q.end(); ++it)
         {
-            if ((direction == Direction::Up and *it > current_floor) or
-                (direction == Direction::Down and *it < current_floor))
+            if ((direction == Up and *it > current_floor) or
+                (direction == Down and *it < current_floor))
             {
                 occupants.emplace(*it);
                 *it = -1;
@@ -79,12 +77,12 @@ struct Lift {
         int i, end, step;
         switch (dir)
         {
-        case Direction::Up:
+        case Up:
             i = 0;
             end = floors.size();
             step = +1;
             break;
-        case Direction::Down:
+        case Down:
             i = int(floors.size())-1;
             end = -1;
             step = -1;
@@ -104,14 +102,14 @@ struct Lift {
         {
             if (auto button = scan_for_pushed_button(direction, current_floor); button.has_value())
                 return {{button.value(), direction}};
-            if (auto button = scan_for_pushed_button(opposite(direction)); button.has_value())
-                return {{button.value(), opposite(direction)}};
+            if (auto button = scan_for_pushed_button(!direction); button.has_value())
+                return {{button.value(), !direction}};
             if (auto button = scan_for_pushed_button(direction); button.has_value())
                 return {{button.value(), direction}};
             return {};
         }
 
-        int next_occupant_floor = direction == Direction::Up ? *occupants.begin() : *occupants.rbegin();
+        int next_occupant_floor = direction == Up ? *occupants.begin() : *occupants.rbegin();
         for (int i = current_floor + int(direction); i != next_occupant_floor; i += int(direction))
             if (floors[i].button_pushed(direction))
                 return {{i, direction}};
