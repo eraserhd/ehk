@@ -4,20 +4,12 @@ defmodule Point do
   end
 end
 
-defmodule Stone do
-  def read_integer, do: IO.gets("") |> Integer.parse |> elem(0)
+defmodule Points do
+  defp adjust1(v1, v2, :min), do: min(v1,v2)
+  defp adjust1(v1, v2, :max), do: max(v1,v2)
 
-  def repeat(0, _), do: :ok
-  def repeat(n, fun) do
-    fun.()
-    repeat(n-1, fun)
-  end
-
-  def adjust1(v1, v2, :min), do: min(v1,v2)
-  def adjust1(v1, v2, :max), do: max(v1,v2)
-
-  def extra_offset(v, :min), do: v-1
-  def extra_offset(v, :max), do: v+1
+  defp extra_offset(v, :min), do: v-1
+  defp extra_offset(v, :max), do: v+1
 
   def offset([{x, y} | rest] = points, x_adjust, y_adjust) do
     {x_offset, y_offset} = rest |>
@@ -32,10 +24,20 @@ defmodule Stone do
 
     {x_offset, y_offset, adjusted_points}
   end
+end
+
+defmodule Stone do
+  def read_integer, do: IO.gets("") |> Integer.parse |> elem(0)
+
+  def repeat(0, _), do: :ok
+  def repeat(n, fun) do
+    fun.()
+    repeat(n-1, fun)
+  end
 
   def bisect(points, x_adjust, y_adjust) do
     # The algorithm requires 0,0 to be outside of the polygon
-    {x_offset, y_offset, adjusted_points} = offset(points, x_adjust, y_adjust)
+    {x_offset, y_offset, adjusted_points} = Points.offset(points, x_adjust, y_adjust)
 
     # Using the Shoelace formula, modifying the triangle interpretation:
     #
