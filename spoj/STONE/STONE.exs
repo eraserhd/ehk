@@ -126,7 +126,7 @@ defmodule Stone do
     n = read_integer()
     points = IO.stream(:stdio, :line) |> Stream.take(n) |> Stream.map(&parse_point/1) |> Enum.to_list
     {x, y} = solve(points)
-    IO.puts "#{x} #{y}"
+    IO.puts "#{:erlang.float_to_binary(x, decimals: 2)} #{:erlang.float_to_binary(y, decimals: 2)}"
   end
 
   def run do
