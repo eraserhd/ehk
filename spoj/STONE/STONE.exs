@@ -1,9 +1,11 @@
-defmodule Stone do
-  def read_integer, do: IO.gets("") |> Integer.parse |> elem(0)
-
-  def parse_point(p) do
+defmodule Point do
+  def parse(p) do
     String.split(p, " ") |> Enum.map(fn coord -> Integer.parse(coord) |> elem(0) end) |> List.to_tuple
   end
+end
+
+defmodule Stone do
+  def read_integer, do: IO.gets("") |> Integer.parse |> elem(0)
 
   def repeat(0, _), do: :ok
   def repeat(n, fun) do
@@ -94,7 +96,6 @@ defmodule Stone do
           ##
           percent = (total_area/2 - subtotal) / ((a2 - a1)*area_per_radian1)
           angle = a1 + (a2-a1)*percent
-          IO.inspect({angle, percent})
           {:halt, {angle, subtotal + (angle - a1)*area_per_radian1}}
         end
       end)
@@ -118,7 +119,7 @@ defmodule Stone do
 
   def process_case do
     n = read_integer()
-    points = IO.stream(:stdio, :line) |> Stream.take(n) |> Stream.map(&parse_point/1) |> Enum.to_list
+    points = IO.stream(:stdio, :line) |> Stream.take(n) |> Stream.map(&Point.parse/1) |> Enum.to_list
     {x, y} = solve(points)
     IO.puts "#{:erlang.float_to_binary(x, decimals: 2)} #{:erlang.float_to_binary(y, decimals: 2)}"
   end
