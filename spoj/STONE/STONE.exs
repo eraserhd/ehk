@@ -87,10 +87,10 @@ defmodule Stone do
         else
           ## THIS IS WRONG!!
           ##
-          ## It assumes that we can take a percent of the area that we need and then
-          ## take a percent of the angle to get that area... but that doesn't work
-          ## because triangles aren't pie-peice shaped, so the area isn't smoothly
-          ## distributed across the angle.
+          ## It assumes that we can take a percent of the angular travel to get
+          ## an equivalent percent of the area of that part of the shape...
+          ## but that doesn't work because triangles aren't pie-peice shaped, so
+          ## the area isn't smoothly distributed across the angle.
           ##
           ## By this point, we've lost the points, so we can't pythogreate the answer,
           ## and area_per_radian is acutally useless because the whole point of it
