@@ -1,21 +1,3 @@
-defmodule Point do
-end
-
-defmodule Polygon do
-
-  def area(points) do
-    ((points ++ [List.first(points)]) |>
-       Enum.chunk_every(2, 1, :discard) |>
-       Enum.map(fn [{x1, y1}, {x2, y2}] -> x1 * y2 - x2 * y1 end) |>
-       Enum.reduce(0, &+/2)) / 2
-  end
-
-  def min_values([p1 | points]) do
-    Enum.reduce(points, p1, fn {x1, y1}, {x2, y2} -> {min(x1,x2), min(y1,y2)} end)
-  end
-
-end
-
 defmodule Stone do
   def read_integer, do: IO.gets("") |> Integer.parse |> elem(0)
 
