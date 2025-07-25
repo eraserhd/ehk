@@ -81,8 +81,20 @@ defmodule Stone do
         if next_subtotal <= total_area/2 do
           {:cont, {a2, next_subtotal}}
         else
+          ## THIS IS WRONG!!
+          ##
+          ## It assumes that we can take a percent of the area that we need and then
+          ## take a percent of the angle to get that area... but that doesn't work
+          ## because triangles aren't pie-peice shaped, so the area isn't smoothly
+          ## distributed across the angle.
+          ##
+          ## By this point, we've lost the points, so we can't pythogreate the answer,
+          ## and area_per_radian is acutally useless because the whole point of it
+          ## was to do this thing here.
+          ##
           percent = (total_area/2 - subtotal) / ((a2 - a1)*area_per_radian1)
           angle = a1 + (a2-a1)*percent
+          IO.inspect({angle, percent})
           {:halt, {angle, subtotal + (angle - a1)*area_per_radian1}}
         end
       end)
