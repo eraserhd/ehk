@@ -8,6 +8,11 @@
     (flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        dotnetPkgs =
+          (with pkgs.dotnetCorePackages; combinePackages [
+            sdk_8_0
+          ]);
+
         testapp = pkgs.callPackage ./derivation.nix {};
       in {
         packages = {
@@ -22,10 +27,12 @@
         };
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            elixir
-            inotify-tools
+            zlib
+            zlib.dev
+            openssl
+            dotnetPkgs
+            dotnet-sdk
           ];
-
         };
     })) // {
       overlays.default = final: prev: {
