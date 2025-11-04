@@ -11,3 +11,7 @@
 !*/*.nix
 !*/*.lock
 !*/*.cs
+!*/*.csproj
+!*/*.java
+!*/.project
+!*/.settings
