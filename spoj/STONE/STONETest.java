@@ -57,4 +57,12 @@ class STONETest {
 		Arrays.stream(o2points).forEach(p -> assertTrue(p.getY() > 1.0));
 	}
 	
+	@Test
+	void finds_intersection_of_lines() {
+		var p1 = new Point2D.Double(0, 0);
+		var p2 = new Point2D.Double(10, 0);
+		var result = STONE.findIntersection(p1, 0.5, p2, -0.5);
+		assertEquals(new Point2D.Double(5, 2.5), result);
+	}
+	
 }

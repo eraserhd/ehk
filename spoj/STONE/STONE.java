@@ -45,4 +45,17 @@ class STONE {
 				new Point2D.Double(maxX + 100, minY - 100),
 		};
 	}
+	
+	static Point2D.Double findIntersection(final Point2D.Double p1, final double slope1, final Point2D.Double p2, final double slope2) {
+		// y - p1.y1 = slope1*(x - p1.x)
+		// y = slope1*(x - p1.x) + p1.y
+		// slope2*(x - p2.x) + p2.y = slope1*(x - p1.x) + p1.y
+		// slope2*x - slope2*p2.x + p2.y = slope1*x - slope1*p1.x + p1.y
+		// slope2*x - slope1*x = slope2*p2.x - p2.y - slope1*p1.x + p1.y
+		// (slope2 - slope1)*x = ...
+		// x = (slope2*p2.x - p2.y - slope1*p1.x + p1.y)/(slope2 - slope1);
+		final double x = (slope2*p2.x - p2.y - slope1*p1.x + p1.y)/(slope2 - slope1);
+		final double y = slope1*(x - p1.x) + p1.y;
+		return new Point2D.Double(x, y);
+	}
 }
