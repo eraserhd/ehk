@@ -34,9 +34,27 @@ class STONETest {
 			new Point2D.Double(-2, -2),
 		};
 		var origin = new Point2D.Double(5,5);
-		var adjusted = PointUtils.moveOrigin(origin, points);
+		var adjusted = STONE.moveOrigin(origin, points);
 		assertEquals(new Point2D.Double(5,0), adjusted[0]);
 		assertEquals(new Point2D.Double(-1,1), adjusted[1]);
 		assertEquals(new Point2D.Double(-7,-7), adjusted[2]);
 	}
+	
+	@Test
+	void findOrigins_finds_origins_that_place_figure_in_separate_quadrants() {
+		var points = new Point2D.Double[] {
+				new Point2D.Double(10,5),
+				new Point2D.Double(4, 6),
+				new Point2D.Double(-2, -1),
+			};
+		var origins = STONE.findOrigins(points);
+		var o1points = STONE.moveOrigin(origins[0], points);
+	    Arrays.stream(o1points).forEach(p -> assertTrue(p.getX() > 1.0));
+	    Arrays.stream(o1points).forEach(p -> assertTrue(p.getY() > 1.0));
+		
+		var o2points = STONE.moveOrigin(origins[1], points);
+		Arrays.stream(o2points).forEach(p -> assertTrue(p.getX() < -1.0));
+		Arrays.stream(o2points).forEach(p -> assertTrue(p.getY() > 1.0));
+	}
+	
 }
