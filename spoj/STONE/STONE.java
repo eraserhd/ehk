@@ -12,7 +12,7 @@ class Triangle {
 	}
 
 	double signedArea() {
-		return (a.y + b.y) * (a.x - b.x) / 2;
+		return (a.y + b.y) * (a.x - b.x) / 2.0;
 	}
 
 	static Triangle[] fromPoints(Point2D.Double[] points) {
@@ -21,6 +21,27 @@ class Triangle {
 			triangles[i] = new Triangle(points[i], points[(i + 1) % points.length]);
 		}
 		return triangles;
+	}
+	
+	Triangle[] bisect(double slope) {
+		// (A) y = slope*x
+		// (B) (x - a.x) / (b.x - a.x) = (y - a.y)/(b.y - a.y)
+		
+		// (x - a.x) / (b.x - a.x) = (slope*x - a.y)/(b.y - a.y)
+		// (x - a.x)*(b.y - a.y) = (b.x - a.x)*(slope*x - a.y)
+		// x*(b.y - a.y) - a.x*(b.y - a.y) = b.x*(slope*x - a.y) - a.x*(slope*x - a.y)
+		// x*b.y - x*a.y - a.x*b.y - a.x*a.y = b.x*slope*x - b.x*a.y - a.x*slope*x - a.x*a.y
+		// x*b.y - x*a.y -b.x*slope*x + a.x*slope*x = a.x*b.y + a.x*a.y - b.x*a.y - a.x*a.y
+		// x(b.y - a.y - b.x*slope + a.x*slope) = a.x*b.y + a.x*a.y - b.x*a.y - a.x*a.y
+		final double x = (b.x - a.x)*(slope*x)
+		
+		final double y = slope*x;
+		final Point2D.Double middle = new Point2D.Double(x, y);
+		System.out.println("a = "+a+"; b = "+b+"; middle = "+middle);
+		return new Triangle[] {
+				new Triangle(a, middle),
+				new Triangle(middle, b),
+		};
 	}
 }
 
@@ -58,4 +79,16 @@ class STONE {
 		final double y = slope1*(x - p1.x) + p1.y;
 		return new Point2D.Double(x, y);
 	}
+	
+	/*
+	static double areaBisectingSlopeThroughOrigin(Triangle[] triangles) {
+		double left = Math.PI/4;
+		double right = 0.0;
+		while (left > right) {
+			double middle = (left + right)/2.0;
+			
+		
+		}
+		return Math.tan((left + right)/2.0);
+	}*/
 }

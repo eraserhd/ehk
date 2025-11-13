@@ -65,4 +65,26 @@ class STONETest {
 		assertEquals(new Point2D.Double(5, 2.5), result);
 	}
 	
+	@Test
+	void can_bisect_triangle_area_with_slope() {
+		var t = new Triangle(new Point2D.Double(10, 20), new Point2D.Double(20, 10));
+		//assertEquals(9, t.signedArea());
+		var result = t.bisect(1/2);
+		assertEquals(result[0].signedArea(), result[1].signedArea());
+		assertEquals(t.signedArea(), Arrays.stream(result).mapToDouble(Triangle::signedArea).sum());
+	}
+	
+	/*
+	@Test
+	void finds_slope_bisecting_origin() {
+		var triangles = Triangle.fromPoints(new Point2D.Double[] {
+				new Point2D.Double(10, 10),
+				new Point2D.Double(10, 50),
+				new Point2D.Double(50, 50),
+				new Point2D.Double(50, 10),
+		});
+		var slope = STONE.areaBisectingSlopeThroughOrigin(triangles);
+		assertEquals(0.5, slope);
+	}*/
+	
 }
