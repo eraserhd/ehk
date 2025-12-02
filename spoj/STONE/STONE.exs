@@ -2,13 +2,13 @@ defmodule Point do
   defstruct x: 0, y: 0
 
   def left_bottom_origin(ps), do: %Point{
-    x: Enum.min(Enum.map(ps, fn %Point{x: x} -> x end)) - 100,
-    y: Enum.min(Enum.map(ps, fn %Point{y: y} -> y end)) - 100,
+    x: Enum.min(Enum.map(ps, fn %Point{x: x} -> x end)) - 100.0,
+    y: Enum.min(Enum.map(ps, fn %Point{y: y} -> y end)) - 100.0,
   }
 
   def right_bottom_origin(ps), do: %Point{
-    x: Enum.max(Enum.map(ps, fn %Point{x: x} -> x end)) + 100,
-    y: Enum.min(Enum.map(ps, fn %Point{y: y} -> y end)) - 100,
+    x: Enum.max(Enum.map(ps, fn %Point{x: x} -> x end)) + 100.0,
+    y: Enum.min(Enum.map(ps, fn %Point{y: y} -> y end)) - 100.0,
   }
 
   def sub(%Point{x: ax, y: ay}, %Point{x: bx, y: by}), do: %Point{x: ax - bx, y: ay - by}
@@ -23,14 +23,59 @@ defmodule Triangle do
   def signed_area(%__MODULE__{a: %Point{x: ax, y: ay}, b: %Point{x: bx, y: by}}), do: (ay + by)*(ax - bx)/2.0
 
   def from_points(ps), do: Enum.zip(ps, tl(ps) ++ [hd(ps)]) |> Enum.map(fn {a, b} -> %Triangle{a: a, b: b} end)
+
+  def split_at_origin(%Triangle{a: a = %Point{x: x1, y: y1}, b: b = %Point{x: x2, y: y2}}, angle) do
+    a_angle = :math.atan2(y1, x1)
+    b_angle = :math.atan2(y2, x2)
+
+    #NO
+    a_proportion = (angle - b_angle)/(a_angle - b_angle)
+    b_proportion = 1.0 - a_proportion
+
+    midpoint = %Point{
+      x: a_proportion * x1 + b_proportion * x2,
+      y: a_proportion * y1 + b_proportion * y2,
+    }
+
+    {
+      %Triangle{a: a, b: midpoint},
+      %Triangle{a: midpoint, b: b},
+    }
+  end
+
 end
 
 
 defmodule Solution do
 
-  def find_bisecting_angle(ts) do
-    # FIXME:
-    0.0
+  def is_left_to_right(a, b), do: a > b
+
+  def find_bisecting_angle(ts, left \\ :math.pi/2.0, right \\ 0.0)
+  def find_bisecting_angle(_ts, left, right) when left <= right, do: left
+  def find_bisecting_angle(ts, left, right) do
+    middle = (left + right)/2.0
+
+    {left, right} = ts |>
+      Enum.map(fn (t = %Triangle{a: %Point{x: x1, y: y1}, b: %Point{x: x2, y: y2}}) ->
+        a = :math.atan2(y1, x1)
+        b = :math.atan2(y2, x2)
+        cond do
+          is_left_to_right(middle, a) && is_left_to_right(middle, b) ->
+            {0.0, Triangle.signed_area(t)}
+          is_left_to_right(a, middle) && is_left_to_right(b, middle) ->
+            {Triangle.signed_area(t), 0.0}
+          true ->
+            {t1, t2} = Triangle.split_at_origin(t, middle)
+            {Triangle.signed_area(t1), Triangle.signed_area(t2)}
+        end
+      end) |>
+      Enum.reduce({0.0, 0.0}, fn {l1, r1}, {l2, r2} -> {l1+l2, r1+r2} end)
+
+    if abs(left) < abs(right) do
+      find_bisecting_angle(ts, left, middle)
+    else
+      find_bisecting_angle(ts, middle, right)
+    end
   end
 
   def intersection_point(%Point{x: ax, y: ay}, aslope, %Point{x: bx, y: by}, bslope) do
@@ -58,6 +103,11 @@ defmodule Solution do
     rbo_ts = Triangle.from_points(rbo_ps)
     rbo_angle = find_bisecting_angle(rbo_ts)
 
+    IO.inspect(lbo)
+    IO.inspect(lbo_angle)
+    IO.inspect(rbo)
+    IO.inspect(rbo_angle)
+
     intersection_point(lbo, :math.tan(lbo_angle), rbo, :math.tan(rbo_angle))
   end
 
@@ -70,7 +120,10 @@ defmodule Solution do
           [x, y] = IO.read(:line) |>
            String.trim() |>
            String.split(~r/\s+/) |>
-           Enum.map(&String.to_integer/1)
+           Enum.map(fn s ->
+             {v, _} = Float.parse(s)
+             v
+           end)
           %Point{x: x, y: y}
         end)
 
@@ -108,6 +161,16 @@ case System.argv() do
         ] == ts
         assert 20*20 == abs(ts |> Enum.map(&Triangle.signed_area/1) |> Enum.sum())
       end
+
+      test "Can split at origin" do
+        t = %Triangle{a: %Point{x: 3.0, y: 7.0}, b: %Point{x: 7.0, y: 3.0}}
+        {t1, t2} = Triangle.split_at_origin(t, :math.pi / 4.0)
+        assert t.a == t1.a
+        assert t.b == t2.b
+        assert t1.b == t2.a
+        assert t1.b == %Point{x: 10.25, y: 10.249999999999998}
+      end
+
     end
 
     defmodule PointTest do

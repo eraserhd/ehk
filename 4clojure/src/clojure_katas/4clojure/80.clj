@@ -6,9 +6,9 @@
     (->>
       (for [d (range 1 n) :when (= 0 (mod n d))] d)
       (reduce +)
-      (= n)))
+      (= n))))
 
-  )
+  
 
 (comment
   (= (perfect? 6) true)

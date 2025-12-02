@@ -47,9 +47,9 @@
         (or (some
               #(dfs #{%} %)
               ws)
-            false))))
+            false)))))
 
-  )
+  
 
 (comment
   (= true (word-chains #{"hat" "coat" "dog" "cat" "oat" "cot" "hot" "hog"}))
