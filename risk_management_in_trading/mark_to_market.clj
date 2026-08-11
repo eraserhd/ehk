@@ -1,7 +1,6 @@
-(ns mark-to-market)
-
-(defn average [series]
-  (/ (reduce + series) (count series)))
+(ns mark-to-market
+ (:require
+  [financial-mathematics :as m]))
 
 (defn stddev [series]
   (-> (/ (->> series
@@ -18,5 +17,5 @@
 
 (defn sharpe-ratio [prices risk-free-rate periods]
   (let [rates (map #(- % risk-free-rate) (percent-returns prices))]
-    (/ (* periods (average rates))
+    (/ (* periods (m/mean rates))
        (* (Math/sqrt periods) (stddev rates)))))
