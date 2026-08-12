@@ -48,24 +48,36 @@
 <title>Clay</title></head><body data-spy="scroll" data-target="#toc" style="border:;margin:auto;">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script><script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js" type="text/javascript"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" type="text/javascript"></script>
 <div class="container"><div class="row"><div class="col-sm-12"><div><div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(ns financial-mathematics
+ (:require
+  [scicloj.kindly.v4.kind :as kind])
  (:import
-  (org.apache.commons.math3.distribution NormalDistribution)))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn mean [series]
+  (org.apache.commons.math3.distribution NormalDistribution)))</code></pre></div></div><div style="margin:15px;"><h3>Here's some comments.</h3></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn mean [series]
   (/ (reduce + series) (count series)))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn standardized-central-moment
   [order series]
-  (let [center (mean series)]
-    (/ (transduce (map #(Math/pow (- % center) order)) + series)
-       (-&gt; (transduce (map #(Math/pow (- % center) 2)) + series)
-           (Math/pow (/ order 2))))))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def stddev (partial standardized-central-moment 2))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def skewness (partial standardized-central-moment 3))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def kurtosis (partial standardized-central-moment 4))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def test-series
+  (let [center   (mean series)
+        centered (map #(- % center) series)
+        stddev   (-&gt; (transduce (map #(Math/pow % 2)) + centered)
+                     (/ (count centered))
+                     Math/sqrt)]
+    (/ (transduce (map #(Math/pow % order)) + centered)
+       (Math/pow stddev (/ order)))))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def stddev (partial standardized-central-moment 2))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def skewness (partial standardized-central-moment 3))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def kurtosis (partial standardized-central-moment 4))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def test-series
   (let [dist (NormalDistribution. 0.0 1.0)]
     (into []
           (map (fn [_]
                  (.sample dist)))
-          (range 100000))))</code></pre></div></div><div style="margin:15px;"><div><p>The first standardized central moment is always zero</p></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(standardized-central-moment 1 test-series)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">7.132534437702375E-15
-</code></pre></div></div><div style="margin:15px;"><div><p>Should be close to zero</p></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(mean test-series)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">6.410370868635458E-4
-</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(stddev test-series)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">1.0
-</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(skewness test-series)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">1.031477281865256E-5
-</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(kurtosis test-series)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">3.0149512865199266E-5
-</code></pre></div></div><div style="margin:15px;"><div style="background-color:grey;height:2px;width:100%;"></div></div><div style="margin:15px;"><div></div></div></div></div></div></div></div><script type="text/javascript">/*!
+          (range 100000))))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn check [actual passes?]
+  (let [color (if (passes? actual)
+                &quot;green&quot;
+                &quot;red&quot;)]
+    (kind/hiccup
+     [:div {:style {:background-color color}} actual])))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn close-to [goal delta]
+  (fn [actual]
+    (&lt; (Math/abs (- goal actual)) delta)))</code></pre></div></div><div style="margin:15px;"><div><p>The first standardized central moment is always zero</p></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(check (standardized-central-moment 1 test-series)
+       (close-to 0 1e-6))</code></pre></div></div><div style="margin:15px;"><div style="background-color:green;">2.3553244847979615E-12</div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(check (mean test-series)
+       (close-to 0 1e-2))</code></pre></div></div><div style="margin:15px;"><div style="background-color:green;">-9.192797590199823E-4</div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(check (stddev test-series)
+       (close-to 1.0 1e-6))</code></pre></div></div><div style="margin:15px;"><div style="background-color:red;">100135.24022291534</div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(skewness test-series)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">-1000.7537748477608
+</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(check (kurtosis test-series)
+       (close-to 3.0 0.1))</code></pre></div></div><div style="margin:15px;"><div style="background-color:red;">300927.1026641678</div></div><div style="margin:15px;"><div style="background-color:grey;height:2px;width:100%;"></div></div><div style="margin:15px;"><div></div></div></div></div></div></div></div><script type="text/javascript">/*!
   Highlight.js v11.9.0 (git: b7ec4bfafc)
   (c) 2006-2023 undefined and other contributors
   License: BSD-3-Clause
