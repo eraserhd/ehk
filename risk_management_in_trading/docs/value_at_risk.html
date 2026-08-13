@@ -44,12 +44,15 @@
 .clay-side-by-side .sourceCode {margin: 0}
 .clay-side-by-side {margin: 1em 0}
 </style>
-<link href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" rel="stylesheet" type="text/css" />
+<link href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" rel="stylesheet" type="text/css" /><link href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" rel="stylesheet" type="text/css" />
 <title>Clay</title></head><body data-spy="scroll" data-target="#toc" style="border:;margin:auto;">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script><script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js" type="text/javascript"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script><script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js" type="text/javascript"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" type="text/javascript"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" type="text/javascript"></script>
 <div class="container"><div class="row"><div class="col-sm-12"><div><div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(ns value-at-risk
+ (:require
+  [scicloj.kindly.v4.kind :as kind]
+  [scicloj.kindly.v4.api :as kindly])
  (:import
-  (org.apache.commons.math3.distribution NormalDistribution)))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn average [series]
+  (org.apache.commons.math3.distribution NormalDistribution)))</code></pre></div></div><div style="margin:15px;"><div><p>Value at Risk, or VaR or V@R, is a measure of the <em>size</em> of investments. Since it assumes normal distribution (or at least single-modality), it doesn't model events that have causes other than normal market working.</p></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn mean [series]
   (/ (reduce + series) (count series)))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn stddev [series]
   (-&gt; (/ (-&gt;&gt; series
               (map #(Math/pow % 2))
@@ -60,21 +63,36 @@
     (- (/ P_t P_t-1) 1.0)))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(percent-returns [100 107 99 102])</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">(0.07000000000000006 -0.07476635514018692 0.030303030303030054)
 </code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn sharpe-ratio [prices risk-free-rate periods]
   (let [rates (map #(- % risk-free-rate) (percent-returns prices))]
-    (/ (* periods (average rates))
+    (/ (* periods (mean rates))
        (* (Math/sqrt periods) (stddev rates)))))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(sharpe-ratio [100 107 99 102] 0.0001 1)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">0.1364451365064719
-</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn continuously-compounded-returns [prices]
-  (for [[P_t-1 P_t] (partition 2 1 prices)]
-    (Math/log (/ P_t P_t-1))))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(continuously-compounded-returns [100 107 99 102])</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">(0.06765864847381486 -0.07770898432731625 0.029852963149680913)
-</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn volatility [prices periods-per-year]
-  (stddev (continuously-compounded-returns prices)))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(volatility [100 107 99 102] 252)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">0.061934315655923035
-</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn one-day-parametric-var
+</code></pre></div></div><div style="margin:15px;"><div><h2 id="continuously-compounded-returns">Continuously Compounded Returns</h2></div></div><div style="margin:15px;"><div><span><script>katex.render("x_t = \\ln\\left(\\frac{S_t}{S_{t-1}}\\right)", document.currentScript.parentElement, {displayMode: true, throwOnError: false});</script></span></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn continuously-compounded-returns [prices]
+  (for [[S_t-1 S_t] (partition 2 1 prices)]
+    (Math/log (/ S_t S_t-1))))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(continuously-compounded-returns [100 107 99 102])</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">(0.06765864847381486 -0.07770898432731625 0.029852963149680913)
+</code></pre></div></div><div style="margin:15px;"><div><h2 id="volatility-calculation-with-equal-probability">Volatility Calculation with Equal Probability</h2></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn volatility [prices periods-per-year]
+  (* (stddev (continuously-compounded-returns prices))
+     (Math/sqrt periods-per-year)))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(volatility [100 107 99 102] 252)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">0.9831767810792794
+</code></pre></div></div><div style="margin:15px;"><div><h2 id="exponentially-weighted-volatility">Exponentially Weighted Volatility</h2></div></div><div style="margin:15px;"><div><span><script>katex.render("p_t = \\lambda^t", document.currentScript.parentElement, {displayMode: true, throwOnError: false});</script></span></div></div><div style="margin:15px;"><div><span><script>katex.render("\\mu = \\frac{\\sum_t{p_t x_t}}{\\sum_t{p_t}}", document.currentScript.parentElement, {displayMode: true, throwOnError: false});</script></span></div></div><div style="margin:15px;"><div><span><script>katex.render("\\sigma = \\sqrt{\\frac{\\sum_{t}{p_t(x_t - \\mu)^2}}{\\sum_{t}{p_t}}}", document.currentScript.parentElement, {displayMode: true, throwOnError: false});</script></span></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn exponentially-weighted-volatility
+  [λ prices]
+  (let [x (continuously-compounded-returns prices)
+        p (-&gt;&gt; (map #(Math/pow λ %) (range))
+               (take (count x))
+               reverse)
+        μ (/ (reduce + (map * p x))
+             (reduce + p))]
+    (Math/sqrt (/ (reduce + (map (fn [p_t x_t]
+                                   (* p_t (Math/pow (- x_t μ) 2)))
+                                 p
+                                 x))
+                  (reduce + p)))))</code></pre></div></div><div style="margin:15px;"><div><h2 id="parametric">Parametric</h2></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(def ^:private standard-normal (NormalDistribution. 0.0 1.0))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(defn one-day-parametric-var
   &quot;Assumes percent returns are normally distributed, and independent from one period
   to the next (no mean reversion), and every period has the same volatility.&quot;
   [volatility size confidence-level]
-  (* (.inverseCumulativeProbability (NormalDistribution. 0.0 1.0) (- 1.0 0.05))
-     size
-     volatility))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(one-day-parametric-var 0.05 100000.0 0.95)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">8224.268134757363
-</code></pre></div></div><div style="margin:15px;"><div style="background-color:grey;height:2px;width:100%;"></div></div><div style="margin:15px;"><div></div></div></div></div></div></div></div><script type="text/javascript">/*!
+  (- (* (.inverseCumulativeProbability standard-normal (- 1.0 confidence-level))
+        size
+        volatility)))</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(one-day-parametric-var 0.05 100000.0 0.95)</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure printed-clojure">8224.268134757363
+</code></pre></div></div><div style="margin:15px;"><div><pre><code class="sourceCode language-clojure source-clojure bg-light">(comment
+  (* (/ 5.0 (.inverseCumulativeProbability (NormalDistribution. 0.0 1.0) 0.99))
+     (.inverseCumulativeProbability (NormalDistribution. 0.0 1.0) 0.95)))</code></pre></div></div><div style="margin:15px;"><div style="background-color:grey;height:2px;width:100%;"></div></div><div style="margin:15px;"><div></div></div></div></div></div></div></div><script type="text/javascript">/*!
   Highlight.js v11.9.0 (git: b7ec4bfafc)
   (c) 2006-2023 undefined and other contributors
   License: BSD-3-Clause

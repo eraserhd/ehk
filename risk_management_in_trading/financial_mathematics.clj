@@ -1,15 +1,24 @@
 (ns financial-mathematics
  (:require
-  [scicloj.kindly.v4.kind :as kind])
+  [scicloj.kindly.v4.kind :as kind]
+  [scicloj.kindly.v4.api :as kindly])
  (:import
   (org.apache.commons.math3.distribution NormalDistribution)))
 
 ^:kindly/hide-code
-(kind/hiccup
- [:h3 "Here's some comments."])
+(def md (comp kindly/hide-code kind/md))
+^:kindly/hide-code
+(def tex (comp kindly/hide-code kind/tex))
 
 (defn mean [series]
   (/ (reduce + series) (count series)))
+
+(md "## Standardized Central Moments
+
+Per [Wikipedia](https://en.wikipedia.org/wiki/Standardized_moment):
+    ")
+
+(tex "\\alpha_k = \\frac{\\mu_k}{\\sigma^k} = \\frac{E[(X - \\mu)^k]}{E[(X - \\mu)^2]^{k/2}}")
 
 (defn standardized-central-moment
   [order series]
@@ -56,3 +65,11 @@
 
 (check (kurtosis test-series)
        (close-to 3.0 0.1))
+
+(tex "\\frac{\\delta\\left[\\frac{\\delta L}{\\delta t}\\right]}{\\delta t}")
+
+(tex "\\frac{\\left[\\frac{\\delta^2 L}{\\delta t}\\right]}{\\delta t}")
+
+(tex "\\frac{\\delta^2 L}{\\delta t}\\cdot\\frac{1}{\\delta t}")
+
+(tex "\\frac{\\delta^2 L}{\\delta^2 t^2}")
