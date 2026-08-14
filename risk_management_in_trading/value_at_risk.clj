@@ -86,7 +86,7 @@
         size
         volatility)))
 
-(one-day-parametric-var 0.05 100000.0 0.95)
+(parametric-var 0.05 100000.0 0.95)
 
 (comment
   (* (/ 5.0 (.inverseCumulativeProbability (NormalDistribution. 0.0 1.0) 0.99))
