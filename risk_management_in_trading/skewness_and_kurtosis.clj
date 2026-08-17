@@ -11,12 +11,15 @@
 ^:kindly/hide-code
 (def tex (comp kindly/hide-code kind/tex))
 
-(def standard-normal-samples
-  (let [dist (NormalDistribution. 0.0 1.0)]
+
+(defn normal-samples [stddev]
+  (let [dist (NormalDistribution. 0.0 stddev)]
     (into []
           (map (fn [_]
                  (.sample dist)))
           (range 100000))))
+  
+(def standard-normal-samples (normal-samples 1.0))
 
 ^:kindly/hide-code
 (kind/vega-lite
@@ -96,3 +99,23 @@ central moment of order k is:")
 ;; The kurtosis of the standard normal distribution is 3.
 (check (kurtosis standard-normal-samples)
        (close-to 3.0 0.1))
+
+(defn mesokurtic? [samples]
+  (= 3.0 (kurtosis samples)))
+
+(defn platykurtic? [samples]
+  (< (kurtosis samples) 3.0))
+
+
+(defn leptokurtic? [samples]
+  (< 3.0 (kurtosis samples)))
+
+(check (platykurtic? (normal-samples 0.5))
+       true?)
+(check (leptokurtic? (normal-samples 0.5))
+       false?)
+
+(check (platykurtic? (normal-samples 1.5))
+       false?)
+(check (leptokurtic? (normal-samples 1.5))
+       true?)
