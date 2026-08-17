@@ -1,5 +1,6 @@
 (ns skewness-and-kurtosis
  (:require
+  [check :refer [check close-to]]
   [scicloj.kindly.v4.kind :as kind]
   [scicloj.kindly.v4.api :as kindly])
  (:import
@@ -10,23 +11,6 @@
 ^:kindly/hide-code
 (def tex (comp kindly/hide-code kind/tex))
 
-(md "## Checking Utilities")
-
-(defn check [actual passes?]
-  (kind/hiccup 
-   [:div
-    [:span {:style {:color "grey"}} ";=> " (pr-str actual)]
-    [:span {:style {:font-weight "bold"}}
-      " ["
-      (if (passes? actual)
-        [:span {:style {:color "green"}} "PASS"]
-        [:span {:style {:color "red"}} "FAIL"])
-      "]"]]))
-
-(defn close-to [goal delta]
-  (fn [actual]
-    (< (Math/abs (- goal actual)) delta)))
-
 (def test-series
   (let [dist (NormalDistribution. 0.0 1.0)]
     (into []
@@ -36,12 +20,12 @@
 
 (md "## Mean & Standard Deviation")
 
-(md "For samples:")
-
-(tex "\\sigma = \\sqrt{\\frac{1}{N-1}\\sum_{i=1}^{N}{(x_i - \\bar{x}})^2}")
-
 (defn mean [series]
   (/ (reduce + series) (count series)))
+
+(md "Standard deviation for samples:")
+
+(tex "\\sigma = \\sqrt{\\frac{1}{N-1}\\sum_{i=1}^{N}{(x_i - \\bar{x}})^2}")
 
 (defn stddev [samples]
   (let [center   (mean samples)
