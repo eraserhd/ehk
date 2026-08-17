@@ -18,6 +18,18 @@
                  (.sample dist)))
           (range 100000))))
 
+^:kindly/hide-code
+(kind/vega-lite
+ {:data {:values (->> standard-normal-samples
+                      (group-by #(long (Math/round (* % 10.0))))
+                      (map (fn [[bin vals]]
+                             {:bin (/ bin 10.0)
+                              :size (count vals)})))}
+  :mark "point"
+  :encoding
+  {:x {:field "bin" :type "quantitative"}
+   :y {:field "size" :type "quantitative"}}})
+
 (md "## Mean & Standard Deviation")
 
 (defn mean [series]
