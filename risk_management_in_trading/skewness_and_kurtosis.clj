@@ -11,7 +11,7 @@
 ^:kindly/hide-code
 (def tex (comp kindly/hide-code kind/tex))
 
-(def test-series
+(def standard-normal-samples
   (let [dist (NormalDistribution. 0.0 1.0)]
     (into []
           (map (fn [_]
@@ -22,6 +22,9 @@
 
 (defn mean [series]
   (/ (reduce + series) (count series)))
+
+(check (mean standard-normal-samples)
+       (close-to 0 1e-2))
 
 (md "Standard deviation for samples:")
 
@@ -34,10 +37,7 @@
         (/ (dec (count centered)))
         Math/sqrt)))
 
-(check (mean test-series)
-       (close-to 0 1e-2))
-
-(check (stddev test-series)
+(check (stddev standard-normal-samples)
        (close-to 1.0 1e-2))
 
 (md "## Standardized Central Moments
@@ -58,14 +58,14 @@ central moment of order k is:")
 (md "### First Standardized Central Moment")
 
 ;; The first standardized central moment is always zero.
-(check (standardized-central-moment 1 test-series)
+(check (standardized-central-moment 1 standard-normal-samples)
        (close-to 0 1e-6))
 
 (md "### Standard Deviation")
 
 ;; Standard deviation is the second standardized central moment.
-(check (standardized-central-moment 2 test-series)
-       (close-to (stddev test-series) 1e-2))
+(check (standardized-central-moment 2 standard-normal-samples)
+       (close-to (stddev standard-normal-samples) 1e-2))
 
 (md "### Skewness")
 
@@ -73,7 +73,7 @@ central moment of order k is:")
 (def skewness (partial standardized-central-moment 3))
 
 ;; The standard normal distribution has no skew.
-(check (skewness test-series)
+(check (skewness standard-normal-samples)
        (close-to 0 0.1))
 
 (md "### Kurtosis")
@@ -82,5 +82,5 @@ central moment of order k is:")
 (def kurtosis (partial standardized-central-moment 4))
 
 ;; The kurtosis of the standard normal distribution is 3.
-(check (kurtosis test-series)
+(check (kurtosis standard-normal-samples)
        (close-to 3.0 0.1))
