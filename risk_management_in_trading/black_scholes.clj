@@ -10,6 +10,8 @@
 ^:kindly/hide-code
 (def tex (comp kindly/hide-code kind/tex))
 
+(defn √ [^double x]
+  (Math/sqrt x))
 (defn Φ [^double x]
   (.cumulativeProbability (NormalDistribution. 0.0 1.0) x))
 
@@ -26,3 +28,16 @@ better to sell unexpired options than to exercise them).
 (tex "d_1 = \\frac{\\ln{\\left(\\frac S X\\right)} + (b + \\frac 1 2\\sigma^2)T}{\\sigma\\sqrt T}")
 (tex "d_2 = \\frac{\\ln{\\left(\\frac S X\\right)} + (b - \\frac 1 2\\sigma^2)T}{\\sigma\\sqrt T} = d_1 - \\sigma\\sqrt T")
 
+(defn d_1 [S X b T σ]
+  (/ (+ (Math/log (/ S X)) (* (+ b (* 1/2 σ σ)) T))
+     (* σ (√ T))))
+
+(defn d_2 [S X b T σ]
+  (/ (+ (Math/log (/ S X)) (* (- b (* 1/2 σ σ)) T))
+     (* σ (√ T))))
+
+(defn C [S X b r T σ]
+  (let [d_1 (d_1 S X b T σ)
+        d_2 (d_2 S X b T σ)]
+    (- (* S (Math/exp (* (- b r) T)) (Φ d_1))
+       (* X (Math/exp (* (- r) T)) (Φ d_2)))))
