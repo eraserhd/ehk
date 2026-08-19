@@ -1,0 +1,6 @@
+= Hello
+
+== Chapter 8: Greeks
+
+On p.212, equation 8.3 is the same as the previous call option payoff
+equation, even though it says the formula is modified.
