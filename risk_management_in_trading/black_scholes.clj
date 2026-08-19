@@ -48,5 +48,12 @@ better to sell unexpired options than to exercise them).
     (- (* X (Math/exp (- (* r T))) (Φ (- d_2)))
        (* S (Math/exp (* (- b r) T)) (Φ (- d_1))))))
 
+(kind/plotly
+ {:data [{:type :surface
+          :z (for [S (range 95 105)]
+               (for [T (map #(/ % 10.0) (range 100 0 -1))]
+                 (C S 100 0 0.05 T 0.2)))}]
+  :layout {"zaxis" {:title "Value"}}})
+
 (C 115 100 0 0.05 0.01 0.2) ;=> 14.992...
 (P 100 105 0 0.05 0.01 0.2) ;=> 5.000...
