@@ -82,3 +82,9 @@ better to sell unexpired options than to exercise them).
 - \\frac{Se^{(b-r)T}\\varphi(d_1)\\sigma}{2\\sqrt T}
 + (b - r)Se^{(b-r)T}\\Phi(-d_1)
 + rXe^{-rT}\\Phi(-d_2)")
+
+(md "### Vega")
+
+(tex "\\Lambda =
+\\frac{\\partial V}{\\partial\\sigma} =
+Se^{(b-r)T}\\varphi(d_1)\\sqrt T")
