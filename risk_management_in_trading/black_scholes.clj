@@ -68,3 +68,17 @@ better to sell unexpired options than to exercise them).
 (md "### Gamma")
 
 (tex "\\Gamma = \\frac{\\partial^2 V}{{\\partial S}^2} = \\frac{e^{(b-r)T}\\varphi(d_1)}{S\\sigma\\sqrt T}")
+
+(md "### Theta")
+
+(tex "\\Theta_\\text{call} =
+\\frac{\\partial{V_\\text{call}}}{\\partial T} =
+- \\frac{Se^{(b-r)T}\\varphi(d_1)\\sigma}{2\\sqrt T}
+- (b - r)Se^{(b-r)T}\\Phi(d_1)
+- rXe^{-rT}\\Phi(d_2)")
+
+(tex "\\Theta_\\text{put} =
+\\frac{\\partial{V_\\text{put}}}{\\partial T} =
+- \\frac{Se^{(b-r)T}\\varphi(d_1)\\sigma}{2\\sqrt T}
++ (b - r)Se^{(b-r)T}\\Phi(-d_1)
++ rXe^{-rT}\\Phi(-d_2)")
