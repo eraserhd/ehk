@@ -88,3 +88,13 @@ better to sell unexpired options than to exercise them).
 (tex "\\Lambda =
 \\frac{\\partial V}{\\partial\\sigma} =
 Se^{(b-r)T}\\varphi(d_1)\\sqrt T")
+
+(md "### Rho")
+
+(tex "\\rho_\\text{call} = \\frac{\\partial V_\\text{call}}{\\partial r} = TXe^{-rT}\\Phi(d_2)")
+(tex "\\rho_\\text{put} = \\frac{\\partial V_\\text{put}}{\\partial r} = -TXe^{-rT}\\Phi(-d_2)")
+
+(md "### Phi / Rho* / Rho-2")
+
+(tex "\\rho_{2\\text{call}} = \\frac{\\partial V_\\text{call}}{\\partial b} = -TSe^{(b-r)T}\\Phi(d_1)")
+(tex "\\rho_{2\\text{put}} = \\frac{\\partial V_\\text{put}}{\\partial b} = TSe^{(b-r)T}\\Phi(-d_1)")
