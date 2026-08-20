@@ -59,6 +59,10 @@ better to sell unexpired options than to exercise them).
   :layout {"zaxis" {:title "Value"}}})
 
 (md "## Greeks")
+(md "### Delta")
+
+(tex "\\Delta_\\text{call} = e^{(b-r)T}\\Phi(d_1)")
+
 (md "### Gamma")
 
 (tex "\\Gamma = \\frac{\\partial^2 V}{{\\partial S}^2} = \\frac{e^{(b-r)T}\\varphi(d_1)}{S\\sigma\\sqrt T}")
