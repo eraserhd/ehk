@@ -48,6 +48,9 @@ better to sell unexpired options than to exercise them).
     (- (* X (Math/exp (- (* r T))) (Φ (- d_2)))
        (* S (Math/exp (* (- b r) T)) (Φ (- d_1))))))
 
+(C 115 100 0 0.05 0.01 0.2) ;=> 14.992...
+(P 100 105 0 0.05 0.01 0.2) ;=> 5.000...
+
 (kind/plotly
  {:data [{:type :surface
           :z (for [S (range 95 105)]
@@ -55,5 +58,7 @@ better to sell unexpired options than to exercise them).
                  (C S 100 0 0.05 T 0.2)))}]
   :layout {"zaxis" {:title "Value"}}})
 
-(C 115 100 0 0.05 0.01 0.2) ;=> 14.992...
-(P 100 105 0 0.05 0.01 0.2) ;=> 5.000...
+(md "## Greeks")
+(md "### Gamma")
+
+(tex "\\Gamma = \\frac{\\partial^2 V}{{\\partial S}^2} = \\frac{e^{(b-r)T}\\varphi(d_1)}{S\\sigma\\sqrt T}")
