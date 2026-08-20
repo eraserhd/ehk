@@ -62,6 +62,8 @@ better to sell unexpired options than to exercise them).
 (md "### Delta")
 
 (tex "\\Delta_\\text{call} = \\frac{\\partial V_\\text{call}}{\\partial S} = e^{(b-r)T}\\Phi(d_1)")
+(tex "\\Delta_\\text{put} = \\frac{\\partial V_\\text{put}}{\\partial S} = e^{(b-r)T}\\left[\\Phi(d_1)-1\\right]")
+
 
 (md "### Gamma")
 
