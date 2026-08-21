@@ -78,7 +78,19 @@ better to sell unexpired options than to exercise them).
   (tex "= \\frac{\\frac X S\\frac{\\partial}{\\partial S}\\left(\\frac S X\\right)}{\\sigma\\sqrt T}")
   (tex "= \\frac{\\frac X S\\left(\\frac{1\\cdot X - 0\\cdot S}{X^2}\\right)}{\\sigma\\sqrt T}")
   (tex "= \\frac{\\frac 1 S}{\\sigma\\sqrt T}")
-  (tex "= \\frac{1}{S\\sigma\\sqrt T}")])
+  (tex "= \\frac{1}{S\\sigma\\sqrt T}")
+
+  ;; d2 = d1
+  (tex "\\Delta_\\text{call} = \\frac{\\partial V_\\text{call}}{\\partial S}")
+  (tex "= \\frac{\\partial}{\\partial S}\\left[Se^{(b-r)T}\\Phi(d_1) - Xe^{-rT}\\Phi(d_2)\\right]")
+  (tex "= \\frac{\\partial}{\\partial S}\\left[Se^{(b-r)T}\\Phi(d_1)\\right] - \\frac{\\partial}{\\partial S}\\left[Xe^{-rT}\\Phi(d_2)\\right]")
+  (tex "= \\frac{\\partial}{\\partial S}S\\left[e^{(b-r)T}\\Phi(d_1)\\right] + S\\frac{\\partial}{\\partial S}\\left[e^{(b-r)T}\\Phi(d_1)\\right] - \\left(\\frac{\\partial}{\\partial S}X\\left[e^{-rT}\\Phi(d_2)\\right] + X\\frac{\\partial}{\\partial S}\\left[e^{-rT}\\Phi(d_2)\\right]\\right)")
+  (tex "= e^{(b-r)T}\\Phi(d_1) + S\\frac{\\partial}{\\partial S}\\left[e^{(b-r)T}\\Phi(d_1)\\right] - X\\frac{\\partial}{\\partial S}\\left[e^{-rT}\\Phi(d_2)\\right]")
+  (tex "= e^{(b-r)T}\\Phi(d_1) + S\\left(\\frac{\\partial}{\\partial S}\\left[e^{(b-r)T}\\right]\\Phi(d_1) + e^{(b-r)T}\\frac{\\partial}{\\partial S}\\Phi(d_1)\\right)
+   - X\\left(\\frac{\\partial}{\\partial S}\\left[e^{-rT}\\right]\\Phi(d_2) + e^{-rT}\\frac{\\partial}{\\partial S}\\Phi(d_2)\\right)")
+  (tex "= e^{(b-r)T}\\Phi(d_1) + Se^{(b-r)T}\\frac{\\partial}{\\partial S}\\Phi(d_1) - Xe^{-rT}\\frac{\\partial}{\\partial S}\\Phi(d_2)")
+  (tex "= e^{(b-r)T}\\Phi(d_1) + Se^{(b-r)T}\\varphi(d_1)\\frac{\\partial}{\\partial S}d_1 - Xe^{-rT}\\varphi(d_2)\\frac{\\partial}{\\partial S}d_2")
+  (tex "= e^{(b-r)T}\\Phi(d_1) + \\frac{Se^{(b-r)T}\\varphi(d_1)}{S\\sigma\\sqrt T} - \\frac{Xe^{-rT}\\varphi(d_2)}{S\\sigma\\sqrt T}")])
 
 (md "### Gamma")
 
