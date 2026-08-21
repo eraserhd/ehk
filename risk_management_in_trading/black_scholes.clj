@@ -64,6 +64,21 @@ better to sell unexpired options than to exercise them).
 (tex "\\Delta_\\text{call} = \\frac{\\partial V_\\text{call}}{\\partial S} = e^{(b-r)T}\\Phi(d_1)")
 (tex "\\Delta_\\text{put} = \\frac{\\partial V_\\text{put}}{\\partial S} = e^{(b-r)T}\\left[\\Phi(d_1)-1\\right]")
 
+(md "#### Derivation")
+^:kindly/hide-code
+(kind/hiccup
+ [:div {:style {:border "solid black 1px"
+                :width "100%"}}
+  (tex "\\frac{\\partial{d_1}}{\\partial S}")
+  (tex "= \\frac{\\partial}{\\partial S}\\frac{\\ln{\\left(\\frac S X\\right)} + (b + \\frac 1 2\\sigma^2)T}{\\sigma\\sqrt T}")
+  (tex "= \\frac{\\sigma\\sqrt T\\frac{\\partial}{\\partial S}\\left[\\ln{\\left(\\frac S X\\right)} + (b + \\frac 1 2\\sigma^2)T\\right]- \\left[\\ln{\\left(\\frac S X\\right)} + (b + \\frac 1 2\\sigma^2)T\\right]\\frac{\\partial}{\\partial S}(\\sigma\\sqrt T)}
+  {(\\sigma\\sqrt T)^2}")
+  (tex "= \\frac{\\frac{\\partial}{\\partial S}\\left[\\ln{\\left(\\frac S X\\right)} + (b + \\frac 1 2\\sigma^2)T\\right]}{\\sigma\\sqrt T}")
+  (tex "= \\frac{\\frac{\\partial}{\\partial S}\\ln{\\left(\\frac S X\\right)} + \\frac{\\partial}{\\partial S}(b + \\frac 1 2\\sigma^2)T}{\\sigma\\sqrt T}")
+  (tex "= \\frac{\\frac X S\\frac{\\partial}{\\partial S}\\left(\\frac S X\\right)}{\\sigma\\sqrt T}")
+  (tex "= \\frac{\\frac X S\\left(\\frac{1\\cdot X - 0\\cdot S}{X^2}\\right)}{\\sigma\\sqrt T}")
+  (tex "= \\frac{\\frac 1 S}{\\sigma\\sqrt T}")
+  (tex "= \\frac{1}{S\\sigma\\sqrt T}")])
 
 (md "### Gamma")
 
