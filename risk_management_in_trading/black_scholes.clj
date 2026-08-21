@@ -90,7 +90,8 @@ better to sell unexpired options than to exercise them).
    - X\\left(\\frac{\\partial}{\\partial S}\\left[e^{-rT}\\right]\\Phi(d_2) + e^{-rT}\\frac{\\partial}{\\partial S}\\Phi(d_2)\\right)")
   (tex "= e^{(b-r)T}\\Phi(d_1) + Se^{(b-r)T}\\frac{\\partial}{\\partial S}\\Phi(d_1) - Xe^{-rT}\\frac{\\partial}{\\partial S}\\Phi(d_2)")
   (tex "= e^{(b-r)T}\\Phi(d_1) + Se^{(b-r)T}\\varphi(d_1)\\frac{\\partial}{\\partial S}d_1 - Xe^{-rT}\\varphi(d_2)\\frac{\\partial}{\\partial S}d_2")
-  (tex "= e^{(b-r)T}\\Phi(d_1) + \\frac{Se^{(b-r)T}\\varphi(d_1)}{S\\sigma\\sqrt T} - \\frac{Xe^{-rT}\\varphi(d_2)}{S\\sigma\\sqrt T}")])
+  (tex "= e^{(b-r)T}\\Phi(d_1) + \\frac{Se^{(b-r)T}\\varphi(d_1)}{S\\sigma\\sqrt T} - \\frac{Xe^{-rT}\\varphi(d_2)}{S\\sigma\\sqrt T}")
+  (tex "= e^{(b-r)T}\\Phi(d_1) + \\frac{1}{S\\sigma\\sqrt T}\\left[Se^{(b-r)T}\\varphi(d_1) - Xe^{-rT}\\varphi(d_2)\\right]")])
 
 (md "### Gamma")
 
